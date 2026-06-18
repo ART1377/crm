@@ -1,0 +1,58 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  
+  businessName   String
+  contactPerson  String?
+  phoneNumber    String
+  secondaryPhone String?
+  industry       String
+  source         String     @default("DIRECT")
+  status         String     @default("NEW")
+  notes          String?
+  
+  activities     Activity[]
+  tasks          Task[]
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      String
+  summary   String
+  detail    String?
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  leadId      String
+  lead        Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  title       String
+  dueDate     DateTime
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt  // این خط رو عوض کن
+}
