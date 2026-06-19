@@ -59,6 +59,24 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Check for duplicate phone number
+    const existing = await prisma.lead.findFirst({
+      where: {
+        OR: [
+          { phoneNumber: body.phoneNumber },
+          { businessName: body.businessName },
+        ],
+      },
+    });
+
+    if (existing) {
+      const field = existing.phoneNumber === body.phoneNumber ? "شماره تماس" : "نام کسب‌وکار";
+      return NextResponse.json(
+        { error: `${field} قبلاً ثبت شده است (${existing.businessName})` },
+        { status: 409 }
+      );
+    }
+
     const lead = await prisma.lead.create({
       data: {
         businessName: body.businessName,
@@ -66,7 +84,7 @@ export async function POST(request: NextRequest) {
         phoneNumber: body.phoneNumber,
         secondaryPhone: body.secondaryPhone || null,
         industry: body.industry,
-        source: body.source || "DIRECT",
+        source: body.source || null,
         notes: body.notes || null,
         status: "NEW",
       },
