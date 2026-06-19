@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
-import { useUpdateTask } from "@/hooks/use-tasks";
+import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { tasksService } from "@/services/tasks.service";
 import { formatDate } from "@/lib/utils";
@@ -11,6 +11,7 @@ import type { Task } from "@/types";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 
 interface TaskSidebarProps {
   tasks: Task[];
@@ -19,16 +20,9 @@ interface TaskSidebarProps {
 
 export function TaskSidebar({ tasks, leadId }: TaskSidebarProps) {
   const updateTask = useUpdateTask();
-  const queryClient = useQueryClient();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const deleteTask = useMutation({
-    mutationFn: (taskId: string) => tasksService.delete(taskId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads", leadId] });
-      toast.success("پیگیری حذف شد");
-    },
-  });
+  const deleteTask = useDeleteTask(leadId);
 
   const handleToggle = (taskId: string, isCompleted: boolean) => {
     updateTask.mutate({ taskId, data: { isCompleted: !isCompleted } });

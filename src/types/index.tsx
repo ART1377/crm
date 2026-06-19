@@ -1,13 +1,16 @@
 // src/types/index.ts
 
+// src/types/index.ts
 export type LeadStatus =
   | "NEW"
+  | "CALLED"
+  | "MESSAGED"
   | "CONTACTED"
   | "FOLLOW_UP"
-  | "NEGOTIATION"
   | "CUSTOMER"
   | "NOT_INTERESTED"
   | "INVALID";
+
 export type LeadSource =
   | "IRAN_SITE"
   | "NIAZ_ROOZ"
@@ -113,9 +116,9 @@ export interface UpdateTaskData {
 }
 
 export interface Messenger {
-  id: string
-  name: string
-  key: string
-  linkTemplate: string
-  isActive: boolean
+  id: string;
+  name: string;
+  key: string;
+  linkTemplate: string;
+  isActive: boolean;
 }

@@ -11,6 +11,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { replaceTemplateVars } from "@/lib/utils";
 import { useState } from "react";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { useCopyToClipboard } from "@/hooks/use-copy";
 
 const PURPOSE_LABELS: Record<string, string> = {
   INITIAL: "معرفی",
@@ -23,12 +24,7 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
   const deleteTemplate = useDeleteTemplate();
   const { data: settings = {} } = useSettings();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const handleCopy = () => {
-    // Copy raw template — users on templates page want the template itself
-    navigator.clipboard.writeText(preview);
-    toast.success("متن قالب کپی شد");
-  };
+  const { copy, copied } = useCopyToClipboard();
 
   // Preview with placeholder values
   const preview = replaceTemplateVars(template.content, {
@@ -38,6 +34,8 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
     companyName: "شرکت نمونه",
     contactPerson: "آقای نمونه",
   });
+
+  const handleCopy = () => copy(preview, "متن قالب کپی شد");
 
   return (
     <Card className="group hover:shadow-md transition-shadow">
@@ -61,7 +59,7 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
             onClick={handleCopy}
           >
             <Copy className="ml-2 h-4 w-4" />
-            کپی قالب
+            {copied ? "کپی شد" : "کپی قالب"}
           </Button>
           <Button
             variant="ghost"

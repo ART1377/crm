@@ -4,6 +4,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { useLeads, useDeleteLead } from "@/hooks/use-leads";
 import type { LeadFilters } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
+import { leadsService } from "@/services/leads.service";
 
 const DEFAULT_FILTERS = { status: "", search: "" };
 
@@ -23,13 +24,14 @@ export function useLeadsPage() {
     [filters.status, debouncedSearch],
   );
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useLeads(queryFilters);
+  const exportAllLeads = useCallback(async () => {
+    // Fetch all filtered leads without pagination
+    const result = await leadsService.getAll({ ...queryFilters, limit: 9999 });
+    return result.leads;
+  }, [queryFilters]);
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useLeads(queryFilters);
 
   const deleteLead = useDeleteLead();
 
@@ -80,5 +82,6 @@ export function useLeadsPage() {
     handleDelete,
     openDeleteDialog: setDeleteId,
     closeDeleteDialog: () => setDeleteId(null),
+    exportAllLeads,
   };
 }

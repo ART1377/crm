@@ -7,18 +7,21 @@ import {
   Hash,
   Copy,
   PhoneCall,
+  Check,
 } from "lucide-react";
 import { InfoItem } from "./info-item";
-import { LEAD_SOURCES } from "@/lib/constants";
 import type { Lead } from "@/types";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import { useCopyToClipboard } from "@/hooks/use-copy";
 
 interface LeadInfoProps {
   lead: Lead;
 }
 
 export function LeadInfo({ lead }: LeadInfoProps) {
+  const { copy, copied: primaryCopied } = useCopyToClipboard();
+  const { copy: copySecondary, copied: secondaryCopied } = useCopyToClipboard();
+
   return (
     <Card>
       <CardHeader>
@@ -36,14 +39,6 @@ export function LeadInfo({ lead }: LeadInfoProps) {
           />
           <InfoItem icon={Tag} label="صنعت" value={lead.industry} />
         </div>
-        <InfoItem
-          icon={Hash}
-          label="منبع"
-          value={
-            LEAD_SOURCES.find((s) => s.value === lead.source)?.label ||
-            lead.source
-          }
-        />
 
         {lead.notes && (
           <div className="pt-4 border-t">
@@ -51,6 +46,7 @@ export function LeadInfo({ lead }: LeadInfoProps) {
             <p className="text-sm text-muted-foreground">{lead.notes}</p>
           </div>
         )}
+
         {/* Phone numbers section */}
         <div className="bg-muted/50 rounded-lg p-4 space-y-3">
           {/* Primary */}
@@ -69,30 +65,24 @@ export function LeadInfo({ lead }: LeadInfoProps) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => {
-                  navigator.clipboard.writeText(lead.phoneNumber);
-                  toast.success("شماره کپی شد");
-                }}
+                onClick={() => copy(lead.phoneNumber, "شماره کپی شد")}
               >
-                <Copy className="h-4 w-4" />
+                {primaryCopied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-green-600"
-                asChild
+              <a
+                href={`tel:${lead.phoneNumber}`}
+                className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200"
               >
-                <a
-                  href={`tel:${lead.phoneNumber}`}
-                  className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200 hover:text-green-600"
-                >
-                  <PhoneCall className="h-4 w-4" />
-                </a>
-              </Button>
+                <PhoneCall className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
-          {/* Secondary — same style */}
+          {/* Secondary */}
           {lead.secondaryPhone && (
             <div className="flex items-center justify-between pt-3 border-t border-border/50">
               <div>
@@ -109,26 +99,22 @@ export function LeadInfo({ lead }: LeadInfoProps) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => {
-                    navigator.clipboard.writeText(lead.secondaryPhone!);
-                    toast.success("شماره کپی شد");
-                  }}
+                  onClick={() =>
+                    copySecondary(lead.secondaryPhone!, "شماره کپی شد")
+                  }
                 >
-                  <Copy className="h-4 w-4" />
+                  {secondaryCopied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-green-600"
-                  asChild
+                <a
+                  href={`tel:${lead.secondaryPhone}`}
+                  className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200"
                 >
-                  <a
-                    href={`tel:${lead.phoneNumber}`}
-                    className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200 hover:text-green-600"
-                  >
-                    <PhoneCall className="h-4 w-4" />
-                  </a>
-                </Button>
+                  <PhoneCall className="h-4 w-4" />
+                </a>
               </div>
             </div>
           )}

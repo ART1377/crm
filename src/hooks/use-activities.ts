@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { activitiesService } from "@/services/activities.service";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
+import apiClient from "@/config/axios";
 import toast from "react-hot-toast";
 import type { CreateActivityData } from "@/types";
 
@@ -15,6 +16,22 @@ export function useCreateActivity(leadId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
       toast.success("فعالیت ثبت شد");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useDeleteActivity(leadId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (activityId: string) =>
+      apiClient.delete(`/activities/${activityId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
+      toast.success("فعالیت حذف شد");
     },
     onError: (error: Error) => {
       toast.error(error.message);

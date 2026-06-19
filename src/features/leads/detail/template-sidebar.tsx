@@ -17,6 +17,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { useMessengers } from "@/hooks/use-messengers";
 import { getMessengerLink, replaceTemplateVars } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { useCopyToClipboard } from "@/hooks/use-copy";
 
 interface TemplateSidebarProps {
   phone: string;
@@ -33,6 +34,7 @@ export function TemplateSidebar({
   const { data: settings = {} } = useSettings();
   const { data: messengers = [] } = useMessengers();
   const [selectedMessengerId, setSelectedMessengerId] = useState("");
+  const { copy } = useCopyToClipboard();
 
   const activeMessengers = messengers.filter((m) => m.isActive);
 
@@ -49,10 +51,8 @@ export function TemplateSidebar({
       contactPerson,
     });
 
-  const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(getMessage(content));
-    toast.success("متن پیام کپی شد");
-  };
+  const handleCopy = (content: string) =>
+    copy(getMessage(content), "متن پیام کپی شد");
 
   const handleSend = (content: string) => {
     if (!selectedMessenger) {

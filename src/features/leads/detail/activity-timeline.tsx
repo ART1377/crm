@@ -10,6 +10,8 @@ import type { Activity } from "@/types";
 import toast from "react-hot-toast";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 import { useState } from "react";
+import { LEADS_QUERY_KEY } from "@/lib/query-keys";
+import { useDeleteActivity } from "@/hooks/use-activities";
 
 interface ActivityTimelineProps {
   activities: Activity[];
@@ -27,16 +29,8 @@ export function ActivityTimeline({
   activities,
   leadId,
 }: ActivityTimelineProps) {
-  const queryClient = useQueryClient();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-
-  const deleteActivity = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/activities/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads", leadId] });
-      toast.success("فعالیت حذف شد");
-    },
-  });
+  const deleteActivity = useDeleteActivity(leadId);
 
   return (
     <Card>

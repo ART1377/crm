@@ -5,235 +5,226 @@ const prisma = new PrismaClient();
 async function main() {
   // Add in prisma/seed.ts before "✅ Seed completed"
 
-await prisma.listOption.deleteMany();
+  await prisma.listOption.deleteMany();
 
-const listOptions = [
-  // Sources
-  { type: "SOURCE", value: "ایران سایت" },
-  { type: "SOURCE", value: "نیاز روز" },
-  { type: "SOURCE", value: "کتاب اول" },
-  { type: "SOURCE", value: "اینستاگرام" },
-  { type: "SOURCE", value: "سایر دایرکتوری‌ها" },
-  { type: "SOURCE", value: "مستقیم" },
-  { type: "SOURCE", value: "معرفی دوستان" },
-  { type: "SOURCE", value: "نمایشگاه" },
-  { type: "SOURCE", value: "تبلیغات پیامکی" },
-  // Industries
-  { type: "INDUSTRY", value: "آهن‌آلات" },
-  { type: "INDUSTRY", value: "فولاد" },
-  { type: "INDUSTRY", value: "پلیمر" },
-  { type: "INDUSTRY", value: "پتروشیمی" },
-  { type: "INDUSTRY", value: "الکترونیک" },
-  { type: "INDUSTRY", value: "مواد غذایی" },
-  { type: "INDUSTRY", value: "ساختمانی" },
-  { type: "INDUSTRY", value: "سیمان" },
-  { type: "INDUSTRY", value: "کاشی و سرامیک" },
-  { type: "INDUSTRY", value: "چوب" },
-  { type: "INDUSTRY", value: "نساجی" },
-  { type: "INDUSTRY", value: "پوشاک" },
-  { type: "INDUSTRY", value: "خودرو" },
-  { type: "INDUSTRY", value: "دارویی" },
-  { type: "INDUSTRY", value: "شیمیایی" },
-  { type: "INDUSTRY", value: "بسته‌بندی" },
-  { type: "INDUSTRY", value: "حمل و نقل" },
-  { type: "INDUSTRY", value: "بازرگانی" },
-  { type: "INDUSTRY", value: "کشاورزی" },
-  { type: "INDUSTRY", value: "لوازم خانگی" },
-];
+  const listOptions = [
+    // Sources
+    { type: "SOURCE", value: "ایران سایت" },
+    { type: "SOURCE", value: "نیاز روز" },
+    { type: "SOURCE", value: "کتاب اول" },
+    { type: "SOURCE", value: "اینستاگرام" },
+    { type: "SOURCE", value: "سایر دایرکتوری‌ها" },
+    { type: "SOURCE", value: "مستقیم" },
+    { type: "SOURCE", value: "معرفی دوستان" },
+    { type: "SOURCE", value: "نمایشگاه" },
+    { type: "SOURCE", value: "تبلیغات پیامکی" },
+    // Industries
+    { type: "INDUSTRY", value: "آهن‌آلات" },
+    { type: "INDUSTRY", value: "فولاد" },
+    { type: "INDUSTRY", value: "پلیمر" },
+    { type: "INDUSTRY", value: "پتروشیمی" },
+    { type: "INDUSTRY", value: "الکترونیک" },
+    { type: "INDUSTRY", value: "مواد غذایی" },
+    { type: "INDUSTRY", value: "ساختمانی" },
+    { type: "INDUSTRY", value: "سیمان" },
+    { type: "INDUSTRY", value: "کاشی و سرامیک" },
+    { type: "INDUSTRY", value: "چوب" },
+    { type: "INDUSTRY", value: "نساجی" },
+    { type: "INDUSTRY", value: "پوشاک" },
+    { type: "INDUSTRY", value: "خودرو" },
+    { type: "INDUSTRY", value: "دارویی" },
+    { type: "INDUSTRY", value: "شیمیایی" },
+    { type: "INDUSTRY", value: "بسته‌بندی" },
+    { type: "INDUSTRY", value: "حمل و نقل" },
+    { type: "INDUSTRY", value: "بازرگانی" },
+    { type: "INDUSTRY", value: "کشاورزی" },
+    { type: "INDUSTRY", value: "لوازم خانگی" },
+  ];
 
-for (const opt of listOptions) {
-  await prisma.listOption.create({ data: opt });
-}
+  for (const opt of listOptions) {
+    await prisma.listOption.create({ data: opt });
+  }
 
-console.log(`✅ ${listOptions.length} list options seeded`);
+  console.log(`✅ ${listOptions.length} list options seeded`);
 
   await prisma.lead.deleteMany();
-  const sampleLeads = [
+
+  const realLeads = [
     {
-      businessName: "آهن‌آلات فلاحی",
-      contactPerson: "آقای فلاحی",
-      phoneNumber: "09121234567",
-      secondaryPhone: "02112345678",
-      industry: "آهن‌آلات",
-      source: "IRAN_SITE",
-      status: "NEW",
-      notes: "نیاز به فاکتور رسمی برای بار هفتگی دارد",
+      businessName: "آهن آلات فولاد میلگرد امیر",
+      phoneNumber: "09131570030",
+      status: "CALLED",
     },
     {
-      businessName: "پلیمر پاسارگاد",
-      contactPerson: "خانم محمدی",
-      phoneNumber: "09131234567",
-      industry: "پلیمر",
-      source: "NIAZ_ROOZ",
+      businessName: "آهن آلات راغبی",
+      phoneNumber: "09113417782",
       status: "CONTACTED",
     },
     {
-      businessName: "الکترونیک سامان",
-      contactPerson: "آقای سامانی",
-      phoneNumber: "09141234567",
-      secondaryPhone: "09141234568",
-      industry: "الکترونیک",
-      source: "INSTAGRAM",
-      status: "FOLLOW_UP",
-      notes: "پاسخگو نبود - پیگیری مجدد هفته بعد",
-    },
-    {
-      businessName: "مواد غذایی تبریز",
-      contactPerson: null,
-      phoneNumber: "09151234567",
-      industry: "مواد غذایی",
-      source: "KETAB_AVAL",
-      status: "NEGOTIATION",
-    },
-    {
-      businessName: "چوب و الوار شمال",
-      contactPerson: "مهندس رضایی",
-      phoneNumber: "09161234567",
-      industry: "چوب",
-      source: "DIRECT",
-      status: "CUSTOMER",
-      notes: "مشتری دائمی - هر ماه فاکتور می‌خواهد",
-    },
-    {
-      businessName: "شرکت ساختمانی مهراز",
-      contactPerson: "آقای احمدی",
-      phoneNumber: "09171234567",
-      secondaryPhone: "02198765432",
-      industry: "ساختمانی",
-      source: "OTHER_DIRECTORY",
-      status: "NOT_INTERESTED",
-    },
-    {
-      businessName: "فولاد مبارکه اصفهان",
-      contactPerson: "آقای هاشمی",
-      phoneNumber: "09181234567",
-      industry: "فولاد",
-      source: "IRAN_SITE",
-      status: "NEW",
-    },
-    {
-      businessName: "نساجی کاشان",
-      contactPerson: null,
-      phoneNumber: "09191234567",
-      industry: "نساجی",
-      source: "NIAZ_ROOZ",
-      status: "INVALID",
-      notes: "شماره اشتباه - شخص دیگری پاسخ داد",
-    },
-    {
-      businessName: "پتروشیمی خلیج فارس",
-      contactPerson: "دکتر امینی",
-      phoneNumber: "09201234567",
-      secondaryPhone: "09201234568",
-      industry: "پتروشیمی",
-      source: "DIRECT",
-      status: "NEGOTIATION",
-      notes: "درخواست نمونه فاکتور داده شد",
-    },
-    {
-      businessName: "بازرگانی تهران",
-      contactPerson: "آقای کریمی",
-      phoneNumber: "09211234567",
-      industry: "بازرگانی",
-      source: "INSTAGRAM",
+      businessName: "آهن آلات حقیقتیان",
+      phoneNumber: "09171163825",
       status: "CONTACTED",
     },
     {
-      businessName: "سیمان فارس",
-      contactPerson: "مهندس شیرازی",
-      phoneNumber: "09221234567",
-      industry: "سیمان",
-      source: "KETAB_AVAL",
-      status: "FOLLOW_UP",
-      notes: "پیگیری مجدد سه‌شنبه",
-    },
-    {
-      businessName: "خودروسازی البرز",
-      contactPerson: null,
-      phoneNumber: "09231234567",
-      secondaryPhone: "02612345678",
-      industry: "خودرو",
-      source: "IRAN_SITE",
-      status: "NEW",
-    },
-    {
-      businessName: "کاشی و سرامیک یزد",
-      contactPerson: "آقای یزدی",
-      phoneNumber: "09241234567",
-      industry: "کاشی",
-      source: "NIAZ_ROOZ",
-      status: "CUSTOMER",
-      notes: "هر دو هفته یکبار فاکتور می‌خواهد",
-    },
-    {
-      businessName: "داروسازی تهران",
-      contactPerson: "دکتر موسوی",
-      phoneNumber: "09251234567",
-      secondaryPhone: "02155667788",
-      industry: "دارویی",
-      source: "OTHER_DIRECTORY",
-      status: "NEGOTIATION",
-    },
-    {
-      businessName: "صنایع بسته‌بندی نوین",
-      contactPerson: "خانم رضوی",
-      phoneNumber: "09261234567",
-      industry: "بسته‌بندی",
-      source: "DIRECT",
+      businessName: "آهن آلات میرمحمدی",
+      phoneNumber: "09127147627",
       status: "CONTACTED",
     },
     {
-      businessName: "شرکت حمل و نقل پارس",
-      contactPerson: "آقای پارسا",
-      phoneNumber: "09271234567",
-      industry: "حمل و نقل",
-      source: "INSTAGRAM",
-      status: "NEW",
+      businessName: "آهن آلات عرب پور",
+      phoneNumber: "09123958084",
+      status: "CONTACTED",
     },
     {
-      businessName: "تولیدی پوشاک نفیس",
-      contactPerson: null,
-      phoneNumber: "09281234567",
-      industry: "پوشاک",
-      source: "KETAB_AVAL",
-      status: "FOLLOW_UP",
-      notes: "صاحب کار در سفر - هفته بعد تماس",
+      businessName: "آهن آلات گودرزی",
+      phoneNumber: "09166629240",
+      secondaryPhone: "09393620091",
+      status: "MESSAGED",
     },
     {
-      businessName: "مواد شیمیایی اکسیر",
-      contactPerson: "مهندس جعفری",
-      phoneNumber: "09291234567",
-      secondaryPhone: "09291234568",
-      industry: "شیمیایی",
-      source: "IRAN_SITE",
-      status: "CUSTOMER",
+      businessName: "آهن آلات تسلیمی",
+      phoneNumber: "09130000861",
+      secondaryPhone: "09131184430",
+      status: "CONTACTED",
     },
     {
-      businessName: "لوازم خانگی الماس",
-      contactPerson: "آقای الماسی",
-      phoneNumber: "09301234567",
-      industry: "لوازم خانگی",
-      source: "NIAZ_ROOZ",
-      status: "NOT_INTERESTED",
-      notes: "قیمت‌ها براش بالا بود",
+      businessName: "آهن صد",
+      phoneNumber: "03185100",
+      secondaryPhone: "03134094",
+      status: "CALLED",
     },
     {
-      businessName: "کشت و صنعت خراسان",
-      contactPerson: "دکتر خراسانی",
-      phoneNumber: "09311234567",
-      secondaryPhone: "05112345678",
-      industry: "کشاورزی",
-      source: "DIRECT",
-      status: "NEGOTIATION",
-      notes: "در انتظار تایید نهایی از طرف مدیریت",
+      businessName: "آهن نوین پارس",
+      phoneNumber: "05191002002",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات امینی",
+      phoneNumber: "09129537411",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات میلاد",
+      phoneNumber: "09177057718",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات امینی",
+      phoneNumber: "09113279972",
+      secondaryPhone: "09112004902",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات دپو",
+      phoneNumber: "02155511555",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "پروفیل یادگاری",
+      phoneNumber: "09182210400",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات آهن یاب",
+      phoneNumber: "03136004000",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات ضامن",
+      phoneNumber: "09123231679",
+      secondaryPhone: "02155449831",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات پارسیان",
+      phoneNumber: "09131170841",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات پاشا",
+      phoneNumber: "09155507004",
+      secondaryPhone: "09155507003",
+      status: "MESSAGED",
+    },
+    {
+      businessName: "آهن آلات برمکی",
+      phoneNumber: "09141780773",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات فتحعلیان",
+      phoneNumber: "09124313426",
+      secondaryPhone: "09127542035",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات حیدرلکی",
+      phoneNumber: "09126364812",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات فولادوند",
+      phoneNumber: "09166643390",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات عزیزی",
+      phoneNumber: "09141468948",
+      secondaryPhone: "09144650351",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات ایران برش",
+      phoneNumber: "09124000228",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات صادقی",
+      phoneNumber: "09124800037",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات عطا",
+      phoneNumber: "09125790109",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات مسلمان",
+      phoneNumber: "09127506858",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات صبا",
+      phoneNumber: "09120435855",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات سرو",
+      phoneNumber: "05136904567",
+      status: "CONTACTED",
+    },
+    {
+      businessName: "آهن آلات خدائی",
+      phoneNumber: "09127692411",
+      secondaryPhone: "09127664428",
+      status: "CONTACTED",
     },
   ];
 
-  for (const lead of sampleLeads) {
-    await prisma.lead.create({ data: lead });
+  for (const lead of realLeads) {
+    await prisma.lead.create({
+      data: {
+        businessName: lead.businessName,
+        phoneNumber: lead.phoneNumber,
+        secondaryPhone: lead.secondaryPhone || null,
+        industry: "آهن‌آلات",
+        source: "INSTAGRAM",
+        status: lead.status,
+      },
+    });
   }
 
-  console.log("✅ 20 sample leads created");
+  console.log(`✅ ${realLeads.length} real leads created`);
   // prisma/seed.ts — add before templates
   await prisma.messenger.deleteMany();
 

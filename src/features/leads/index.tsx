@@ -6,12 +6,13 @@ import { useLeadsPage } from "./hooks/use-leads-page";
 import { LeadsPageSkeleton } from "./skeleton";
 import { LeadsFilters } from "./filters";
 import { DeleteLeadDialog } from "./delete-dialog";
-import { LeadsTable } from "./table";
+import { LeadsTable, exportToCsv } from "./table";
 import { LeadsEmptyState } from "./empty";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { PageHeader } from "@/components/shared/page-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useUpdateLead } from "@/hooks/use-leads";
 
 export function LeadsPage() {
   const {
@@ -28,7 +29,20 @@ export function LeadsPage() {
     handleDelete,
     openDeleteDialog,
     closeDeleteDialog,
+    exportAllLeads,
   } = useLeadsPage();
+
+  const handleExportAll = async () => {
+    const allLeads = await exportAllLeads();
+    exportToCsv(allLeads);
+  };
+
+  const updateLead = useUpdateLead();
+  // ...
+
+  const handleStatusChange = (id: string, status: string) => {
+    updateLead.mutate({ id, data: { status } });
+  };
 
   if (isLoading) return <LeadsPageSkeleton />;
 
@@ -60,7 +74,13 @@ export function LeadsPage() {
             <LeadsEmptyState hasFilters={hasFilters} />
           ) : (
             <>
-              <LeadsTable leads={leads} onDelete={openDeleteDialog} />
+              <LeadsTable
+                leads={leads}
+                totalCount={totalCount}
+                onDelete={openDeleteDialog}
+                onExportAll={handleExportAll}
+                onStatusChange={handleStatusChange}
+              />
               <div ref={loaderRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
