@@ -6,13 +6,14 @@ import { useLeadsPage } from "./hooks/use-leads-page";
 import { LeadsPageSkeleton } from "./skeleton";
 import { LeadsFilters } from "./filters";
 import { DeleteLeadDialog } from "./delete-dialog";
-import { LeadsTable, exportToCsv } from "./table";
+import { LeadsTable } from "./table";
 import { LeadsEmptyState } from "./empty";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { PageHeader } from "@/components/shared/page-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUpdateLead } from "@/hooks/use-leads";
+import { Lead } from "@/types";
 
 export function LeadsPage() {
   const {
@@ -32,13 +33,11 @@ export function LeadsPage() {
     exportAllLeads,
   } = useLeadsPage();
 
-  const handleExportAll = async () => {
-    const allLeads = await exportAllLeads();
-    exportToCsv(allLeads);
+  const handleExportAll = async (): Promise<Lead[]> => {
+    return await exportAllLeads();
   };
 
   const updateLead = useUpdateLead();
-  // ...
 
   const handleStatusChange = (id: string, status: string) => {
     updateLead.mutate({ id, data: { status } });

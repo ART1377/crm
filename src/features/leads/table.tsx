@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Eye, Trash2, Download } from "lucide-react";
 import type { Lead } from "@/types";
 import { formatDate } from "@/lib/utils";
@@ -27,46 +37,102 @@ interface LeadsTableProps {
   leads: Lead[];
   totalCount: number;
   onDelete: (id: string) => void;
-  onExportAll: () => void;
+  onExportAll: () => Promise<Lead[]>;
   onStatusChange: (id: string, status: string) => void;
 }
+const ALL_COLUMNS = [
+  { key: "businessName", label: "نام کسب‌وکار" },
+  { key: "contactPerson", label: "شخص تماس" },
+  { key: "phoneNumber", label: "شماره اصلی" },
+  { key: "secondaryPhone", label: "شماره دوم" },
+  { key: "industry", label: "صنعت" },
+  { key: "source", label: "منبع" },
+  { key: "status", label: "وضعیت" },
+  { key: "createdAt", label: "تاریخ ثبت" },
+] as const;
 
-export function exportToCsv(leads: Lead[]) {
-  const headers = [
-    "نام کسب‌وکار",
-    "شخص تماس",
-    "شماره اصلی",
-    "شماره دوم",
-    "صنعت",
-    "منبع",
-    "وضعیت",
-    "تاریخ ثبت",
-  ];
+type ColumnKey = (typeof ALL_COLUMNS)[number]["key"];
 
-  const rows = leads.map((lead) => [
-    lead.businessName,
-    lead.contactPerson || "",
-    `=""${lead.phoneNumber}""`,
-    lead.secondaryPhone ? `=""${lead.secondaryPhone}""` : "",
-    lead.industry,
-    LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source,
-    LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status,
-    formatDate(new Date(lead.createdAt)),
-  ]);
+const DEFAULT_COLUMNS: ColumnKey[] = [
+  "businessName",
+  "phoneNumber",
+  "industry",
+  "secondaryPhone",
+];
 
+function getCellValue(lead: Lead, key: ColumnKey): string {
+  switch (key) {
+    case "businessName":
+      return lead.businessName;
+    case "contactPerson":
+      return lead.contactPerson || "";
+    case "phoneNumber":
+      return lead.phoneNumber;
+    case "secondaryPhone":
+      return lead.secondaryPhone || "";
+    case "industry":
+      return lead.industry;
+    case "source":
+      return (
+        LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source
+      );
+    case "status":
+      return (
+        LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status
+      );
+    case "createdAt":
+      return formatDate(new Date(lead.createdAt));
+  }
+}
+
+function exportToText(leads: Lead[], columns: ColumnKey[]) {
+  const lines = leads.map((lead, i) => {
+    const items = columns.map((key) => {
+      const label = ALL_COLUMNS.find((c) => c.key === key)!.label;
+      const value = getCellValue(lead, key);
+      return `  ${label}: ${value}`;
+    });
+    return [`📋 ${lead.businessName}`, ...items, ""].join("\n");
+  });
+
+  const content = `گزارش سرنخ‌ها - ${formatDate(new Date())}\n${"=".repeat(40)}\n\n${lines.join("\n")}`;
+
+  const blob = new Blob(["\uFEFF" + content], {
+    type: "text/plain;charset=utf-8;",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leads-${formatDate(new Date()).replace(/\//g, "-")}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportToCsv(leads: Lead[], columns: ColumnKey[]) {
+  const headers = columns.map(
+    (key) => ALL_COLUMNS.find((c) => c.key === key)!.label,
+  );
+  const rows = leads.map((lead) =>
+    columns.map((key) => {
+      const value = getCellValue(lead, key);
+      if (key === "phoneNumber" || key === "secondaryPhone") {
+        return value ? `=""${value}""` : "";
+      }
+      return value;
+    }),
+  );
   const csvContent = [
     headers.map((h) => `"${h}"`).join(","),
     ...rows.map((row) => row.map((cell) => String(cell)).join(",")),
   ].join("\n");
-
   const blob = new Blob(["\uFEFF" + csvContent], {
     type: "text/csv;charset=utf-8;",
   });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `leads-${formatDate(new Date()).replace(/\//g, "-")}.csv`;
-  link.click();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leads-${formatDate(new Date()).replace(/\//g, "-")}.csv`;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -77,18 +143,93 @@ export function LeadsTable({
   onExportAll,
   onStatusChange,
 }: LeadsTableProps) {
+  const [exportFormat, setExportFormat] = useState<"csv" | "txt">("csv");
+  const [selectedColumns, setSelectedColumns] =
+    useState<ColumnKey[]>(DEFAULT_COLUMNS);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
+  const toggleColumn = (key: ColumnKey) => {
+    setSelectedColumns((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    );
+  };
+
+  const handleExport = async () => {
+    if (selectedColumns.length === 0) return;
+    const allLeads = await onExportAll();
+    if (exportFormat === "txt") {
+      exportToText(allLeads, selectedColumns);
+    } else {
+      exportToCsv(allLeads, selectedColumns);
+    }
+    setIsExportOpen(false);
+  };
+
   return (
     <div className="overflow-x-auto">
       <div className="flex justify-end mb-3">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onExportAll}
-          disabled={totalCount === 0}
-        >
-          <Download className="ml-2 h-4 w-4" />
-          خروجی CSV ({totalCount} مورد)
-        </Button>
+        <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" disabled={totalCount === 0}>
+              <Download className="ml-2 h-4 w-4" />
+              خروجی ({totalCount})
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>تنظیمات خروجی</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Format */}
+              <div className="space-y-2">
+                <Label>فرمت خروجی</Label>
+                <Select
+                  value={exportFormat}
+                  onValueChange={(v) => setExportFormat(v as "csv" | "txt")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="csv">CSV (اکسل)</SelectItem>
+                    <SelectItem value="txt">TXT (متن ساده)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Columns */}
+              <div className="space-y-2">
+                <Label>ستون‌های انتخابی</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {ALL_COLUMNS.map((col) => (
+                    <div key={col.key} className="flex items-center gap-2">
+                      <Checkbox
+                        id={col.key}
+                        checked={selectedColumns.includes(col.key)}
+                        onCheckedChange={() => toggleColumn(col.key)}
+                      />
+                      <Label
+                        htmlFor={col.key}
+                        className="text-sm cursor-pointer"
+                      >
+                        {col.label}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={handleExport}
+                disabled={selectedColumns.length === 0}
+              >
+                <Download className="ml-2 h-4 w-4" />
+                دانلود ({totalCount} سرنخ)
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Table>
