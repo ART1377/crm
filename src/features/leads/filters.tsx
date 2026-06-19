@@ -7,15 +7,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ArrowUpDown } from "lucide-react";
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface LeadsFiltersProps {
-  filters: {
-    status: string;
-    search: string;
-  };
+  filters: { status: string; search: string };
+  sortBy: string;
+  sortOrder: string;
   onFilterChange: (field: "status" | "search", value: string) => void;
+  onSortByChange: (value: string) => void;
+  onSortOrderChange: (value: string) => void;
 }
 
 const STATUS_FILTERS = [
@@ -23,7 +24,14 @@ const STATUS_FILTERS = [
   ...LEAD_STATUSES,
 ] as const;
 
-export function LeadsFilters({ filters, onFilterChange }: LeadsFiltersProps) {
+export function LeadsFilters({
+  filters,
+  sortBy,
+  sortOrder,
+  onFilterChange,
+  onSortByChange,
+  onSortOrderChange,
+}: LeadsFiltersProps) {
   return (
     <Card>
       <CardContent className="p-4">
@@ -46,6 +54,28 @@ export function LeadsFilters({ filters, onFilterChange }: LeadsFiltersProps) {
               </button>
             )}
           </div>
+          <Select value={sortBy} onValueChange={onSortByChange}>
+            <SelectTrigger className="w-full sm:w-40">
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+              <SelectValue placeholder="مرتب‌سازی" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt">تاریخ ثبت</SelectItem>
+              <SelectItem value="businessName">نام کسب‌وکار</SelectItem>
+              <SelectItem value="status">وضعیت</SelectItem>
+              <SelectItem value="industry">صنعت</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={sortOrder} onValueChange={onSortOrderChange}>
+            <SelectTrigger className="w-full sm:w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">نزولی</SelectItem>
+              <SelectItem value="asc">صعودی</SelectItem>
+            </SelectContent>
+          </Select>
           <Select
             value={filters.status}
             onValueChange={(value) => onFilterChange("status", value)}

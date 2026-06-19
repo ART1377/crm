@@ -12,9 +12,10 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "15");
     const skip = (page - 1) * limit;
+    const sortBy = searchParams.get("sortBy") || "createdAt";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
 
     const where: Prisma.LeadWhereInput = {};
-
     if (status && status !== "all") where.status = status;
     if (industry) where.industry = industry;
     if (search) {
@@ -28,13 +29,11 @@ export async function GET(request: NextRequest) {
     const [leads, total] = await Promise.all([
       prisma.lead.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy: { [sortBy]: sortOrder },
         skip,
         take: limit,
         include: {
-          _count: {
-            select: { activities: true, tasks: true },
-          },
+          _count: { select: { activities: true, tasks: true } },
         },
       }),
       prisma.lead.count({ where }),
@@ -70,10 +69,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      const field = existing.phoneNumber === body.phoneNumber ? "شماره تماس" : "نام کسب‌وکار";
+      const field =
+        existing.phoneNumber === body.phoneNumber
+          ? "شماره تماس"
+          : "نام کسب‌وکار";
       return NextResponse.json(
         { error: `${field} قبلاً ثبت شده است (${existing.businessName})` },
-        { status: 409 }
+        { status: 409 },
       );
     }
 

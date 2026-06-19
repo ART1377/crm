@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PhoneCall, Calendar } from "lucide-react";
-import { activitiesService } from "@/services/activities.service";
-import type { ActivityType, Lead } from "@/types";
-import toast from "react-hot-toast";
+import type { Lead } from "@/types";
 import { LogCallDialog } from "./log-call-dialog";
 import { ScheduleTaskDialog } from "./schedule-task-dialog";
 import { useCreateActivity } from "@/hooks/use-activities";

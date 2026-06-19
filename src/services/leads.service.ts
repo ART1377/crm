@@ -11,12 +11,21 @@ import type {
 const LEADS_ENDPOINT = "/leads";
 
 export const leadsService = {
-  async getAll(filters?: LeadFilters & { page?: number; limit?: number }) {
+  async getAll(
+    filters?: LeadFilters & {
+      page?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: string;
+    },
+  ) {
     const params = new URLSearchParams();
     if (filters?.status) params.append("status", filters.status);
     if (filters?.search) params.append("search", filters.search);
     if (filters?.industry) params.append("industry", filters.industry);
     if (filters?.page) params.append("page", String(filters.page));
+    if (filters?.sortBy) params.append("sortBy", filters.sortBy);
+    if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
     params.append("limit", String(filters?.limit || LEADS_PAGE_SIZE));
 
     const queryString = params.toString();

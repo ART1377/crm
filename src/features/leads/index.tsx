@@ -21,12 +21,16 @@ export function LeadsPage() {
     totalCount,
     isLoading,
     filters,
+    sortBy,
+    sortOrder,
     deleteId,
     hasFilters,
     deleteIsPending,
     isFetchingNextPage,
     loaderRef,
     handleFilterChange,
+    setSortBy,
+    setSortOrder,
     handleDelete,
     openDeleteDialog,
     closeDeleteDialog,
@@ -62,8 +66,15 @@ export function LeadsPage() {
         />
       }
     >
-      <LeadsFilters filters={filters} onFilterChange={handleFilterChange} />
-
+      <LeadsFilters
+        filters={filters}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onFilterChange={handleFilterChange}
+        onSortByChange={setSortBy}
+        onSortOrderChange={setSortOrder}
+      />
+      ;
       <Card className="flex-1 overflow-y-auto">
         <CardHeader>
           <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
@@ -89,7 +100,6 @@ export function LeadsPage() {
           )}
         </CardContent>
       </Card>
-
       <DeleteLeadDialog
         open={Boolean(deleteId)}
         onClose={closeDeleteDialog}

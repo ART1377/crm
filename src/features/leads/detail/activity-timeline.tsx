@@ -3,14 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PhoneCall, MessageSquare, Hash, Tag, Trash2 } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "@/config/axios";
 import { formatDate } from "@/lib/utils";
 import type { Activity } from "@/types";
-import toast from "react-hot-toast";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 import { useState } from "react";
-import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 import { useDeleteActivity } from "@/hooks/use-activities";
 
 interface ActivityTimelineProps {

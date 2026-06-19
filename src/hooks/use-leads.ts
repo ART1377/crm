@@ -10,7 +10,9 @@ import { LEADS_PAGE_SIZE } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 import apiClient from "@/config/axios";
 
-export function useLeads(filters?: LeadFilters) {
+export function useLeads(
+  filters?: LeadFilters & { sortBy?: string; sortOrder?: string },
+) {
   return useInfiniteQuery({
     queryKey: [LEADS_QUERY_KEY, "infinite", filters],
     queryFn: ({ pageParam = 1 }) =>

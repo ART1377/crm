@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
@@ -16,7 +16,6 @@ import { PageWrapper } from "@/components/shared/page-wrapper";
 
 export function LeadDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const leadId = params.id as string;
 
   const { data: lead, isLoading } = useLead(leadId);

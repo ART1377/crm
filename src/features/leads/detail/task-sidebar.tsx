@@ -4,14 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
 import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { tasksService } from "@/services/tasks.service";
 import { formatDate } from "@/lib/utils";
 import type { Task } from "@/types";
-import toast from "react-hot-toast";
 import { useState } from "react";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
-import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 
 interface TaskSidebarProps {
   tasks: Task[];

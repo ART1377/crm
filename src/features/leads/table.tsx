@@ -40,6 +40,7 @@ interface LeadsTableProps {
   onExportAll: () => Promise<Lead[]>;
   onStatusChange: (id: string, status: string) => void;
 }
+
 const ALL_COLUMNS = [
   { key: "businessName", label: "نام کسب‌وکار" },
   { key: "contactPerson", label: "شخص تماس" },
@@ -57,8 +58,18 @@ const DEFAULT_COLUMNS: ColumnKey[] = [
   "businessName",
   "phoneNumber",
   "industry",
-  "secondaryPhone",
+  "source",
+  "status",
 ];
+
+function normalizePhoneNumber(value: string): string {
+  if (!value) return "";
+  return value
+    .replace(/[\u06F0-\u06F9]/g, (d) =>
+      String.fromCharCode(d.charCodeAt(0) - 1728),
+    ) // Persian to English
+    .replace(/[^\d]/g, ""); // Remove non-digits
+}
 
 function getCellValue(lead: Lead, key: ColumnKey): string {
   switch (key) {
@@ -67,14 +78,16 @@ function getCellValue(lead: Lead, key: ColumnKey): string {
     case "contactPerson":
       return lead.contactPerson || "";
     case "phoneNumber":
-      return lead.phoneNumber;
+      return normalizePhoneNumber(lead.phoneNumber);
     case "secondaryPhone":
-      return lead.secondaryPhone || "";
+      return normalizePhoneNumber(lead.secondaryPhone || "");
     case "industry":
       return lead.industry;
     case "source":
       return (
-        LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source
+        LEAD_SOURCES.find((s) => s.value === lead.source)?.label ||
+        lead.source ||
+        ""
       );
     case "status":
       return (
@@ -82,16 +95,22 @@ function getCellValue(lead: Lead, key: ColumnKey): string {
       );
     case "createdAt":
       return formatDate(new Date(lead.createdAt));
+    default:
+      return "";
   }
 }
 
 function exportToText(leads: Lead[], columns: ColumnKey[]) {
-  const lines = leads.map((lead, i) => {
-    const items = columns.map((key) => {
-      const label = ALL_COLUMNS.find((c) => c.key === key)!.label;
-      const value = getCellValue(lead, key);
-      return `  ${label}: ${value}`;
-    });
+  const lines = leads.map((lead) => {
+    const items = columns
+      .map((key) => {
+        const value = getCellValue(lead, key);
+        if (!value) return null;
+        const label = ALL_COLUMNS.find((c) => c.key === key)!.label;
+        return `  ${label}: ${value}`;
+      })
+      .filter(Boolean);
+
     return [`📋 ${lead.businessName}`, ...items, ""].join("\n");
   });
 
@@ -180,7 +199,6 @@ export function LeadsTable({
               <DialogTitle>تنظیمات خروجی</DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
-              {/* Format */}
               <div className="space-y-2">
                 <Label>فرمت خروجی</Label>
                 <Select
@@ -197,7 +215,6 @@ export function LeadsTable({
                 </Select>
               </div>
 
-              {/* Columns */}
               <div className="space-y-2">
                 <Label>ستون‌های انتخابی</Label>
                 <div className="grid grid-cols-2 gap-2">

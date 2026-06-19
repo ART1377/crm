@@ -12,16 +12,19 @@ export function useLeadsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
-  const queryFilters = useMemo<LeadFilters>(
+  const queryFilters = useMemo(
     () => ({
       status: filters.status || undefined,
-      // Only send search if 3+ characters
       search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
+      sortBy,
+      sortOrder,
     }),
-    [filters.status, debouncedSearch],
+    [filters.status, debouncedSearch, sortBy, sortOrder],
   );
 
   const exportAllLeads = useCallback(async () => {
@@ -83,5 +86,9 @@ export function useLeadsPage() {
     openDeleteDialog: setDeleteId,
     closeDeleteDialog: () => setDeleteId(null),
     exportAllLeads,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
   };
 }

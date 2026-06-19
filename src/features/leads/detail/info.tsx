@@ -1,18 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Building2,
-  Phone,
-  User,
-  Tag,
-  Hash,
-  Copy,
-  PhoneCall,
-  Check,
-} from "lucide-react";
+import { Building2, User, Tag, Copy, PhoneCall, Check, Pencil } from "lucide-react";
 import { InfoItem } from "./info-item";
 import type { Lead } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCopyToClipboard } from "@/hooks/use-copy";
+import { EditLeadDialog } from "./edit-lead-dialog";
 
 interface LeadInfoProps {
   lead: Lead;
@@ -29,6 +21,11 @@ export function LeadInfo({ lead }: LeadInfoProps) {
           <Building2 className="h-5 w-5" />
           اطلاعات تماس
         </CardTitle>
+        <EditLeadDialog lead={lead}>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </EditLeadDialog>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
