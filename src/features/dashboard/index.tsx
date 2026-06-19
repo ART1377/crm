@@ -32,7 +32,7 @@ export function DashboardPage() {
         />
       }
     >
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="gap-4 flex flex-col lg:flex-row flex-1 lg:flex-none">
         <StatCard
           title="کل سرنخ‌ها"
           value={stats?.total ?? 0}

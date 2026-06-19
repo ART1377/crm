@@ -1,17 +1,17 @@
 // src/features/dashboard/today-tasks.tsx
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, AlertCircle } from 'lucide-react'
-import { useTodayTasks } from '@/hooks/use-tasks'
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar, AlertCircle } from "lucide-react";
+import { useTodayTasks } from "@/hooks/use-tasks";
 
 export function TodayTasks() {
-  const { data: tasks = [], isLoading } = useTodayTasks()
+  const { data: tasks = [], isLoading } = useTodayTasks();
 
   return (
-    <Card>
+    <Card className="flex-1 min-h-fit flex-1 lg:flex-none">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5" />
@@ -21,7 +21,7 @@ export function TodayTasks() {
       <CardContent>
         {isLoading ? (
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-16 w-full" />
             ))}
           </div>
@@ -33,17 +33,24 @@ export function TodayTasks() {
         ) : (
           <div className="space-y-3">
             {tasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+              <div
+                key={task.id}
+                className="flex items-center justify-between p-3 bg-muted rounded-lg"
+              >
                 <div>
                   <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-muted-foreground">{task.lead?.businessName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {task.lead?.businessName}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={task.isCompleted ? 'secondary' : 'default'}>
-                    {task.isCompleted ? 'انجام شد' : 'در انتظار'}
+                  <Badge variant={task.isCompleted ? "secondary" : "default"}>
+                    {task.isCompleted ? "انجام شد" : "در انتظار"}
                   </Badge>
                   <Link href={`/leads/${task.leadId}`}>
-                    <Button variant="outline" size="sm">مشاهده</Button>
+                    <Button variant="outline" size="sm">
+                      مشاهده
+                    </Button>
                   </Link>
                 </div>
               </div>
@@ -52,5 +59,5 @@ export function TodayTasks() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

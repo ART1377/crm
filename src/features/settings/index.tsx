@@ -42,22 +42,34 @@ export function SettingsPage() {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="w-full justify-start gap-2 bg-transparent p-0">
-          <TabsTrigger value="general" className="gap-2">
-            <Settings2 className="h-4 w-4" />
-            اطلاعات فرستنده
+        <TabsList className="w-full justify-start gap-1 bg-muted/50 p-1 rounded-lg overflow-x-auto flex-nowrap">
+          <TabsTrigger
+            value="general"
+            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
+          >
+            <Settings2 className="h-3.5 w-3.5" />
+            فرستنده
           </TabsTrigger>
-          <TabsTrigger value="messengers" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
+          <TabsTrigger
+            value="messengers"
+            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
             پیام‌رسان‌ها
           </TabsTrigger>
-          <TabsTrigger value="sources" className="gap-2">
-            <List className="h-4 w-4" />
-            منابع سرنخ
+          <TabsTrigger
+            value="sources"
+            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
+          >
+            <List className="h-3.5 w-3.5" />
+            منابع
           </TabsTrigger>
-          <TabsTrigger value="industries" className="gap-2">
-            <List className="h-4 w-4" />
-            حوزه‌های فعالیت
+          <TabsTrigger
+            value="industries"
+            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
+          >
+            <List className="h-3.5 w-3.5" />
+            حوزه‌ها
           </TabsTrigger>
         </TabsList>
 

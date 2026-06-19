@@ -45,7 +45,10 @@ export function Navbar() {
       <Button
         variant="ghost"
         size="icon"
-        className="lg:hidden fixed top-4 right-4 z-50 shadow-md bg-background border"
+        className={cn(
+          "lg:hidden fixed top-4 z-50 shadow-md bg-background border transition-all duration-300",
+          isOpen ? "right-52 bg-gray-200" : "right-4",
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

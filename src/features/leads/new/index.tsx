@@ -55,7 +55,7 @@ export function NewLeadPage() {
           <CardDescription>فیلدهای ستاره‌دار (*) الزامی هستند</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-8">
             <LeadForm form={form} />
             <LeadFormActions
               onCancel={() => router.back()}

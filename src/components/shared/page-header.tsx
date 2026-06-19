@@ -17,7 +17,7 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-between gap-6 pb-6 mb-2 border-b",
+        "relative flex items-center justify-between gap-6 pb-6 mb-2 border-b mt-8 lg:mt-0",
         className,
       )}
     >
