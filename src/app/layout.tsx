@@ -21,7 +21,7 @@ export default function RootLayout({
         <QueryProvider>
           <div className="flex h-screen max-h-screen">
             <Navbar />
-            <main className="flex-1 overflow-hidden p-2">{children} </main>
+            <main className="flex-1 overflow-hidden">{children}</main>{" "}
           </div>
           <Toaster position="top-center" reverseOrder={false} />
         </QueryProvider>
