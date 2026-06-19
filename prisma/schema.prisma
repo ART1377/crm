@@ -48,11 +48,33 @@ model Task {
   createdAt   DateTime  @default(now())
 }
 
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
 model MessageTemplate {
   id        String   @id @default(cuid())
   title     String
   content   String
   type      String
+  purpose   String   @default("INITIAL")
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt  // این خط رو عوض کن
+  updatedAt DateTime @updatedAt
+}
+
+model Messenger {
+  id        String   @id @default(cuid())
+  name      String   // "واتساپ", "ایتا", etc.
+  key       String   @unique // "WHATSAPP", "ETA", etc.
+  linkTemplate String // "https://wa.me/{phone}?text={message}"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ListOption {
+  id    String @id @default(cuid())
+  type  String // "SOURCE" or "INDUSTRY"
+  value String
 }

@@ -1,25 +1,29 @@
-// src/features/leads/index.tsx
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LeadsHeader,
-  LeadsFilters,
-  LeadsEmptyState,
-  LeadsTable,
-  DeleteLeadDialog,
-  LeadsPageSkeleton,
-} from "@/components/leads";
+import { Loader2, Plus } from "lucide-react";
 import { useLeadsPage } from "./hooks/use-leads-page";
+import { LeadsPageSkeleton } from "./skeleton";
+import { LeadsFilters } from "./filters";
+import { DeleteLeadDialog } from "./delete-dialog";
+import { LeadsTable } from "./table";
+import { LeadsEmptyState } from "./empty";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from "@/components/shared/page-header";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function LeadsPage() {
   const {
     leads,
+    totalCount,
     isLoading,
     filters,
     deleteId,
     hasFilters,
     deleteIsPending,
+    isFetchingNextPage,
+    loaderRef,
     handleFilterChange,
     handleDelete,
     openDeleteDialog,
@@ -29,19 +33,40 @@ export function LeadsPage() {
   if (isLoading) return <LeadsPageSkeleton />;
 
   return (
-    <div className="space-y-6">
-      <LeadsHeader />
+    <PageWrapper
+      header={
+        <PageHeader
+          title="سرنخ‌ها"
+          description="مدیریت و پیگیری سرنخ‌های فروش"
+          actions={
+            <Link href="/leads/new">
+              <Button size="lg">
+                <Plus className="ml-2 h-5 w-5" />
+                افزودن سرنخ جدید
+              </Button>
+            </Link>
+          }
+        />
+      }
+    >
       <LeadsFilters filters={filters} onFilterChange={handleFilterChange} />
 
-      <Card>
+      <Card className="flex-1 overflow-y-auto">
         <CardHeader>
-          <CardTitle>{leads.length} سرنخ پیدا شد</CardTitle>
+          <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
         </CardHeader>
         <CardContent>
           {leads.length === 0 ? (
             <LeadsEmptyState hasFilters={hasFilters} />
           ) : (
-            <LeadsTable leads={leads} onDelete={openDeleteDialog} />
+            <>
+              <LeadsTable leads={leads} onDelete={openDeleteDialog} />
+              <div ref={loaderRef} className="flex justify-center py-4">
+                {isFetchingNextPage && (
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                )}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -52,6 +77,6 @@ export function LeadsPage() {
         onConfirm={handleDelete}
         isPending={deleteIsPending}
       />
-    </div>
+    </PageWrapper>
   );
 }

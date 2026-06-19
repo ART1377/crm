@@ -32,3 +32,18 @@ export const MESSENGER_TYPES = [
   { value: 'RUBIKA', label: 'روبیکا' },
   { value: 'SMS', label: 'پیامک' },
 ] as const
+
+export const DEFAULT_SENDER = {
+  name: 'صادقی',
+  phone: '09191234567',
+  company: 'حسابداری کیهان',
+}
+
+export const TEMPLATE_PURPOSES = [
+  { value: "INITIAL", label: "معرفی اولیه" },
+  { value: "FOLLOW_UP", label: "پیگیری" },
+  { value: "CLOSING", label: "تشکر نهایی" },
+  { value: "CUSTOM", label: "سفارشی" },
+];
+
+export const LEADS_PAGE_SIZE = 10;

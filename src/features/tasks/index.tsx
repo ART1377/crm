@@ -5,6 +5,8 @@ import { Calendar, AlertCircle } from "lucide-react";
 import { useTodayTasks } from "@/hooks/use-tasks";
 import { TaskItem } from "./item";
 import { TasksSkeleton } from "./skeleton";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from "@/components/shared/page-header";
 
 export function TasksPage() {
   const { data: tasks = [], isLoading } = useTodayTasks();
@@ -12,14 +14,14 @@ export function TasksPage() {
   if (isLoading) return <TasksSkeleton />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">تسک‌های امروز</h1>
-        <p className="text-muted-foreground mt-1">
-          پیگیری‌های سررسید شده امروز
-        </p>
-      </div>
-
+    <PageWrapper
+      header={
+        <PageHeader
+          title="تسک‌های امروز"
+          description="پیگیری‌های سررسید شده امروز"
+        />
+      }
+    >
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -42,6 +44,6 @@ export function TasksPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageWrapper>
   );
 }

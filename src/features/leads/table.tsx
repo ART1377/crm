@@ -8,19 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Eye, MoreVertical, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import type { Lead } from "@/types";
 import { formatDate } from "@/lib/utils";
-import {
-  getSourceLabel,
-  getStatusBadge,
-} from "@/components/leads/lead-helpers";
+import { getSourceLabel, getStatusBadge } from "@/features/leads/lead-helpers";
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -55,7 +46,7 @@ export function LeadsTable({ leads, onDelete }: LeadsTableProps) {
                 </Link>
               </TableCell>
               <TableCell>{lead.contactPerson || "---"}</TableCell>
-              <TableCell dir="ltr" className="text-left">
+              <TableCell>
                 {lead.phoneNumber}
               </TableCell>
               <TableCell>{lead.industry}</TableCell>

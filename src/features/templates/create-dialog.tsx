@@ -19,8 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateTemplate } from "@/hooks/use-templates";
-import { MESSENGER_TYPES } from "@/lib/constants";
-import { MessengerType } from "@/types";
+import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "@/lib/constants";
+import type { MessengerType } from "@/types";
+
+
 
 interface CreateTemplateDialogProps {
   open: boolean;
@@ -36,13 +38,15 @@ export function CreateTemplateDialog({
   const createTemplate = useCreateTemplate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [purpose, setPurpose] = useState("CUSTOM");
   const [type, setType] = useState<MessengerType>("WHATSAPP");
 
   const handleCreate = async () => {
-    await createTemplate.mutateAsync({ title, content, type });
+    await createTemplate.mutateAsync({ title, content, type, purpose });
     onOpenChange(false);
     setTitle("");
     setContent("");
+    setPurpose("CUSTOM");
     setType("WHATSAPP");
   };
 
@@ -59,18 +63,37 @@ export function CreateTemplateDialog({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
+
+          <Select value={purpose} onValueChange={setPurpose}>
+            <SelectTrigger>
+              <SelectValue placeholder="نوع قالب" />
+            </SelectTrigger>
+            <SelectContent>
+              {TEMPLATE_PURPOSES.map((p) => (
+                <SelectItem key={p.value} value={p.value}>
+                  {p.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Textarea
             placeholder="متن پیام"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="min-h-25"
           />
+          <p className="text-xs text-muted-foreground -mt-2">
+            متغیرهای قابل استفاده: {"{senderName}"} {"{senderPhone}"} {"{senderCompany}"}{" "}
+            {"{companyName}"} {"{contactPerson}"}
+          </p>
+
           <Select
             value={type}
             onValueChange={(value) => setType(value as MessengerType)}
           >
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="پلتفرم پیش‌فرض" />
             </SelectTrigger>
             <SelectContent>
               {MESSENGER_TYPES.map((m) => (
@@ -80,6 +103,7 @@ export function CreateTemplateDialog({
               ))}
             </SelectContent>
           </Select>
+
           <Button
             className="w-full"
             onClick={handleCreate}

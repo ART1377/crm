@@ -1,52 +1,55 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateLead } from '@/hooks/use-leads'
-import { leadSchema } from '@/lib/validations'
-import type { CreateLeadData } from '@/types'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ArrowRight } from 'lucide-react'
-import { LeadForm } from './form'
-import { LeadFormActions } from './actions'
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateLead } from "@/hooks/use-leads";
+import { leadSchema } from "@/lib/validations";
+import type { CreateLeadData } from "@/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { LeadForm } from "./form";
+import { LeadFormActions } from "./actions";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from "@/components/shared/page-header";
 
 export function NewLeadPage() {
-  const router = useRouter()
-  const createLead = useCreateLead()
+  const router = useRouter();
+  const createLead = useCreateLead();
 
   const form = useForm<CreateLeadData>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
-      businessName: '',
-      contactPerson: '',
-      phoneNumber: '',
-      secondaryPhone: '',
-      industry: '',
-      source: 'DIRECT',
-      notes: '',
+      businessName: "",
+      contactPerson: "",
+      phoneNumber: "",
+      secondaryPhone: "",
+      industry: "",
+      source: "",
+      notes: "",
     },
-  })
+  });
 
   const onSubmit = async (data: CreateLeadData) => {
-    await createLead.mutateAsync(data)
-    router.push('/leads')
-  }
+    await createLead.mutateAsync(data);
+    router.push("/leads");
+  };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowRight className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">افزودن سرنخ جدید</h1>
-          <p className="text-muted-foreground mt-1">اطلاعات کسب‌وکار جدید را وارد کنید</p>
-        </div>
-      </div>
-
-      <Card>
+    <PageWrapper
+      header={
+        <PageHeader
+          title="افزودن سرنخ جدید"
+          description="اطلاعات کسب‌وکار جدید را وارد کنید"
+        />
+      }
+    >
+      <Card className="flex-1 overflow-y-auto"> 
         <CardHeader>
           <CardTitle>اطلاعات سرنخ</CardTitle>
           <CardDescription>فیلدهای ستاره‌دار (*) الزامی هستند</CardDescription>
@@ -61,6 +64,6 @@ export function NewLeadPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
-  )
+    </PageWrapper>
+  );
 }

@@ -1,6 +1,7 @@
 // src/app/api/leads/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(
   request: NextRequest,
@@ -41,8 +42,8 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    // فقط فیلدهایی که وجود دارن رو آپدیت کن
-    const updateData: any = {};
+    const updateData: Prisma.LeadUpdateInput = {};
+
     if (body.businessName !== undefined)
       updateData.businessName = body.businessName;
     if (body.contactPerson !== undefined)

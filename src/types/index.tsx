@@ -66,7 +66,8 @@ export interface MessageTemplate {
   id: string;
   title: string;
   content: string;
-  type: MessengerType;
+  type: string;
+  purpose: string;
 }
 
 export interface DashboardStats {
@@ -83,13 +84,13 @@ export interface LeadFilters {
 }
 
 export interface CreateLeadData {
-  businessName: string
-  contactPerson?: string
-  phoneNumber: string
-  secondaryPhone?: string
-  industry: string
-  source?: string
-  notes?: string
+  businessName: string;
+  contactPerson?: string;
+  phoneNumber: string;
+  secondaryPhone?: string;
+  industry: string;
+  source?: string;
+  notes?: string;
 }
 
 export interface UpdateLeadData extends Partial<CreateLeadData> {
@@ -109,4 +110,12 @@ export interface CreateTaskData {
 
 export interface UpdateTaskData {
   isCompleted: boolean;
+}
+
+export interface Messenger {
+  id: string
+  name: string
+  key: string
+  linkTemplate: string
+  isActive: boolean
 }

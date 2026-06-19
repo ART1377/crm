@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface LeadsFiltersProps {
@@ -34,8 +34,17 @@ export function LeadsFilters({ filters, onFilterChange }: LeadsFiltersProps) {
               placeholder="جستجو در نام کسب‌وکار، شخص تماس یا شماره..."
               value={filters.search}
               onChange={(e) => onFilterChange("search", e.target.value)}
-              className="pr-10"
+              className="pr-10 pl-10"
             />
+            {filters.search && (
+              <button
+                type="button"
+                onClick={() => onFilterChange("search", "")}
+                className="absolute cursor-pointer left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
           <Select
             value={filters.status}

@@ -5,9 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tasksService } from '@/services/tasks.service'
 import type { CreateTaskData, UpdateTaskData } from '@/types'
 import toast from 'react-hot-toast'
-import { LEADS_QUERY_KEY } from './use-leads'
-
-export const TASKS_QUERY_KEY = 'tasks'
+import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from '@/lib/query-keys'
 
 export function useTasks(leadId: string) {
   return useQuery({
