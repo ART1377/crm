@@ -38,7 +38,7 @@ export function LeadsFilters({
     <Card>
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative flex-1 min-w-50">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="جستجو..."

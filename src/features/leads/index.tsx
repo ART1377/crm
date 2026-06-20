@@ -74,7 +74,6 @@ export function LeadsPage() {
         onSortByChange={setSortBy}
         onSortOrderChange={setSortOrder}
       />
-      ;
       <Card className="flex-1 overflow-y-auto">
         <CardHeader>
           <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
