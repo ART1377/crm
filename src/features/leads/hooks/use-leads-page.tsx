@@ -17,8 +17,7 @@ export function useLeadsPage() {
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
-  // In queryFilters:
-  const queryFilters = useMemo<LeadFilters>(
+  const queryFilters = useMemo(
     () => ({
       status: filters.status || undefined,
       search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
@@ -38,8 +37,10 @@ export function useLeadsPage() {
   );
 
   const exportAllLeads = useCallback(async () => {
-    // Fetch all filtered leads without pagination
-    const result = await leadsService.getAll({ ...queryFilters, limit: 9999 });
+    const result = await leadsService.getAll({
+      ...queryFilters,
+      limit: 9999,
+    });
     return result.leads;
   }, [queryFilters]);
 

@@ -26,6 +26,8 @@ export const leadsService = {
     if (filters?.page) params.append("page", String(filters.page));
     if (filters?.sortBy) params.append("sortBy", filters.sortBy);
     if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
+    if (filters?.dateFrom) params.append("dateFrom", filters.dateFrom);
+    if (filters?.dateTo) params.append("dateTo", filters.dateTo);
     params.append("limit", String(filters?.limit || LEADS_PAGE_SIZE));
 
     const queryString = params.toString();
