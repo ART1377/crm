@@ -84,6 +84,8 @@ export interface LeadFilters {
   status?: string;
   search?: string;
   industry?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface CreateLeadData {

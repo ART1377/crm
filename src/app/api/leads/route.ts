@@ -12,10 +12,13 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "15");
     const skip = (page - 1) * limit;
-    const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const sortBy = (searchParams.get("sortBy") as string) || "createdAt";
+    const sortOrder = (searchParams.get("sortOrder") as string) || "desc";
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
 
     const where: Prisma.LeadWhereInput = {};
+
     if (status && status !== "all") where.status = status;
     if (industry) where.industry = industry;
     if (search) {
@@ -26,10 +29,34 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Date filtering
+    if (dateFrom || dateTo) {
+      const createdAt: Prisma.DateTimeFilter = {};
+      if (dateFrom) createdAt.gte = new Date(dateFrom);
+      if (dateTo) {
+        const endDate = new Date(dateTo);
+        endDate.setHours(23, 59, 59, 999);
+        createdAt.lte = endDate;
+      }
+      where.createdAt = createdAt;
+    }
+
+    // Validate sortBy to prevent injection
+    const allowedSortFields = [
+      "createdAt",
+      "businessName",
+      "status",
+      "industry",
+    ];
+    const safeSortBy = allowedSortFields.includes(sortBy)
+      ? sortBy
+      : "createdAt";
+    const safeSortOrder = sortOrder === "asc" ? "asc" : "desc";
+
     const [leads, total] = await Promise.all([
       prisma.lead.findMany({
         where,
-        orderBy: { [sortBy]: sortOrder },
+        orderBy: { [safeSortBy]: safeSortOrder },
         skip,
         take: limit,
         include: {

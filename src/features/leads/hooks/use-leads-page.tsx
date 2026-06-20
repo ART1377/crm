@@ -6,7 +6,7 @@ import type { LeadFilters } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { leadsService } from "@/services/leads.service";
 
-const DEFAULT_FILTERS = { status: "", search: "" };
+const DEFAULT_FILTERS = { status: "", search: "", dateFrom: "", dateTo: "" };
 
 export function useLeadsPage() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
@@ -17,14 +17,24 @@ export function useLeadsPage() {
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
-  const queryFilters = useMemo(
+  // In queryFilters:
+  const queryFilters = useMemo<LeadFilters>(
     () => ({
       status: filters.status || undefined,
       search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
+      dateFrom: filters.dateFrom || undefined,
+      dateTo: filters.dateTo || undefined,
       sortBy,
       sortOrder,
     }),
-    [filters.status, debouncedSearch, sortBy, sortOrder],
+    [
+      filters.status,
+      debouncedSearch,
+      filters.dateFrom,
+      filters.dateTo,
+      sortBy,
+      sortOrder,
+    ],
   );
 
   const exportAllLeads = useCallback(async () => {
