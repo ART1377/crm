@@ -10,23 +10,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, X, ArrowUpDown, Calendar, RotateCcw } from "lucide-react";
+import {
+  Search,
+  Filter,
+  X,
+  ArrowUpDown,
+  Calendar,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface LeadsFiltersProps {
   filters: { status: string; search: string; dateFrom: string; dateTo: string };
   sortBy: string;
   sortOrder: string;
-  onFilterChange: (field: "status" | "search" | "dateFrom" | "dateTo", value: string) => void;
+  onFilterChange: (
+    field: "status" | "search" | "dateFrom" | "dateTo",
+    value: string,
+  ) => void;
   onSortByChange: (value: string) => void;
   onSortOrderChange: (value: string) => void;
   onClearFilters: () => void;
 }
 
-const STATUS_FILTERS = [
-  { value: "", label: "همه" },
-  ...LEAD_STATUSES,
-] as const;
+const STATUS_FILTERS = [{ value: "", label: "همه" }, ...LEAD_STATUSES] as const;
 
 const hasActiveFilters = (filters: LeadsFiltersProps["filters"]) =>
   filters.search || filters.status || filters.dateFrom || filters.dateTo;
@@ -66,14 +74,19 @@ export function LeadsFilters({
                 </button>
               )}
             </div>
-            <Select value={filters.status} onValueChange={(v) => onFilterChange("status", v)}>
+            <Select
+              value={filters.status}
+              onValueChange={(v) => onFilterChange("status", v)}
+            >
               <SelectTrigger className="w-full sm:w-40">
                 <Filter className="ml-2 h-4 w-4 shrink-0" />
                 <SelectValue placeholder="وضعیت" />
               </SelectTrigger>
               <SelectContent>
                 {STATUS_FILTERS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -81,9 +94,9 @@ export function LeadsFilters({
 
           {/* Row 2: Sort + Date + Clear */}
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto sm:flex-1">
               <Select value={sortBy} onValueChange={onSortByChange}>
-                <SelectTrigger className="w-full sm:w-36">
+                <SelectTrigger className="w-full sm:w-36 sm:flex-1">
                   <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
                   <SelectValue placeholder="مرتب‌سازی" />
                 </SelectTrigger>
@@ -95,7 +108,7 @@ export function LeadsFilters({
                 </SelectContent>
               </Select>
               <Select value={sortOrder} onValueChange={onSortOrderChange}>
-                <SelectTrigger className="w-full sm:w-28">
+                <SelectTrigger className="w-full sm:w-28 sm:flex-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -121,19 +134,18 @@ export function LeadsFilters({
                 className="flex-1 text-xs px-2"
               />
             </div>
-
-            {showClear && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClearFilters}
-                className="text-muted-foreground hover:text-destructive gap-1 shrink-0"
-              >
-                <RotateCcw className="h-4 w-4" />
-                حذف فیلترها
-              </Button>
-            )}
           </div>
+          {showClear && (
+            <Button
+              variant="destructive"
+              size="lg"
+              onClick={onClearFilters}
+              className="w-full gap-1.5"
+            >
+              <Trash2 className="h-4 w-4" />
+              حذف فیلترها
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
