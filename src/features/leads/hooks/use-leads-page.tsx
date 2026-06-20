@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { useLeads, useDeleteLead } from "@/hooks/use-leads";
-import type { LeadFilters } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { leadsService } from "@/services/leads.service";
 
