@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, X, ArrowUpDown, Calendar } from "lucide-react";
+import { Search, Filter, X, ArrowUpDown, Calendar, RotateCcw } from "lucide-react";
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface LeadsFiltersProps {
@@ -19,12 +20,16 @@ interface LeadsFiltersProps {
   onFilterChange: (field: "status" | "search" | "dateFrom" | "dateTo", value: string) => void;
   onSortByChange: (value: string) => void;
   onSortOrderChange: (value: string) => void;
+  onClearFilters: () => void;
 }
 
 const STATUS_FILTERS = [
   { value: "", label: "همه وضعیت‌ها" },
   ...LEAD_STATUSES,
 ] as const;
+
+const hasActiveFilters = (filters: LeadsFiltersProps["filters"]) =>
+  filters.search || filters.status || filters.dateFrom || filters.dateTo;
 
 export function LeadsFilters({
   filters,
@@ -33,11 +38,14 @@ export function LeadsFilters({
   onFilterChange,
   onSortByChange,
   onSortOrderChange,
+  onClearFilters,
 }: LeadsFiltersProps) {
+  const showClear = hasActiveFilters(filters);
+
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-4 flex-wrap items-center">
           <div className="relative flex-1 min-w-50">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -115,6 +123,18 @@ export function LeadsFilters({
               placeholder="تا تاریخ"
             />
           </div>
+
+          {showClear && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearFilters}
+              className="text-muted-foreground hover:text-destructive gap-1"
+            >
+              <RotateCcw className="h-4 w-4" />
+              حذف فیلترها
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

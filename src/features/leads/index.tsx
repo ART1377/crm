@@ -47,6 +47,15 @@ export function LeadsPage() {
     updateLead.mutate({ id, data: { status } });
   };
 
+  const handleClearFilters = () => {
+    handleFilterChange("search", "");
+    handleFilterChange("status", "");
+    handleFilterChange("dateFrom", "");
+    handleFilterChange("dateTo", "");
+    setSortBy("createdAt");
+    setSortOrder("desc");
+  };
+
   if (isLoading) return <LeadsPageSkeleton />;
 
   return (
@@ -73,7 +82,9 @@ export function LeadsPage() {
         onFilterChange={handleFilterChange}
         onSortByChange={setSortBy}
         onSortOrderChange={setSortOrder}
+        onClearFilters={handleClearFilters}
       />
+      ;
       <Card className="flex-1 overflow-y-auto">
         <CardHeader>
           <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
