@@ -70,7 +70,7 @@ export function LeadsFilters({
               <ArrowUpDown className="ml-2 h-4 w-4" />
               <SelectValue placeholder="مرتب‌سازی" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="w-fit">
               <SelectItem value="createdAt">تاریخ ثبت</SelectItem>
               <SelectItem value="businessName">نام کسب‌وکار</SelectItem>
               <SelectItem value="status">وضعیت</SelectItem>
@@ -82,7 +82,7 @@ export function LeadsFilters({
             <SelectTrigger className="w-full sm:w-36">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="w-fit">
               <SelectItem value="desc">نزولی</SelectItem>
               <SelectItem value="asc">صعودی</SelectItem>
             </SelectContent>
@@ -96,7 +96,7 @@ export function LeadsFilters({
               <Filter className="ml-2 h-4 w-4" />
               <SelectValue placeholder="فیلتر وضعیت" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="w-fit">
               {STATUS_FILTERS.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
                   {status.label}
