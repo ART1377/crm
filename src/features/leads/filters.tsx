@@ -82,7 +82,7 @@ export function LeadsFilters({
                 <Filter className="ml-2 h-4 w-4 shrink-0" />
                 <SelectValue placeholder="وضعیت" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-fit">
                 {STATUS_FILTERS.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
                     {s.label}
