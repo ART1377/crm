@@ -27,11 +27,12 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Eye, Trash2, Download } from "lucide-react";
+import { Eye, Trash2, Download, Pencil } from "lucide-react";
 import type { Lead } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { getSourceLabel } from "@/features/leads/lead-helpers";
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
+import { EditLeadDialog } from "./detail/edit-lead-dialog";
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -322,6 +323,11 @@ export function LeadsTable({
                       <Eye className="h-4 w-4" />
                     </Button>
                   </Link>
+                  <EditLeadDialog lead={lead}>
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </EditLeadDialog>
                   <Button
                     variant="ghost"
                     size="icon"
