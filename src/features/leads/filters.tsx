@@ -16,7 +16,6 @@ import {
   X,
   ArrowUpDown,
   Calendar,
-  RotateCcw,
   Trash2,
 } from "lucide-react";
 import { LEAD_STATUSES } from "@/lib/constants";

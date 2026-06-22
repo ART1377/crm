@@ -1,10 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, User, Tag, Copy, PhoneCall, Check, Pencil } from "lucide-react";
+import {
+  Building2,
+  User,
+  Tag,
+  Copy,
+  PhoneCall,
+  Check,
+  Pencil,
+} from "lucide-react";
 import { InfoItem } from "./info-item";
 import type { Lead } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCopyToClipboard } from "@/hooks/use-copy";
-import { EditLeadDialog } from "./edit-lead-dialog";
+import { EditLeadDialog } from "../edit-lead-dialog";
 
 interface LeadInfoProps {
   lead: Lead;

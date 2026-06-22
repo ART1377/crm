@@ -26,7 +26,14 @@ export function useLeadsPage() {
       sortBy,
       sortOrder,
     }),
-    [filters.status, debouncedSearch, filters.dateFrom, filters.dateTo, sortBy, sortOrder],
+    [
+      filters.status,
+      debouncedSearch,
+      filters.dateFrom,
+      filters.dateTo,
+      sortBy,
+      sortOrder,
+    ],
   );
 
   const exportAllLeads = useCallback(async () => {
@@ -34,10 +41,14 @@ export function useLeadsPage() {
     return result.leads;
   }, [queryFilters]);
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useLeads(queryFilters);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useLeads(queryFilters);
   const deleteLead = useDeleteLead();
 
-  const leads = data?.pages.flatMap((page) => page.leads) ?? [];
+  const leads = useMemo(
+    () => data?.pages.flatMap((page) => page.leads) ?? [],
+    [data?.pages],
+  );
   const totalCount = data?.pages[0]?.total ?? 0;
 
   // Moved AFTER leads is defined
@@ -91,7 +102,9 @@ export function useLeadsPage() {
     isLoading,
     filters,
     deleteId,
-    hasFilters: Boolean(filters.search || filters.status || filters.dateFrom || filters.dateTo),
+    hasFilters: Boolean(
+      filters.search || filters.status || filters.dateFrom || filters.dateTo,
+    ),
     deleteIsPending: deleteLead.isPending,
     isFetchingNextPage,
     loaderRef,

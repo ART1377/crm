@@ -66,4 +66,4 @@ export const TEMPLATE_PURPOSES = [
   { value: "CUSTOM", label: "سفارشی" },
 ];
 
-export const LEADS_PAGE_SIZE = 10;
+export const LEADS_PAGE_SIZE = 20;

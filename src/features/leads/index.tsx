@@ -8,6 +8,8 @@ import { LeadsFilters } from "./filters";
 import { DeleteLeadDialog } from "./delete-dialog";
 import { LeadsTable } from "./table";
 import { LeadsEmptyState } from "./empty";
+import { ExportDialog } from "./export-dialog";
+import { BulkActionsBar } from "./bulk-actions-bar";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 import { PageHeader } from "@/components/shared/page-header";
 import Link from "next/link";
@@ -43,12 +45,6 @@ export function LeadsPage() {
 
   const updateLead = useUpdateLead();
 
-  const handleExportAll = async () => {
-    const allLeads = await exportAllLeads();
-    // Returns leads, caller handles it
-    return allLeads;
-  };
-
   const handleStatusChange = (id: string, status: string) => {
     updateLead.mutate({ id, data: { status } });
   };
@@ -56,12 +52,10 @@ export function LeadsPage() {
   const handleBulkStatusChange = useCallback(
     (status: string) => {
       if (!status) return;
-      selectedIds.forEach((id) => {
-        updateLead.mutate({ id, data: { status } });
-      });
+      selectedIds.forEach((id) => updateLead.mutate({ id, data: { status } }));
       handleClearSelection();
     },
-    [selectedIds, updateLead, handleClearSelection]
+    [selectedIds, updateLead, handleClearSelection],
   );
 
   const handleClearFilters = () => {
@@ -101,26 +95,31 @@ export function LeadsPage() {
         onSortOrderChange={setSortOrder}
         onClearFilters={handleClearFilters}
       />
+
       <Card className="flex-1 overflow-y-auto">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
+          <ExportDialog totalCount={totalCount} onExportAll={exportAllLeads} />
         </CardHeader>
         <CardContent>
           {leads.length === 0 ? (
             <LeadsEmptyState hasFilters={hasFilters} />
           ) : (
             <>
+              {selectedIds.length > 0 && (
+                <BulkActionsBar
+                  selectedCount={selectedIds.length}
+                  onBulkStatusChange={handleBulkStatusChange}
+                  onClearSelection={handleClearSelection}
+                />
+              )}
               <LeadsTable
                 leads={leads}
-                totalCount={totalCount}
                 onDelete={openDeleteDialog}
-                onExportAll={exportAllLeads}
                 onStatusChange={handleStatusChange}
                 selectedIds={selectedIds}
                 onSelectAll={handleSelectAll}
                 onSelectOne={handleSelectOne}
-                onBulkStatusChange={handleBulkStatusChange}
-                onClearSelection={handleClearSelection}
               />
               <div ref={loaderRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (
@@ -131,6 +130,7 @@ export function LeadsPage() {
           )}
         </CardContent>
       </Card>
+
       <DeleteLeadDialog
         open={Boolean(deleteId)}
         onClose={closeDeleteDialog}
