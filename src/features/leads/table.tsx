@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,11 @@ interface LeadsTableProps {
   onDelete: (id: string) => void;
   onExportAll: () => Promise<Lead[]>;
   onStatusChange: (id: string, status: string) => void;
+  selectedIds: string[];
+  onSelectAll: () => void;
+  onSelectOne: (id: string) => void;
+  onBulkStatusChange: (status: string) => void;
+  onClearSelection: () => void;
 }
 
 const ALL_COLUMNS = [
@@ -162,7 +167,15 @@ export function LeadsTable({
   onDelete,
   onExportAll,
   onStatusChange,
+  selectedIds,
+  onSelectAll,
+  onSelectOne,
+  onBulkStatusChange,
+  onClearSelection,
 }: LeadsTableProps) {
+  const allSelected = leads.length > 0 && selectedIds.length === leads.length;
+  const someSelected =
+    selectedIds.length > 0 && selectedIds.length < leads.length;
   const [exportFormat, setExportFormat] = useState<"csv" | "txt">("csv");
   const [selectedColumns, setSelectedColumns] =
     useState<ColumnKey[]>(DEFAULT_COLUMNS);
@@ -173,6 +186,16 @@ export function LeadsTable({
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
     );
   };
+  const checkboxRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      const input = checkboxRef.current.querySelector("input");
+      if (input) {
+        input.indeterminate = someSelected;
+      }
+    }
+  }, [someSelected]);
 
   const handleExport = async () => {
     if (selectedColumns.length === 0) return;
@@ -249,10 +272,44 @@ export function LeadsTable({
           </DialogContent>
         </Dialog>
       </div>
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 mb-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+          <span className="text-sm font-medium">
+            {selectedIds.length} سرنخ انتخاب شد
+          </span>
+          <Select value="" onValueChange={onBulkStatusChange}>
+            <SelectTrigger className="h-8 w-40">
+              <SelectValue placeholder="تغییر وضعیت گروهی" />
+            </SelectTrigger>
+            <SelectContent>
+              {LEAD_STATUSES.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearSelection}
+            className="mr-auto"
+          >
+            لغو انتخاب
+          </Button>
+        </div>
+      )}
 
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10">
+              <Checkbox
+                ref={checkboxRef}
+                checked={allSelected}
+                onCheckedChange={onSelectAll}
+              />
+            </TableHead>
             <TableHead className="text-start">نام کسب‌وکار</TableHead>
             <TableHead className="text-start">شخص تماس</TableHead>
             <TableHead className="text-start">شماره اصلی</TableHead>
@@ -266,7 +323,16 @@ export function LeadsTable({
         </TableHeader>
         <TableBody>
           {leads.map((lead) => (
-            <TableRow key={lead.id}>
+            <TableRow
+              key={lead.id}
+              className={selectedIds.includes(lead.id) ? "bg-primary/5" : ""}
+            >
+              <TableCell>
+                <Checkbox
+                  checked={selectedIds.includes(lead.id)}
+                  onCheckedChange={() => onSelectOne(lead.id)}
+                />
+              </TableCell>
               <TableCell className="font-medium">
                 <Link
                   href={`/leads/${lead.id}`}

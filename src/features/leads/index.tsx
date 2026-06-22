@@ -13,7 +13,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUpdateLead } from "@/hooks/use-leads";
-import { Lead } from "@/types";
+import { useCallback } from "react";
 
 export function LeadsPage() {
   const {
@@ -35,17 +35,34 @@ export function LeadsPage() {
     openDeleteDialog,
     closeDeleteDialog,
     exportAllLeads,
+    selectedIds,
+    handleSelectAll,
+    handleSelectOne,
+    handleClearSelection,
   } = useLeadsPage();
 
-  const handleExportAll = async (): Promise<Lead[]> => {
-    return await exportAllLeads();
-  };
-
   const updateLead = useUpdateLead();
+
+  const handleExportAll = async () => {
+    const allLeads = await exportAllLeads();
+    // Returns leads, caller handles it
+    return allLeads;
+  };
 
   const handleStatusChange = (id: string, status: string) => {
     updateLead.mutate({ id, data: { status } });
   };
+
+  const handleBulkStatusChange = useCallback(
+    (status: string) => {
+      if (!status) return;
+      selectedIds.forEach((id) => {
+        updateLead.mutate({ id, data: { status } });
+      });
+      handleClearSelection();
+    },
+    [selectedIds, updateLead, handleClearSelection]
+  );
 
   const handleClearFilters = () => {
     handleFilterChange("search", "");
@@ -97,8 +114,13 @@ export function LeadsPage() {
                 leads={leads}
                 totalCount={totalCount}
                 onDelete={openDeleteDialog}
-                onExportAll={handleExportAll}
+                onExportAll={exportAllLeads}
                 onStatusChange={handleStatusChange}
+                selectedIds={selectedIds}
+                onSelectAll={handleSelectAll}
+                onSelectOne={handleSelectOne}
+                onBulkStatusChange={handleBulkStatusChange}
+                onClearSelection={handleClearSelection}
               />
               <div ref={loaderRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (

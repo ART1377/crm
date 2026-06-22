@@ -18,6 +18,14 @@ import { useListOptions } from "@/hooks/use-list-options";
 import { User, Building2, Phone, Tag, Hash, StickyNote } from "lucide-react";
 import type { Lead } from "@/types";
 import toast from "react-hot-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { LEAD_STATUSES } from "@/lib/constants";
 
 interface EditLeadDialogProps {
   lead: Lead;
@@ -40,6 +48,7 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
     secondaryPhone: lead.secondaryPhone || "",
     industry: lead.industry,
     source: lead.source as string,
+    status: lead.status as string,
     notes: lead.notes || "",
   });
 
@@ -140,6 +149,24 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
                 placeholder="انتخاب منبع"
                 icon={<Hash className="h-4 w-4" />}
               />
+            </div>
+            <div className="space-y-2">
+              <Label>وضعیت</Label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm({ ...form, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEAD_STATUSES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

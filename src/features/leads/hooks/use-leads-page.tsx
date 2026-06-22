@@ -13,6 +13,7 @@ export function useLeadsPage() {
   const loaderRef = useRef<HTMLDivElement>(null);
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
@@ -25,31 +26,36 @@ export function useLeadsPage() {
       sortBy,
       sortOrder,
     }),
-    [
-      filters.status,
-      debouncedSearch,
-      filters.dateFrom,
-      filters.dateTo,
-      sortBy,
-      sortOrder,
-    ],
+    [filters.status, debouncedSearch, filters.dateFrom, filters.dateTo, sortBy, sortOrder],
   );
 
   const exportAllLeads = useCallback(async () => {
-    const result = await leadsService.getAll({
-      ...queryFilters,
-      limit: 9999,
-    });
+    const result = await leadsService.getAll({ ...queryFilters, limit: 9999 });
     return result.leads;
   }, [queryFilters]);
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useLeads(queryFilters);
-
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useLeads(queryFilters);
   const deleteLead = useDeleteLead();
 
   const leads = data?.pages.flatMap((page) => page.leads) ?? [];
   const totalCount = data?.pages[0]?.total ?? 0;
+
+  // Moved AFTER leads is defined
+  const handleSelectAll = useCallback(() => {
+    if (selectedIds.length === leads.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(leads.map((l) => l.id));
+    }
+  }, [selectedIds, leads]);
+
+  const handleSelectOne = useCallback((id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
+  }, []);
+
+  const handleClearSelection = useCallback(() => setSelectedIds([]), []);
 
   const handleFilterChange = useCallback(
     (field: keyof typeof filters, value: string) => {
@@ -67,7 +73,6 @@ export function useLeadsPage() {
   useEffect(() => {
     const loader = loaderRef.current;
     if (!loader) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -76,7 +81,6 @@ export function useLeadsPage() {
       },
       { threshold: 0.1 },
     );
-
     observer.observe(loader);
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
@@ -87,7 +91,7 @@ export function useLeadsPage() {
     isLoading,
     filters,
     deleteId,
-    hasFilters: Boolean(filters.search || filters.status),
+    hasFilters: Boolean(filters.search || filters.status || filters.dateFrom || filters.dateTo),
     deleteIsPending: deleteLead.isPending,
     isFetchingNextPage,
     loaderRef,
@@ -100,5 +104,9 @@ export function useLeadsPage() {
     setSortBy,
     sortOrder,
     setSortOrder,
+    selectedIds,
+    handleSelectAll,
+    handleSelectOne,
+    handleClearSelection,
   };
 }

@@ -1,6 +1,5 @@
 // src/types/index.ts
 
-// src/types/index.ts
 export type LeadStatus =
   | "NEW"
   | "CALLED"
