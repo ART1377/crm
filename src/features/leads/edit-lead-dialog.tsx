@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
+
+import type { Lead } from "@/types";
+import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUpdateLead } from "@/hooks/use-leads";
-import { ComboboxInput } from "@/components/shared/combobox-input";
-import { useListOptions } from "@/hooks/use-list-options";
-import { User, Building2, Phone, Tag, Hash, StickyNote } from "lucide-react";
-import type { Lead } from "@/types";
-import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -25,6 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
+import { ComboboxInput } from "@/components/shared/combobox-input";
+
+import { useUpdateLead } from "@/hooks/use-leads";
+import { useListOptions } from "@/hooks/use-list-options";
+
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface EditLeadDialogProps {
@@ -64,72 +69,64 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
   return (
     <Dialog key={lead.id} open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>ویرایش سرنخ</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>نام کسب‌وکار *</Label>
               <div className="relative">
-                <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Building2 className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 <Input
                   className="pr-10"
                   value={form.businessName}
-                  onChange={(e) =>
-                    setForm({ ...form, businessName: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, businessName: e.target.value })}
                 />
               </div>
             </div>
             <div className="space-y-2">
               <Label>شخص تماس</Label>
               <div className="relative">
-                <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 <Input
                   className="pr-10"
                   value={form.contactPerson}
-                  onChange={(e) =>
-                    setForm({ ...form, contactPerson: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, contactPerson: e.target.value })}
                 />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>شماره اصلی *</Label>
               <div className="relative">
-                <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Phone className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 <Input
                   className="pr-10"
                   dir="ltr"
                   value={form.phoneNumber}
-                  onChange={(e) =>
-                    setForm({ ...form, phoneNumber: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                 />
               </div>
             </div>
             <div className="space-y-2">
               <Label>شماره دوم</Label>
               <div className="relative">
-                <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Phone className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 <Input
                   className="pr-10"
                   dir="ltr"
                   value={form.secondaryPhone}
-                  onChange={(e) =>
-                    setForm({ ...form, secondaryPhone: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, secondaryPhone: e.target.value })}
                 />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>حوزه فعالیت *</Label>
               <ComboboxInput
@@ -173,7 +170,7 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
           <div className="space-y-2">
             <Label>یادداشت</Label>
             <div className="relative">
-              <StickyNote className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+              <StickyNote className="text-muted-foreground absolute top-3 right-3 h-4 w-4" />
               <Textarea
                 className="min-h-24 pr-10"
                 value={form.notes}
@@ -182,11 +179,7 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
             </div>
           </div>
 
-          <Button
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={updateLead.isPending}
-          >
+          <Button className="w-full" onClick={handleSubmit} disabled={updateLead.isPending}>
             {updateLead.isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
           </Button>
         </div>

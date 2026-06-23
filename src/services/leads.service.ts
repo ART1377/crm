@@ -1,12 +1,8 @@
 // src/services/leads.service.ts
 import apiClient from "@/config/axios";
+import type { CreateLeadData, Lead, LeadFilters, UpdateLeadData } from "@/types";
+
 import { LEADS_PAGE_SIZE } from "@/lib/constants";
-import type {
-  Lead,
-  LeadFilters,
-  CreateLeadData,
-  UpdateLeadData,
-} from "@/types";
 
 const LEADS_ENDPOINT = "/leads";
 
@@ -17,7 +13,7 @@ export const leadsService = {
       limit?: number;
       sortBy?: string;
       sortOrder?: string;
-    },
+    }
   ) {
     const params = new URLSearchParams();
     if (filters?.status) params.append("status", filters.status);
@@ -31,9 +27,7 @@ export const leadsService = {
     params.append("limit", String(filters?.limit || LEADS_PAGE_SIZE));
 
     const queryString = params.toString();
-    const url = queryString
-      ? `${LEADS_ENDPOINT}?${queryString}`
-      : LEADS_ENDPOINT;
+    const url = queryString ? `${LEADS_ENDPOINT}?${queryString}` : LEADS_ENDPOINT;
 
     return apiClient.get(url) as Promise<{
       leads: Lead[];

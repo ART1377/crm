@@ -1,7 +1,9 @@
 // src/app/api/leads/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+
 import { Prisma } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,15 +44,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate sortBy to prevent injection
-    const allowedSortFields = [
-      "createdAt",
-      "businessName",
-      "status",
-      "industry",
-    ];
-    const safeSortBy = allowedSortFields.includes(sortBy)
-      ? sortBy
-      : "createdAt";
+    const allowedSortFields = ["createdAt", "businessName", "status", "industry"];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
     const safeSortOrder = sortOrder === "asc" ? "asc" : "desc";
 
     const [leads, total] = await Promise.all([
@@ -74,10 +69,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("GET /api/leads error:", error);
-    return NextResponse.json(
-      { error: "خطا در دریافت سرنخ‌ها" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "خطا در دریافت سرنخ‌ها" }, { status: 500 });
   }
 }
 
@@ -88,21 +80,15 @@ export async function POST(request: NextRequest) {
     // Check for duplicate phone number
     const existing = await prisma.lead.findFirst({
       where: {
-        OR: [
-          { phoneNumber: body.phoneNumber },
-          { businessName: body.businessName },
-        ],
+        OR: [{ phoneNumber: body.phoneNumber }, { businessName: body.businessName }],
       },
     });
 
     if (existing) {
-      const field =
-        existing.phoneNumber === body.phoneNumber
-          ? "شماره تماس"
-          : "نام کسب‌وکار";
+      const field = existing.phoneNumber === body.phoneNumber ? "شماره تماس" : "نام کسب‌وکار";
       return NextResponse.json(
         { error: `${field} قبلاً ثبت شده است (${existing.businessName})` },
-        { status: 409 },
+        { status: 409 }
       );
     }
 

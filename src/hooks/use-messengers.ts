@@ -1,8 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/config/axios";
 import type { Messenger } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+
 import { MESSENGER_QUERY_KEY } from "@/lib/query-keys";
 
 export function useMessengers() {

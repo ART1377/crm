@@ -1,17 +1,21 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Copy, Trash2 } from "lucide-react";
-import { useDeleteTemplate } from "@/hooks/use-templates";
-import type { MessageTemplate } from "@/types";
-import toast from "react-hot-toast";
-import { useSettings } from "@/hooks/use-settings";
-import { replaceTemplateVars } from "@/lib/utils";
 import { useState } from "react";
+
+import type { MessageTemplate } from "@/types";
+import { Copy, Trash2 } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+
 import { useCopyToClipboard } from "@/hooks/use-copy";
+import { useSettings } from "@/hooks/use-settings";
+import { useDeleteTemplate } from "@/hooks/use-templates";
+
+import { replaceTemplateVars } from "@/lib/utils";
 
 const PURPOSE_LABELS: Record<string, string> = {
   INITIAL: "معرفی",
@@ -38,26 +42,19 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
   const handleCopy = () => copy(preview, "متن قالب کپی شد");
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="group transition-shadow hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{template.title}</CardTitle>
-          <Badge variant="secondary">
-            {PURPOSE_LABELS[template.purpose] || template.purpose}
-          </Badge>
+          <Badge variant="secondary">{PURPOSE_LABELS[template.purpose] || template.purpose}</Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 justify-between flex flex-col">
-        <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed flex-1">
+      <CardContent className="flex flex-1 flex-col justify-between">
+        <p className="text-muted-foreground flex-1 text-sm leading-relaxed whitespace-pre-wrap">
           {preview}
         </p>
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={handleCopy}
-          >
+        <div className="mt-4 flex items-center gap-2 border-t pt-3">
+          <Button variant="outline" size="sm" className="flex-1" onClick={handleCopy}>
             <Copy className="ml-2 h-4 w-4" />
             {copied ? "کپی شد" : "کپی قالب"}
           </Button>

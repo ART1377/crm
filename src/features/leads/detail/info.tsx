@@ -1,18 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Building2,
-  User,
-  Tag,
-  Copy,
-  PhoneCall,
-  Check,
-  Pencil,
-} from "lucide-react";
-import { InfoItem } from "./info-item";
 import type { Lead } from "@/types";
+import { Building2, Check, Copy, Pencil, PhoneCall, Tag, User } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { useCopyToClipboard } from "@/hooks/use-copy";
+
 import { EditLeadDialog } from "../edit-lead-dialog";
+import { InfoItem } from "./info-item";
 
 interface LeadInfoProps {
   lead: Lead;
@@ -36,31 +31,27 @@ export function LeadInfo({ lead }: LeadInfoProps) {
         </EditLeadDialog>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem
-            icon={User}
-            label="شخص تماس"
-            value={lead.contactPerson || "---"}
-          />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <InfoItem icon={User} label="شخص تماس" value={lead.contactPerson || "---"} />
           <InfoItem icon={Tag} label="صنعت" value={lead.industry} />
         </div>
 
         {lead.notes && (
-          <div className="pt-4 border-t">
-            <p className="text-sm font-medium mb-1">یادداشت:</p>
-            <p className="text-sm text-muted-foreground">{lead.notes}</p>
+          <div className="border-t pt-4">
+            <p className="mb-1 text-sm font-medium">یادداشت:</p>
+            <p className="text-muted-foreground text-sm">{lead.notes}</p>
           </div>
         )}
 
         {/* Phone numbers section */}
-        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+        <div className="bg-muted/50 space-y-3 rounded-lg p-4">
           {/* Primary */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">شماره اصلی</p>
+              <p className="text-muted-foreground mb-1 text-xs">شماره اصلی</p>
               <a
                 href={`tel:${lead.phoneNumber}`}
-                className="text-lg font-semibold text-primary hover:underline ltr text-left block"
+                className="text-primary ltr block text-left text-lg font-semibold hover:underline"
               >
                 {lead.phoneNumber}
               </a>
@@ -80,7 +71,7 @@ export function LeadInfo({ lead }: LeadInfoProps) {
               </Button>
               <a
                 href={`tel:${lead.phoneNumber}`}
-                className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green-50 text-green-600 transition-all duration-200 hover:scale-110 hover:bg-green-200"
               >
                 <PhoneCall className="h-4 w-4" />
               </a>
@@ -89,12 +80,12 @@ export function LeadInfo({ lead }: LeadInfoProps) {
 
           {/* Secondary */}
           {lead.secondaryPhone && (
-            <div className="flex items-center justify-between pt-3 border-t border-border/50">
+            <div className="border-border/50 flex items-center justify-between border-t pt-3">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">شماره دوم</p>
+                <p className="text-muted-foreground mb-1 text-xs">شماره دوم</p>
                 <a
                   href={`tel:${lead.secondaryPhone}`}
-                  className="text-lg font-semibold text-primary hover:underline ltr text-left block"
+                  className="text-primary ltr block text-left text-lg font-semibold hover:underline"
                 >
                   {lead.secondaryPhone}
                 </a>
@@ -104,9 +95,7 @@ export function LeadInfo({ lead }: LeadInfoProps) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() =>
-                    copySecondary(lead.secondaryPhone!, "شماره کپی شد")
-                  }
+                  onClick={() => copySecondary(lead.secondaryPhone!, "شماره کپی شد")}
                 >
                   {secondaryCopied ? (
                     <Check className="h-4 w-4 text-green-500" />
@@ -116,7 +105,7 @@ export function LeadInfo({ lead }: LeadInfoProps) {
                 </Button>
                 <a
                   href={`tel:${lead.secondaryPhone}`}
-                  className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-green-50 text-green-600 hover:bg-green-200 hover:scale-110 transition-all duration-200"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green-50 text-green-600 transition-all duration-200 hover:scale-110 hover:bg-green-200"
                 >
                   <PhoneCall className="h-4 w-4" />
                 </a>

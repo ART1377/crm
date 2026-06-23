@@ -1,12 +1,16 @@
 "use client";
 
+import { AlertCircle, Calendar } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, AlertCircle } from "lucide-react";
+
+import { PageHeader } from "@/components/shared/page-header";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+
 import { useTodayTasks } from "@/hooks/use-tasks";
+
 import { TaskItem } from "./item";
 import { TasksSkeleton } from "./skeleton";
-import { PageWrapper } from "@/components/shared/page-wrapper";
-import { PageHeader } from "@/components/shared/page-header";
 
 export function TasksPage() {
   const { data: tasks = [], isLoading } = useTodayTasks();
@@ -15,12 +19,7 @@ export function TasksPage() {
 
   return (
     <PageWrapper
-      header={
-        <PageHeader
-          title="تسک‌های امروز"
-          description="پیگیری‌های سررسید شده امروز"
-        />
-      }
+      header={<PageHeader title="تسک‌های امروز" description="پیگیری‌های سررسید شده امروز" />}
     >
       <Card>
         <CardHeader>
@@ -31,7 +30,7 @@ export function TasksPage() {
         </CardHeader>
         <CardContent>
           {tasks.length === 0 ? (
-            <div className="flex items-center justify-center py-8 text-muted-foreground">
+            <div className="text-muted-foreground flex items-center justify-center py-8">
               <AlertCircle className="ml-2 h-5 w-5" />
               تسکی برای امروز ندارید
             </div>

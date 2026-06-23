@@ -1,11 +1,9 @@
 // src/app/api/leads/[id]/tasks/route.ts
 import { NextRequest, NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const tasks = await prisma.task.findMany({
@@ -16,17 +14,11 @@ export async function GET(
     return NextResponse.json(tasks);
   } catch (error) {
     console.error("GET /api/leads/[id]/tasks error:", error);
-    return NextResponse.json(
-      { error: "خطا در دریافت تسک‌ها" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "خطا در دریافت تسک‌ها" }, { status: 500 });
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();

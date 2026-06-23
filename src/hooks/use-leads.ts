@@ -1,18 +1,19 @@
 // src/hooks/use-leads.ts
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { leadsService } from "@/services/leads.service";
-import type { LeadFilters, CreateLeadData, UpdateLeadData } from "@/types";
 import toast from "react-hot-toast";
+
+import apiClient from "@/config/axios";
+import type { CreateLeadData, LeadFilters, UpdateLeadData } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
+
+import { leadsService } from "@/services/leads.service";
+
 import { LEADS_PAGE_SIZE } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
-import apiClient from "@/config/axios";
 
-export function useLeads(
-  filters?: LeadFilters & { sortBy?: string; sortOrder?: string },
-) {
+export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
   return useInfiniteQuery({
     queryKey: [LEADS_QUERY_KEY, "infinite", filters],
     queryFn: ({ pageParam = 1 }) =>
@@ -21,8 +22,7 @@ export function useLeads(
         page: pageParam,
         limit: LEADS_PAGE_SIZE,
       }),
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
     initialPageParam: 1,
     placeholderData: (previousData) => previousData,
   });

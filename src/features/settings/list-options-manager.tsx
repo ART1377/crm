@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import toast from "react-hot-toast";
+
+import apiClient from "@/config/axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { List, Pencil, Plus, Trash2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -12,19 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "@/config/axios";
-import { useListOptions } from "@/hooks/use-list-options";
-import toast from "react-hot-toast";
-import { Plus, Trash2, Pencil, List } from "lucide-react";
+
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+
+import { useListOptions } from "@/hooks/use-list-options";
 
 interface ListOptionsManagerProps {
   type: "SOURCE" | "INDUSTRY";
@@ -83,7 +82,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       </CardHeader>
       <CardContent>
         {options.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">
+          <p className="text-muted-foreground py-6 text-center text-sm">
             هیچ گزینه‌ای ثبت نشده است
           </p>
         ) : (
@@ -91,7 +90,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-start">مقدار</TableHead>
-                <TableHead className="text-start w-24">عملیات</TableHead>
+                <TableHead className="w-24 text-start">عملیات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,7 +117,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
                         className="h-8 w-8"
                         onClick={() => setDeleting(opt.id)}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="text-destructive h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -133,9 +132,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {editing ? "ویرایش گزینه" : "افزودن گزینه جدید"}
-            </DialogTitle>
+            <DialogTitle>{editing ? "ویرایش گزینه" : "افزودن گزینه جدید"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">

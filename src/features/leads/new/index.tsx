@@ -1,21 +1,21 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateLead } from "@/hooks/use-leads";
-import { leadSchema } from "@/lib/validations";
+
 import type { CreateLeadData } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LeadForm } from "./form";
-import { LeadFormActions } from "./actions";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { PageHeader } from "@/components/shared/page-header";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+
+import { useCreateLead } from "@/hooks/use-leads";
+
+import { leadSchema } from "@/lib/validations";
+
+import { LeadFormActions } from "./actions";
+import { LeadForm } from "./form";
 
 export function NewLeadPage() {
   const createLead = useCreateLead();
@@ -45,10 +45,7 @@ export function NewLeadPage() {
   return (
     <PageWrapper
       header={
-        <PageHeader
-          title="افزودن سرنخ جدید"
-          description="اطلاعات کسب‌وکار جدید را وارد کنید"
-        />
+        <PageHeader title="افزودن سرنخ جدید" description="اطلاعات کسب‌وکار جدید را وارد کنید" />
       }
     >
       <Card className="flex-1 overflow-y-auto">
@@ -59,10 +56,7 @@ export function NewLeadPage() {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-8">
             <LeadForm form={form} />
-            <LeadFormActions
-              onCancel={() => form.reset()}
-              isPending={createLead.isPending}
-            />
+            <LeadFormActions onCancel={() => form.reset()} isPending={createLead.isPending} />
           </form>
         </CardContent>
       </Card>

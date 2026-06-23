@@ -1,10 +1,13 @@
 // src/hooks/use-templates.ts
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { templatesService } from "@/services/templates.service";
-import type { MessageTemplate } from "@/types";
 import toast from "react-hot-toast";
+
+import type { MessageTemplate } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { templatesService } from "@/services/templates.service";
+
 import { TEMPLATES_QUERY_KEY } from "@/lib/query-keys";
 
 export function useTemplates() {
@@ -18,12 +21,8 @@ export function useCreateTemplate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      title: string;
-      content: string;
-      type: string;
-      purpose: string;
-    }) => templatesService.create(data),
+    mutationFn: (data: { title: string; content: string; type: string; purpose: string }) =>
+      templatesService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TEMPLATES_QUERY_KEY] });
       toast.success("قالب پیام ایجاد شد");
@@ -38,13 +37,8 @@ export function useUpdateTemplate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: Partial<MessageTemplate>;
-    }) => templatesService.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<MessageTemplate> }) =>
+      templatesService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TEMPLATES_QUERY_KEY] });
       toast.success("قالب پیام بروزرسانی شد");

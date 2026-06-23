@@ -1,20 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+
 import {
-  LayoutDashboard,
-  Users,
   CheckSquare,
-  MessageSquare,
+  LayoutDashboard,
   Menu,
-  X,
-  Sparkles,
+  MessageSquare,
   Settings,
+  Sparkles,
+  Users,
+  X,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+
+import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "داشبورد", href: "/", icon: LayoutDashboard },
@@ -46,8 +50,8 @@ export function Navbar() {
         variant="ghost"
         size="icon"
         className={cn(
-          "lg:hidden fixed top-4 z-50 shadow-md bg-background border transition-all duration-300",
-          isOpen ? "right-52 bg-gray-200" : "right-4",
+          "bg-background fixed top-4 z-50 border shadow-md transition-all duration-300 lg:hidden",
+          isOpen ? "right-52 bg-gray-200" : "right-4"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -65,60 +69,55 @@ export function Navbar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 right-0 z-40 w-64 bg-card border-l flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
-          isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0",
+          "bg-card fixed inset-y-0 right-0 z-40 flex w-64 flex-col border-l transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+          isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         )}
       >
         {/* Brand */}
-        <div className="p-6 border-b">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <div className="border-b p-6">
+          <div className="mb-1 flex items-center gap-2">
+            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
+              <Sparkles className="text-primary-foreground h-4 w-4" />
             </div>
             <h1 className="text-lg font-bold">CRM سرنخ‌ها</h1>
           </div>
-          <p className="text-xs text-muted-foreground">مدیریت فروش تلفنی</p>
+          <p className="text-muted-foreground text-xs">مدیریت فروش تلفنی</p>
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 space-y-1 p-3">
           {navigation.map((item) => {
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={handleLinkClick}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group",
+                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 <item.icon
                   className={cn(
                     "h-5 w-5 transition-colors",
-                    isActive
-                      ? "text-primary"
-                      : "text-muted-foreground group-hover:text-foreground",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                   )}
                 />
                 {item.name}
-                {isActive && (
-                  <span className="mr-auto w-1.5 h-1.5 rounded-full bg-primary" />
-                )}
+                {isActive && <span className="bg-primary mr-auto h-1.5 w-1.5 rounded-full" />}
               </Link>
             );
           })}
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t">
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+        <div className="border-t p-4">
+          <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
             CRM v1.0
           </div>
         </div>

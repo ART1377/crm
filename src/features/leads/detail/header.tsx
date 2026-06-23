@@ -1,5 +1,9 @@
 "use client";
 
+import toast from "react-hot-toast";
+
+import type { Lead } from "@/types";
+
 import {
   Select,
   SelectContent,
@@ -7,13 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUpdateLead } from "@/hooks/use-leads";
+
+import { PageHeader } from "@/components/shared/page-header";
+
 import { useCreateActivity } from "@/hooks/use-activities";
+import { useUpdateLead } from "@/hooks/use-leads";
+
 import { LEAD_STATUSES } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
-import type { Lead } from "@/types";
-import toast from "react-hot-toast";
-import { PageHeader } from "@/components/shared/page-header";
 
 interface LeadHeaderProps {
   lead: Lead;

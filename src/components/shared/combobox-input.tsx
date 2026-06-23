@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef, useState } from "react";
+
 import { Check } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
+
 import { cn } from "@/lib/utils";
 
 interface ComboboxInputProps {
@@ -29,9 +32,7 @@ export function ComboboxInput({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filtered = options.filter((opt) =>
-    opt.toLowerCase().includes(value.toLowerCase())
-  );
+  const filtered = options.filter((opt) => opt.toLowerCase().includes(value.toLowerCase()));
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -76,7 +77,7 @@ export function ComboboxInput({
     <div ref={containerRef} className="relative">
       <div className="relative">
         {icon && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+          <div className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2">
             {icon}
           </div>
         )}
@@ -96,18 +97,18 @@ export function ComboboxInput({
         />
       </div>
       {isOpen && (value || filtered.length > 0) && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border bg-popover shadow-lg max-h-48 overflow-y-auto">
+        <div className="bg-popover absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border shadow-lg">
           {value && !filtered.includes(value) && (
             <button
               type="button"
-              className="w-full text-start px-3 py-2 text-sm hover:bg-muted transition-colors flex items-center gap-2 text-muted-foreground"
+              className="hover:bg-muted text-muted-foreground flex w-full items-center gap-2 px-3 py-2 text-start text-sm transition-colors"
               onClick={() => {
                 onChange(value);
                 setIsOpen(false);
               }}
             >
               <span className="text-xs">افزودن</span>
-              <span className="font-medium text-foreground">{value}</span>
+              <span className="text-foreground font-medium">{value}</span>
             </button>
           )}
           {filtered.map((opt, i) => (
@@ -115,7 +116,7 @@ export function ComboboxInput({
               key={opt}
               type="button"
               className={cn(
-                "w-full text-start px-3 py-2 text-sm hover:bg-muted transition-colors flex items-center justify-between",
+                "hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-start text-sm transition-colors",
                 i === highlightedIndex && "bg-muted",
                 value === opt && "text-primary font-medium"
               )}

@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function TemplatesSkeleton() {
   return (
@@ -8,10 +8,10 @@ export function TemplatesSkeleton() {
         <Skeleton className="h-10 w-40" />
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-48 w-full" />
         ))}
       </div>
     </div>
-  )
+  );
 }

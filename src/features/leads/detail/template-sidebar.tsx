@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+
+import { Copy, MessageSquare, Send } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -11,13 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageSquare, Copy, Send } from "lucide-react";
-import { useTemplates } from "@/hooks/use-templates";
-import { useSettings } from "@/hooks/use-settings";
-import { useMessengers } from "@/hooks/use-messengers";
-import { getMessengerLink, replaceTemplateVars } from "@/lib/utils";
-import toast from "react-hot-toast";
+
 import { useCopyToClipboard } from "@/hooks/use-copy";
+import { useMessengers } from "@/hooks/use-messengers";
+import { useSettings } from "@/hooks/use-settings";
+import { useTemplates } from "@/hooks/use-templates";
+
+import { getMessengerLink, replaceTemplateVars } from "@/lib/utils";
 
 interface TemplateSidebarProps {
   phone: string;
@@ -25,11 +29,7 @@ interface TemplateSidebarProps {
   contactPerson?: string | null;
 }
 
-export function TemplateSidebar({
-  phone,
-  companyName,
-  contactPerson,
-}: TemplateSidebarProps) {
+export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateSidebarProps) {
   const { data: templates = [] } = useTemplates();
   const { data: settings = {} } = useSettings();
   const { data: messengers = [] } = useMessengers();
@@ -38,9 +38,7 @@ export function TemplateSidebar({
 
   const activeMessengers = messengers.filter((m) => m.isActive);
 
-  const selectedMessenger = activeMessengers.find(
-    (m) => m.id === selectedMessengerId,
-  );
+  const selectedMessenger = activeMessengers.find((m) => m.id === selectedMessengerId);
 
   const getMessage = (content: string) =>
     replaceTemplateVars(content, {
@@ -51,8 +49,7 @@ export function TemplateSidebar({
       contactPerson,
     });
 
-  const handleCopy = (content: string) =>
-    copy(getMessage(content), "متن پیام کپی شد");
+  const handleCopy = (content: string) => copy(getMessage(content), "متن پیام کپی شد");
 
   const handleSend = (content: string) => {
     if (!selectedMessenger) {
@@ -64,9 +61,9 @@ export function TemplateSidebar({
         selectedMessenger.key,
         phone,
         getMessage(content),
-        selectedMessenger.linkTemplate,
+        selectedMessenger.linkTemplate
       ),
-      "_blank",
+      "_blank"
     );
   };
 
@@ -80,10 +77,7 @@ export function TemplateSidebar({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Platform selector */}
-        <Select
-          value={selectedMessengerId}
-          onValueChange={setSelectedMessengerId}
-        >
+        <Select value={selectedMessengerId} onValueChange={setSelectedMessengerId}>
           <SelectTrigger>
             <SelectValue placeholder="انتخاب پیام‌رسان" />
           </SelectTrigger>
@@ -99,20 +93,14 @@ export function TemplateSidebar({
         {/* Templates */}
         <div className="space-y-3">
           {templates.map((template) => (
-            <div key={template.id} className="p-3 bg-muted rounded-lg">
-              <div className="flex items-center justify-between mb-2">
+            <div key={template.id} className="bg-muted rounded-lg p-3">
+              <div className="mb-2 flex items-center justify-between">
                 <span className="text-sm font-medium">{template.title}</span>
                 <Badge variant="outline">{template.title}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                {template.content}
-              </p>
+              <p className="text-muted-foreground mb-2 line-clamp-2 text-xs">{template.content}</p>
               <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(template.content)}
-                >
+                <Button size="sm" variant="outline" onClick={() => handleCopy(template.content)}>
                   <Copy className="ml-1 h-3 w-3" />
                   کپی
                 </Button>

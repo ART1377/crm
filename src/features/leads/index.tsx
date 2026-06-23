@@ -1,21 +1,27 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCallback } from "react";
+
+import Link from "next/link";
+
 import { Loader2, Plus } from "lucide-react";
-import { useLeadsPage } from "./hooks/use-leads-page";
-import { LeadsPageSkeleton } from "./skeleton";
-import { LeadsFilters } from "./filters";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { PageHeader } from "@/components/shared/page-header";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+
+import { useUpdateLead } from "@/hooks/use-leads";
+
+import { BulkActionsBar } from "./bulk-actions-bar";
 import { DeleteLeadDialog } from "./delete-dialog";
-import { LeadsTable } from "./table";
 import { LeadsEmptyState } from "./empty";
 import { ExportDialog } from "./export-dialog";
-import { BulkActionsBar } from "./bulk-actions-bar";
-import { PageWrapper } from "@/components/shared/page-wrapper";
-import { PageHeader } from "@/components/shared/page-header";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useUpdateLead } from "@/hooks/use-leads";
-import { useCallback } from "react";
+import { LeadsFilters } from "./filters";
+import { useLeadsPage } from "./hooks/use-leads-page";
+import { LeadsPageSkeleton } from "./skeleton";
+import { LeadsTable } from "./table";
 
 export function LeadsPage() {
   const {
@@ -41,6 +47,7 @@ export function LeadsPage() {
     handleSelectAll,
     handleSelectOne,
     handleClearSelection,
+    handleClearFilters,
   } = useLeadsPage();
 
   const updateLead = useUpdateLead();
@@ -55,17 +62,8 @@ export function LeadsPage() {
       selectedIds.forEach((id) => updateLead.mutate({ id, data: { status } }));
       handleClearSelection();
     },
-    [selectedIds, updateLead, handleClearSelection],
+    [selectedIds, updateLead, handleClearSelection]
   );
-
-  const handleClearFilters = () => {
-    handleFilterChange("search", "");
-    handleFilterChange("status", "");
-    handleFilterChange("dateFrom", "");
-    handleFilterChange("dateTo", "");
-    setSortBy("createdAt");
-    setSortOrder("desc");
-  };
 
   if (isLoading) return <LeadsPageSkeleton />;
 
@@ -123,7 +121,7 @@ export function LeadsPage() {
               />
               <div ref={loaderRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
                 )}
               </div>
             </>

@@ -1,24 +1,29 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { CheckCircle, Clock } from 'lucide-react'
-import { useUpdateTask } from '@/hooks/use-tasks'
-import type { Task } from '@/types'
+import Link from "next/link";
+
+import type { Task } from "@/types";
+import { CheckCircle, Clock } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+import { useUpdateTask } from "@/hooks/use-tasks";
 
 interface TaskItemProps {
-  task: Task
+  task: Task;
 }
 
 export function TaskItem({ task }: TaskItemProps) {
-  const updateTask = useUpdateTask()
+  const updateTask = useUpdateTask();
 
   return (
-    <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+    <div className="bg-muted flex items-center justify-between rounded-lg p-4">
       <div className="flex items-center gap-3">
         <div
-          onClick={() => updateTask.mutate({ taskId: task.id, data: { isCompleted: !task.isCompleted } })}
+          onClick={() =>
+            updateTask.mutate({ taskId: task.id, data: { isCompleted: !task.isCompleted } })
+          }
           className="cursor-pointer"
         >
           {task.isCompleted ? (
@@ -28,24 +33,24 @@ export function TaskItem({ task }: TaskItemProps) {
           )}
         </div>
         <div>
-          <p className={task.isCompleted ? 'line-through text-muted-foreground' : ''}>
+          <p className={task.isCompleted ? "text-muted-foreground line-through" : ""}>
             {task.title}
           </p>
-          {task.lead && (
-            <p className="text-sm text-muted-foreground">{task.lead.businessName}</p>
-          )}
+          {task.lead && <p className="text-muted-foreground text-sm">{task.lead.businessName}</p>}
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant={task.isCompleted ? 'secondary' : 'default'}>
-          {task.isCompleted ? 'انجام شد' : 'در انتظار'}
+        <Badge variant={task.isCompleted ? "secondary" : "default"}>
+          {task.isCompleted ? "انجام شد" : "در انتظار"}
         </Badge>
         {task.lead && (
           <Link href={`/leads/${task.leadId}`}>
-            <Button variant="outline" size="sm">مشاهده</Button>
+            <Button variant="outline" size="sm">
+              مشاهده
+            </Button>
           </Link>
         )}
       </div>
     </div>
-  )
+  );
 }

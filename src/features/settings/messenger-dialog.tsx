@@ -2,19 +2,16 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
+
+import apiClient from "@/config/axios";
+import type { Messenger } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "@/config/axios";
-import toast from "react-hot-toast";
-import type { Messenger } from "@/types";
 
 interface MessengerDialogProps {
   open: boolean;
@@ -51,9 +48,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "ویرایش پیام‌رسان" : "افزودن پیام‌رسان جدید"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? "ویرایش پیام‌رسان" : "افزودن پیام‌رسان جدید"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -82,7 +77,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
               onChange={(e) => setLinkTemplate(e.target.value)}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             از {"{phone}"} و {"{message}"} در لینک استفاده کنید
           </p>
           <Button className="w-full" onClick={handleSubmit} disabled={!isValid}>

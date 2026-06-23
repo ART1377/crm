@@ -1,10 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Save } from "lucide-react";
 import type { UseFormRegister } from "react-hook-form";
+
+import { Save } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
 import Field from "./field";
 
 export interface SenderFormValues {
@@ -19,11 +22,7 @@ interface SenderInfoFormProps {
   isPending: boolean;
 }
 
-export function SenderInfoForm({
-  register,
-  onSubmit,
-  isPending,
-}: SenderInfoFormProps) {
+export function SenderInfoForm({ register, onSubmit, isPending }: SenderInfoFormProps) {
   return (
     <form onSubmit={onSubmit}>
       <Card>
@@ -40,10 +39,10 @@ export function SenderInfoForm({
           <Field label="نام شرکت">
             <Input {...register("senderCompany")} />
           </Field>
-        <Button type="submit" className="mt-4" disabled={isPending}>
-          <Save className="ml-2 h-4 w-4" />
-          ذخیره تنظیمات فرستنده
-        </Button>
+          <Button type="submit" className="mt-4" disabled={isPending}>
+            <Save className="ml-2 h-4 w-4" />
+            ذخیره تنظیمات فرستنده
+          </Button>
         </CardContent>
       </Card>
     </form>

@@ -1,12 +1,11 @@
 // src/app/api/leads/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+
 import { Prisma } from "@prisma/client";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+import { prisma } from "@/lib/prisma";
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const lead = await prisma.lead.findUnique({
@@ -27,31 +26,21 @@ export async function GET(
     return NextResponse.json(lead);
   } catch (error) {
     console.error("GET /api/leads/[id] error:", error);
-    return NextResponse.json(
-      { error: "خطا در دریافت اطلاعات" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "خطا در دریافت اطلاعات" }, { status: 500 });
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();
 
     const updateData: Prisma.LeadUpdateInput = {};
 
-    if (body.businessName !== undefined)
-      updateData.businessName = body.businessName;
-    if (body.contactPerson !== undefined)
-      updateData.contactPerson = body.contactPerson;
-    if (body.phoneNumber !== undefined)
-      updateData.phoneNumber = body.phoneNumber;
-    if (body.secondaryPhone !== undefined)
-      updateData.secondaryPhone = body.secondaryPhone;
+    if (body.businessName !== undefined) updateData.businessName = body.businessName;
+    if (body.contactPerson !== undefined) updateData.contactPerson = body.contactPerson;
+    if (body.phoneNumber !== undefined) updateData.phoneNumber = body.phoneNumber;
+    if (body.secondaryPhone !== undefined) updateData.secondaryPhone = body.secondaryPhone;
     if (body.industry !== undefined) updateData.industry = body.industry;
     if (body.source !== undefined) updateData.source = body.source;
     if (body.status !== undefined) updateData.status = body.status;
@@ -71,7 +60,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;

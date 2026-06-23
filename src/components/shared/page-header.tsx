@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
@@ -8,35 +9,26 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({
-  title,
-  description,
-  actions,
-  className,
-}: PageHeaderProps) {
+export function PageHeader({ title, description, actions, className }: PageHeaderProps) {
   return (
     <div
       className={cn(
-        "relative flex items-center justify-between gap-6 pb-6 mb-2 border-b mt-8 lg:mt-0",
-        className,
+        "relative mt-8 mb-2 flex items-center justify-between gap-6 border-b pb-6 lg:mt-0",
+        className
       )}
     >
       <div className="space-y-1">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-1 h-5 mb-1 rounded-full bg-primary shrink-0" />
-          <h1 className="text-2xl font-bold tracking-tight truncate">
-            {title}
-          </h1>
+        <div className="mb-2 flex items-center gap-3">
+          <div className="bg-primary mb-1 h-5 w-1 shrink-0 rounded-full" />
+          <h1 className="truncate text-2xl font-bold tracking-tight">{title}</h1>
         </div>
         {description && (
-          <p className="text-sm text-muted-foreground/60 leading-relaxed max-w-prose">
+          <p className="text-muted-foreground/60 max-w-prose text-sm leading-relaxed">
             {description}
           </p>
         )}
       </div>
-      {actions && (
-        <div className="flex items-center gap-2.5 shrink-0">{actions}</div>
-      )}
+      {actions && <div className="flex shrink-0 items-center gap-2.5">{actions}</div>}
     </div>
   );
 }

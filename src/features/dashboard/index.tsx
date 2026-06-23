@@ -1,14 +1,19 @@
 "use client";
 
 import Link from "next/link";
+
+import { Building2, Phone, Plus, Users } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Plus, Users, Phone, Building2 } from "lucide-react";
+
+import { PageHeader } from "@/components/shared/page-header";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+
 import { useLeadsStats } from "@/hooks/use-leads";
+
 import { StatCard } from "./card";
 import { DashboardSkeleton } from "./skeleton";
 import { TodayTasks } from "./today-tasks";
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
 
 export function DashboardPage() {
   const { data: stats, isLoading } = useLeadsStats();
@@ -32,13 +37,8 @@ export function DashboardPage() {
         />
       }
     >
-      <div className="gap-4 flex flex-col lg:flex-row flex-1 lg:flex-none">
-        <StatCard
-          title="کل سرنخ‌ها"
-          value={stats?.total ?? 0}
-          subtitle="تعداد کل"
-          icon={Users}
-        />
+      <div className="flex flex-1 flex-col gap-4 lg:flex-none lg:flex-row">
+        <StatCard title="کل سرنخ‌ها" value={stats?.total ?? 0} subtitle="تعداد کل" icon={Users} />
         <StatCard
           title="سرنخ‌های جدید"
           value={stats?.newLeads ?? 0}

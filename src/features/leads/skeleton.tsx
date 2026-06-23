@@ -7,7 +7,7 @@ export function LeadsPageSkeleton() {
       <div className="flex items-center justify-between">
         <div>
           <Skeleton className="h-9 w-32" />
-          <Skeleton className="h-5 w-48 mt-2" />
+          <Skeleton className="mt-2 h-5 w-48" />
         </div>
         <Skeleton className="h-10 w-40" />
       </div>
@@ -27,7 +27,7 @@ export function LeadsPageSkeleton() {
         </CardHeader>
         <CardContent>
           {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-16 w-full mb-2" />
+            <Skeleton key={i} className="mb-2 h-16 w-full" />
           ))}
         </CardContent>
       </Card>

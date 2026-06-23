@@ -2,15 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSettings, useSaveSettings } from "@/hooks/use-settings";
+
+import { List, MessageSquare, Settings2 } from "lucide-react";
+
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessengersTable } from "./messangers-table";
-import { SenderFormValues, SenderInfoForm } from "./info-form";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+
 import { PageHeader } from "@/components/shared/page-header";
+import { PageWrapper } from "@/components/shared/page-wrapper";
+
+import { useSaveSettings, useSettings } from "@/hooks/use-settings";
+
+import { SenderFormValues, SenderInfoForm } from "./info-form";
 import { ListOptionsManager } from "./list-options-manager";
-import { Settings2, MessageSquare, List } from "lucide-react";
+import { MessengersTable } from "./messangers-table";
 
 export function SettingsPage() {
   const { data: settings = {}, isLoading } = useSettings();
@@ -37,37 +42,21 @@ export function SettingsPage() {
         />
       }
     >
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
-        <TabsList className="w-full justify-start gap-1 bg-muted/50 p-1 rounded-lg overflow-x-auto flex-nowrap">
-          <TabsTrigger
-            value="general"
-            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
-          >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="bg-muted/50 w-full flex-nowrap justify-start gap-1 overflow-x-auto rounded-lg p-1">
+          <TabsTrigger value="general" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
             <Settings2 className="h-3.5 w-3.5" />
             فرستنده
           </TabsTrigger>
-          <TabsTrigger
-            value="messengers"
-            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
-          >
+          <TabsTrigger value="messengers" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
             <MessageSquare className="h-3.5 w-3.5" />
             پیام‌رسان‌ها
           </TabsTrigger>
-          <TabsTrigger
-            value="sources"
-            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
-          >
+          <TabsTrigger value="sources" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
             <List className="h-3.5 w-3.5" />
             منابع
           </TabsTrigger>
-          <TabsTrigger
-            value="industries"
-            className="gap-1.5 text-xs px-3 py-1.5 shrink-0"
-          >
+          <TabsTrigger value="industries" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
             <List className="h-3.5 w-3.5" />
             حوزه‌ها
           </TabsTrigger>

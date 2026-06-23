@@ -7,20 +7,12 @@ export const templatesService = {
     return apiClient.get("/templates") as Promise<MessageTemplate[]>;
   },
 
-  async create(data: {
-    title: string;
-    content: string;
-    type: string;
-    purpose: string;
-  }) {
+  async create(data: { title: string; content: string; type: string; purpose: string }) {
     return apiClient.post("/templates", data) as Promise<MessageTemplate>;
   },
 
   async update(id: string, data: Partial<MessageTemplate>) {
-    return apiClient.patch(
-      `/templates/${id}`,
-      data,
-    ) as Promise<MessageTemplate>;
+    return apiClient.patch(`/templates/${id}`, data) as Promise<MessageTemplate>;
   },
 
   async delete(id: string) {

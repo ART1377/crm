@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+
+import type { MessengerType } from "@/types";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
 import { useCreateTemplate } from "@/hooks/use-templates";
+
 import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "@/lib/constants";
-import type { MessengerType } from "@/types";
-
-
 
 interface CreateTemplateDialogProps {
   open: boolean;
@@ -30,11 +32,7 @@ interface CreateTemplateDialogProps {
   children: React.ReactNode;
 }
 
-export function CreateTemplateDialog({
-  open,
-  onOpenChange,
-  children,
-}: CreateTemplateDialogProps) {
+export function CreateTemplateDialog({ open, onOpenChange, children }: CreateTemplateDialogProps) {
   const createTemplate = useCreateTemplate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -83,15 +81,12 @@ export function CreateTemplateDialog({
             onChange={(e) => setContent(e.target.value)}
             className="min-h-25"
           />
-          <p className="text-xs text-muted-foreground -mt-2">
+          <p className="text-muted-foreground -mt-2 text-xs">
             متغیرهای قابل استفاده: {"{senderName}"} {"{senderPhone}"} {"{senderCompany}"}{" "}
             {"{companyName}"} {"{contactPerson}"}
           </p>
 
-          <Select
-            value={type}
-            onValueChange={(value) => setType(value as MessengerType)}
-          >
+          <Select value={type} onValueChange={(value) => setType(value as MessengerType)}>
             <SelectTrigger>
               <SelectValue placeholder="پلتفرم پیش‌فرض" />
             </SelectTrigger>
@@ -104,11 +99,7 @@ export function CreateTemplateDialog({
             </SelectContent>
           </Select>
 
-          <Button
-            className="w-full"
-            onClick={handleCreate}
-            disabled={!title || !content}
-          >
+          <Button className="w-full" onClick={handleCreate} disabled={!title || !content}>
             ذخیره قالب
           </Button>
         </div>

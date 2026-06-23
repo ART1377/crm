@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PhoneCall, Calendar } from "lucide-react";
+
 import type { Lead } from "@/types";
+import { Calendar, PhoneCall } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useCreateActivity } from "@/hooks/use-activities";
+
 import { LogCallDialog } from "./log-call-dialog";
 import { ScheduleTaskDialog } from "./schedule-task-dialog";
-import { useCreateActivity } from "@/hooks/use-activities";
 
 interface LeadQuickActionsProps {
   lead: Lead;

@@ -1,13 +1,18 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
-import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
-import { formatDate } from "@/lib/utils";
-import type { Task } from "@/types";
 import { useState } from "react";
+
+import type { Task } from "@/types";
+import { Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+
+import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
+
+import { formatDate } from "@/lib/utils";
 
 interface TaskSidebarProps {
   tasks: Task[];
@@ -34,15 +39,13 @@ export function TaskSidebar({ tasks, leadId }: TaskSidebarProps) {
       </CardHeader>
       <CardContent>
         {tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            پیگیری‌ای ثبت نشده
-          </p>
+          <p className="text-muted-foreground py-4 text-center text-sm">پیگیری‌ای ثبت نشده</p>
         ) : (
           <div className="space-y-2">
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${
                   task.isCompleted ? "bg-muted/50" : "bg-muted"
                 }`}
               >
@@ -51,21 +54,21 @@ export function TaskSidebar({ tasks, leadId }: TaskSidebarProps) {
                   className="cursor-pointer"
                 >
                   {task.isCompleted ? (
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
+                    <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
                   ) : (
-                    <Clock className="h-5 w-5 text-orange-500 shrink-0" />
+                    <Clock className="h-5 w-5 shrink-0 text-orange-500" />
                   )}
                 </div>
                 <div
-                  className="flex-1 min-w-0"
+                  className="min-w-0 flex-1"
                   onClick={() => handleToggle(task.id, task.isCompleted)}
                 >
                   <p
-                    className={`text-sm cursor-pointer ${task.isCompleted ? "line-through text-muted-foreground" : ""}`}
+                    className={`cursor-pointer text-sm ${task.isCompleted ? "text-muted-foreground line-through" : ""}`}
                   >
                     {task.title}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     {formatDate(new Date(task.dueDate))}
                   </p>
                 </div>
@@ -78,7 +81,7 @@ export function TaskSidebar({ tasks, leadId }: TaskSidebarProps) {
                     setDeleteTarget(task.id);
                   }}
                 >
-                  <Trash2 className="h-3 w-3 text-destructive" />
+                  <Trash2 className="text-destructive h-3 w-3" />
                 </Button>
               </div>
             ))}

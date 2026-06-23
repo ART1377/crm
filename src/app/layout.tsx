@@ -1,9 +1,13 @@
 // src/app/layout.tsx
-import type { Metadata } from "next";
-import "../styles/globals.css";
 import { Toaster } from "react-hot-toast";
-import { Navbar } from "@/components/layout/navbar";
+
+import type { Metadata } from "next";
+
 import { QueryProvider } from "@/providers/query-provider";
+
+import { Navbar } from "@/components/layout/navbar";
+
+import "../styles/globals.css";
 
 export const metadata: Metadata = {
   title: "CRM مدیریت سرنخ‌ها",
@@ -17,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" className="h-screen overflow-hidden">
-      <body className="h-screen overflow-hidden bg-background">
+      <body className="bg-background h-screen overflow-hidden">
         <QueryProvider>
           <div className="flex h-screen max-h-screen">
             <Navbar />

@@ -1,6 +1,7 @@
 import type { Lead } from "@/types";
-import { formatDate } from "@/lib/utils";
+
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
+import { formatDate } from "@/lib/utils";
 
 export const ALL_COLUMNS = [
   { key: "businessName", label: "نام کسب‌وکار" },
@@ -32,15 +33,24 @@ function normalizePhoneNumber(value: string): string {
 
 function getCellValue(lead: Lead, key: ColumnKey): string {
   switch (key) {
-    case "businessName": return lead.businessName;
-    case "contactPerson": return lead.contactPerson || "";
-    case "phoneNumber": return normalizePhoneNumber(lead.phoneNumber);
-    case "secondaryPhone": return normalizePhoneNumber(lead.secondaryPhone || "");
-    case "industry": return lead.industry;
-    case "source": return LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source || "";
-    case "status": return LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status;
-    case "createdAt": return formatDate(new Date(lead.createdAt));
-    default: return "";
+    case "businessName":
+      return lead.businessName;
+    case "contactPerson":
+      return lead.contactPerson || "";
+    case "phoneNumber":
+      return normalizePhoneNumber(lead.phoneNumber);
+    case "secondaryPhone":
+      return normalizePhoneNumber(lead.secondaryPhone || "");
+    case "industry":
+      return lead.industry;
+    case "source":
+      return LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source || "";
+    case "status":
+      return LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status;
+    case "createdAt":
+      return formatDate(new Date(lead.createdAt));
+    default:
+      return "";
   }
 }
 
@@ -76,7 +86,7 @@ export function exportToCsv(leads: Lead[], columns: ColumnKey[]) {
         return value ? `=""${value}""` : "";
       }
       return value;
-    }),
+    })
   );
   const csvContent = [
     headers.map((h) => `"${h}"`).join(","),

@@ -1,9 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useMessengers } from "@/hooks/use-messengers";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import toast from "react-hot-toast";
+
+import apiClient from "@/config/axios";
+import type { Messenger } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Settings2, Trash2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -12,13 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "@/config/axios";
-import toast from "react-hot-toast";
-import { Plus, Trash2, Pencil, Settings2 } from "lucide-react";
+
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
-import type { Messenger } from "@/types";
+
+import { useMessengers } from "@/hooks/use-messengers";
+
 import { MessengerDialog } from "./messenger-dialog";
 
 export function MessengersTable() {
@@ -98,12 +103,8 @@ export function MessengersTable() {
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleting(m.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                    <Button variant="ghost" size="icon" onClick={() => setDeleting(m.id)}>
+                      <Trash2 className="text-destructive h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

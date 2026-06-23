@@ -1,94 +1,94 @@
 @font-face {
-  font-family: 'IRANSansXFaNum';
-  src: url('/fonts/IranSans/IRANSansXFaNum-Regular.ttf');
+  font-family: "IRANSansXFaNum";
+  src: url("/fonts/IranSans/IRANSansXFaNum-Regular.ttf");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'IRANSansXFaNum';
-  src: url('/fonts/IranSans/IRANSansXFaNum-Medium.ttf');
+  font-family: "IRANSansXFaNum";
+  src: url("/fonts/IranSans/IRANSansXFaNum-Medium.ttf");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'IRANSansXFaNum';
-  src: url('/fonts/IranSans/IRANSansXFaNum-DemiBold.ttf');
+  font-family: "IRANSansXFaNum";
+  src: url("/fonts/IranSans/IRANSansXFaNum-DemiBold.ttf");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'IRANSansXFaNum';
-  src: url('/fonts/IranSans/IRANSansXFaNum-Bold.ttf');
+  font-family: "IRANSansXFaNum";
+  src: url("/fonts/IranSans/IRANSansXFaNum-Bold.ttf");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'dana';
-  src: url('/fonts/Fa-DanaFont/Dana-Bold.ttf');
+  font-family: "dana";
+  src: url("/fonts/Fa-DanaFont/Dana-Bold.ttf");
   font-style: normal;
   font-weight: 500;
 }
 
 @font-face {
-  font-family: 'dana';
-  src: url('/fonts/Fa-DanaFont/Dana-DemiBold.ttf');
+  font-family: "dana";
+  src: url("/fonts/Fa-DanaFont/Dana-DemiBold.ttf");
   font-style: normal;
   font-weight: bold;
 }
 
 @font-face {
-  font-family: 'dana';
-  src: url('/fonts/Fa-DanaFont/Dana-Light.ttf');
+  font-family: "dana";
+  src: url("/fonts/Fa-DanaFont/Dana-Light.ttf");
   font-style: normal;
   font-weight: 300;
 }
 
 @font-face {
-  font-family: 'dana';
-  src: url('/fonts/Fa-DanaFont/Dana-Medium.ttf');
+  font-family: "dana";
+  src: url("/fonts/Fa-DanaFont/Dana-Medium.ttf");
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'oxanium';
+  font-family: "oxanium";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/Oxanium/Oxanium-Regular.ttf') format('truetype');
+  src: url("/fonts/Oxanium/Oxanium-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'oxanium';
+  font-family: "oxanium";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('/fonts/Oxanium/Oxanium-Medium.ttf') format('truetype');
+  src: url("/fonts/Oxanium/Oxanium-Medium.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'oxanium';
+  font-family: "oxanium";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/Oxanium/Oxanium-SemiBold.ttf') format('truetype');
+  src: url("/fonts/Oxanium/Oxanium-SemiBold.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'oxanium';
+  font-family: "oxanium";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('/fonts/Oxanium/Oxanium-Bold.ttf') format('truetype');
+  src: url("/fonts/Oxanium/Oxanium-Bold.ttf") format("truetype");
 }
 
 .font-oxanium {
-  font-family: 'oxanium', 'dana', sans-serif;
+  font-family: "oxanium", "dana", sans-serif;
 }

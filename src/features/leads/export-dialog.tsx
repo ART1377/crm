@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
+
+import type { Lead } from "@/types";
+import { Download } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -16,17 +14,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Download } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import {
   ALL_COLUMNS,
+  type ColumnKey,
   DEFAULT_COLUMNS,
   exportToCsv,
   exportToText,
-  type ColumnKey,
 } from "./export-utils";
-import type { Lead } from "@/types";
 
 interface ExportDialogProps {
   totalCount: number;
@@ -64,10 +67,7 @@ export function ExportDialog({ totalCount, onExportAll }: ExportDialogProps) {
         <div className="space-y-6">
           <div className="space-y-2">
             <Label>فرمت خروجی</Label>
-            <Select
-              value={format}
-              onValueChange={(v) => setFormat(v as "csv" | "txt")}
-            >
+            <Select value={format} onValueChange={(v) => setFormat(v as "csv" | "txt")}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -89,22 +89,18 @@ export function ExportDialog({ totalCount, onExportAll }: ExportDialogProps) {
                       setColumns((prev) =>
                         prev.includes(col.key)
                           ? prev.filter((k) => k !== col.key)
-                          : [...prev, col.key],
+                          : [...prev, col.key]
                       )
                     }
                   />
-                  <Label htmlFor={col.key} className="text-sm cursor-pointer">
+                  <Label htmlFor={col.key} className="cursor-pointer text-sm">
                     {col.label}
                   </Label>
                 </div>
               ))}
             </div>
           </div>
-          <Button
-            className="w-full"
-            onClick={handleExport}
-            disabled={columns.length === 0}
-          >
+          <Button className="w-full" onClick={handleExport} disabled={columns.length === 0}>
             <Download className="ml-2 h-4 w-4" />
             دانلود ({totalCount} سرنخ)
           </Button>

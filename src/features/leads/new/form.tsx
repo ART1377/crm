@@ -1,13 +1,18 @@
 "use client";
 
 import type { UseFormReturn } from "react-hook-form";
+
 import type { CreateLeadData } from "@/types";
+import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FormField } from "./form-field";
-import { User, Building2, Phone, Tag, Hash, StickyNote } from "lucide-react";
+
 import { ComboboxInput } from "@/components/shared/combobox-input";
+
 import { useListOptions } from "@/hooks/use-list-options";
+
+import { FormField } from "./form-field";
 
 interface LeadFormProps {
   form: UseFormReturn<CreateLeadData>;
@@ -27,10 +32,10 @@ export function LeadForm({ form }: LeadFormProps) {
   return (
     <div className="space-y-6">
       {/* Business name + Contact person */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="نام کسب‌وکار *" error={errors.businessName?.message}>
           <div className="relative">
-            <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Building2 className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
             <Input
               id="businessName"
               placeholder="آهن‌فروشی فلاحی"
@@ -42,7 +47,7 @@ export function LeadForm({ form }: LeadFormProps) {
 
         <FormField label="شخص تماس" error={errors.contactPerson?.message}>
           <div className="relative">
-            <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <User className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
             <Input
               id="contactPerson"
               placeholder="نام و نام خانوادگی"
@@ -54,13 +59,10 @@ export function LeadForm({ form }: LeadFormProps) {
       </div>
 
       {/* Phones */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormField
-          label="شماره تماس اصلی *"
-          error={errors.phoneNumber?.message}
-        >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FormField label="شماره تماس اصلی *" error={errors.phoneNumber?.message}>
           <div className="relative">
-            <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Phone className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
             <Input
               id="phoneNumber"
               placeholder="0912 345 6789"
@@ -71,12 +73,9 @@ export function LeadForm({ form }: LeadFormProps) {
           </div>
         </FormField>
 
-        <FormField
-          label="شماره تماس دوم"
-          error={errors.secondaryPhone?.message}
-        >
+        <FormField label="شماره تماس دوم" error={errors.secondaryPhone?.message}>
           <div className="relative">
-            <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Phone className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
             <Input
               id="secondaryPhone"
               placeholder="0912 345 6789"
@@ -89,7 +88,7 @@ export function LeadForm({ form }: LeadFormProps) {
       </div>
 
       {/* Industry + Source */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="حوزه فعالیت *" error={errors.industry?.message}>
           <ComboboxInput
             value={form.watch("industry")}
@@ -114,7 +113,7 @@ export function LeadForm({ form }: LeadFormProps) {
       {/* Notes */}
       <FormField label="یادداشت" error={errors.notes?.message}>
         <div className="relative">
-          <StickyNote className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+          <StickyNote className="text-muted-foreground absolute top-3 right-3 h-4 w-4" />
           <Textarea
             id="notes"
             placeholder="یادداشت‌های خود را وارد کنید..."

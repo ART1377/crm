@@ -1,39 +1,47 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
-import { useLeads, useDeleteLead } from "@/hooks/use-leads";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { useDebounce } from "@/hooks/use-debounce";
+import { useDeleteLead, useLeads } from "@/hooks/use-leads";
+import { useQueryParams } from "@/hooks/use-query-params";
+
 import { leadsService } from "@/services/leads.service";
 
-const DEFAULT_FILTERS = { status: "", search: "", dateFrom: "", dateTo: "" };
+const DEFAULTS = {
+  status: "",
+  search: "",
+  dateFrom: "",
+  dateTo: "",
+  sortBy: "createdAt",
+  sortOrder: "desc",
+};
 
 export function useLeadsPage() {
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const { params, setParams, resetParams } = useQueryParams(DEFAULTS);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
-  const debouncedSearch = useDebounce(filters.search, 300);
+  const debouncedSearch = useDebounce(params.search, 300);
 
   const queryFilters = useMemo(
     () => ({
-      status: filters.status || undefined,
+      status: params.status || undefined,
       search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
-      dateFrom: filters.dateFrom || undefined,
-      dateTo: filters.dateTo || undefined,
-      sortBy,
-      sortOrder,
+      dateFrom: params.dateFrom || undefined,
+      dateTo: params.dateTo || undefined,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
     }),
     [
-      filters.status,
+      params.status,
       debouncedSearch,
-      filters.dateFrom,
-      filters.dateTo,
-      sortBy,
-      sortOrder,
-    ],
+      params.dateFrom,
+      params.dateTo,
+      params.sortBy,
+      params.sortOrder,
+    ]
   );
 
   const exportAllLeads = useCallback(async () => {
@@ -45,35 +53,18 @@ export function useLeadsPage() {
     useLeads(queryFilters);
   const deleteLead = useDeleteLead();
 
-  const leads = useMemo(
-    () => data?.pages.flatMap((page) => page.leads) ?? [],
-    [data?.pages],
-  );
+  const leads = useMemo(() => data?.pages.flatMap((page) => page.leads) ?? [], [data?.pages]);
   const totalCount = data?.pages[0]?.total ?? 0;
 
-  // Moved AFTER leads is defined
   const handleSelectAll = useCallback(() => {
-    if (selectedIds.length === leads.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(leads.map((l) => l.id));
-    }
-  }, [selectedIds, leads]);
+    setSelectedIds((prev) => (prev.length === leads.length ? [] : leads.map((l) => l.id)));
+  }, [leads]);
 
   const handleSelectOne = useCallback((id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   }, []);
 
   const handleClearSelection = useCallback(() => setSelectedIds([]), []);
-
-  const handleFilterChange = useCallback(
-    (field: keyof typeof filters, value: string) => {
-      setFilters((prev) => ({ ...prev, [field]: value }));
-    },
-    [],
-  );
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -81,16 +72,29 @@ export function useLeadsPage() {
     setDeleteId(null);
   };
 
+  const handleFilterChange = useCallback(
+    (field: string, value: string) => setParams({ [field]: value } as Partial<typeof DEFAULTS>),
+    [setParams]
+  );
+
+  const setSortBy = useCallback(
+    (value: string) => setParams({ sortBy: value } as Partial<typeof DEFAULTS>),
+    [setParams]
+  );
+
+  const setSortOrder = useCallback(
+    (value: string) => setParams({ sortOrder: value } as Partial<typeof DEFAULTS>),
+    [setParams]
+  );
+
   useEffect(() => {
     const loader = loaderRef.current;
     if (!loader) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage();
       },
-      { threshold: 0.1 },
+      { threshold: 0.1 }
     );
     observer.observe(loader);
     return () => observer.disconnect();
@@ -100,23 +104,27 @@ export function useLeadsPage() {
     leads,
     totalCount,
     isLoading,
-    filters,
+    filters: {
+      status: params.status,
+      search: params.search,
+      dateFrom: params.dateFrom,
+      dateTo: params.dateTo,
+    },
+    sortBy: params.sortBy,
+    sortOrder: params.sortOrder,
     deleteId,
-    hasFilters: Boolean(
-      filters.search || filters.status || filters.dateFrom || filters.dateTo,
-    ),
+    hasFilters: Boolean(params.search || params.status || params.dateFrom || params.dateTo),
     deleteIsPending: deleteLead.isPending,
     isFetchingNextPage,
     loaderRef,
     handleFilterChange,
+    setSortBy,
+    setSortOrder,
+    handleClearFilters: resetParams,
     handleDelete,
     openDeleteDialog: setDeleteId,
     closeDeleteDialog: () => setDeleteId(null),
     exportAllLeads,
-    sortBy,
-    setSortBy,
-    sortOrder,
-    setSortOrder,
     selectedIds,
     handleSelectAll,
     handleSelectOne,

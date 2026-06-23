@@ -1,10 +1,13 @@
 // src/hooks/use-tasks.ts
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { tasksService } from "@/services/tasks.service";
-import type { CreateTaskData, UpdateTaskData } from "@/types";
 import toast from "react-hot-toast";
+
+import type { CreateTaskData, UpdateTaskData } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { tasksService } from "@/services/tasks.service";
+
 import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from "@/lib/query-keys";
 
 export function useTasks(leadId: string) {
@@ -28,7 +31,7 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: ({ leadId, data }: { leadId: string; data: CreateTaskData }) =>
       tasksService.create(leadId, data),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       toast.success("تسک با موفقیت ایجاد شد");

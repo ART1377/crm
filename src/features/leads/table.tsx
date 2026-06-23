@@ -1,8 +1,22 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
 import Link from "next/link";
+
+import { ROUTES } from "@/routes/routes";
+import type { Lead } from "@/types";
+import { Eye, Pencil, Trash2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -11,19 +25,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, Trash2, Pencil } from "lucide-react";
-import type { Lead } from "@/types";
-import { formatDate } from "@/lib/utils";
+
 import { getSourceLabel } from "@/features/leads/lead-helpers";
+
 import { LEAD_STATUSES } from "@/lib/constants";
+import { formatDate } from "@/lib/utils";
+
 import { EditLeadDialog } from "./edit-lead-dialog";
 
 interface LeadsTableProps {
@@ -44,8 +51,7 @@ export function LeadsTable({
   onSelectOne,
 }: LeadsTableProps) {
   const allSelected = leads.length > 0 && selectedIds.length === leads.length;
-  const someSelected =
-    selectedIds.length > 0 && selectedIds.length < leads.length;
+  const someSelected = selectedIds.length > 0 && selectedIds.length < leads.length;
   const checkboxRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -61,11 +67,7 @@ export function LeadsTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-10">
-              <Checkbox
-                ref={checkboxRef}
-                checked={allSelected}
-                onCheckedChange={onSelectAll}
-              />
+              <Checkbox ref={checkboxRef} checked={allSelected} onCheckedChange={onSelectAll} />
             </TableHead>
             <TableHead className="text-start">نام کسب‌وکار</TableHead>
             <TableHead className="text-start">شخص تماس</TableHead>
@@ -80,10 +82,7 @@ export function LeadsTable({
         </TableHeader>
         <TableBody>
           {leads.map((lead) => (
-            <TableRow
-              key={lead.id}
-              className={selectedIds.includes(lead.id) ? "bg-primary/5" : ""}
-            >
+            <TableRow key={lead.id} className={selectedIds.includes(lead.id) ? "bg-primary/5" : ""}>
               <TableCell>
                 <Checkbox
                   checked={selectedIds.includes(lead.id)}
@@ -91,19 +90,13 @@ export function LeadsTable({
                 />
               </TableCell>
               <TableCell className="font-medium">
-                <Link
-                  href={`/leads/${lead.id}`}
-                  className="hover:text-primary transition-colors"
-                >
+                <Link href={`/leads/${lead.id}`} className="hover:text-primary transition-colors">
                   {lead.businessName}
                 </Link>
               </TableCell>
               <TableCell>{lead.contactPerson || "---"}</TableCell>
               <TableCell>
-                <a
-                  href={`tel:${lead.phoneNumber}`}
-                  className="hover:underline text-primary block"
-                >
+                <a href={`tel:${lead.phoneNumber}`} className="text-primary block hover:underline">
                   {lead.phoneNumber}
                 </a>
               </TableCell>
@@ -111,7 +104,7 @@ export function LeadsTable({
                 {lead.secondaryPhone ? (
                   <a
                     href={`tel:${lead.secondaryPhone}`}
-                    className="hover:underline text-primary block"
+                    className="text-primary block hover:underline"
                   >
                     {lead.secondaryPhone}
                   </a>
@@ -122,10 +115,7 @@ export function LeadsTable({
               <TableCell>{lead.industry}</TableCell>
               <TableCell>{getSourceLabel(lead.source)}</TableCell>
               <TableCell>
-                <Select
-                  value={lead.status}
-                  onValueChange={(v) => onStatusChange(lead.id, v)}
-                >
+                <Select value={lead.status} onValueChange={(v) => onStatusChange(lead.id, v)}>
                   <SelectTrigger className="h-8 w-40">
                     <SelectValue />
                   </SelectTrigger>
@@ -141,7 +131,7 @@ export function LeadsTable({
               <TableCell>{formatDate(new Date(lead.createdAt))}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
-                  <Link href={`/leads/${lead.id}`}>
+                  <Link href={ROUTES.leads.detail(lead.id)}>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -151,12 +141,8 @@ export function LeadsTable({
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </EditLeadDialog>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDelete(lead.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                  <Button variant="ghost" size="icon" onClick={() => onDelete(lead.id)}>
+                    <Trash2 className="text-destructive h-4 w-4" />
                   </Button>
                 </div>
               </TableCell>
