@@ -1,7 +1,7 @@
-import unusedImports from "eslint-plugin-unused-imports";
 import nextPlugin from "@next/eslint-plugin-next";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import unusedImports from "eslint-plugin-unused-imports";
 
 const eslintConfig = [
   {
