@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+
 import { LeadsPage } from "@/features/leads";
 import { LeadsPageSkeleton } from "@/features/leads/skeleton";
 
