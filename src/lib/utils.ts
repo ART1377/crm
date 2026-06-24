@@ -66,3 +66,16 @@ export function replaceTemplateVars(
 
   return result;
 }
+
+export function countOverdueTasks(tasks?: { isCompleted: boolean; dueDate: string }[]): number {
+  if (!tasks?.length) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return tasks.filter((t) => {
+    if (t.isCompleted) return false;
+    const dueDate = new Date(t.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays > 14;
+  }).length;
+}

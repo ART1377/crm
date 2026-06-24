@@ -3,8 +3,9 @@
 import { useState } from "react";
 
 import type { Task } from "@/types";
-import { Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,79 +13,117 @@ import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
 import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
 
-import { formatDate } from "@/lib/utils";
+import { countOverdueTasks, formatDate } from "@/lib/utils";
 
-interface TaskSidebarProps {
-  tasks: Task[];
-  leadId: string;
-}
-
-export function TaskSidebar({ tasks, leadId }: TaskSidebarProps) {
+export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }) {
   const updateTask = useUpdateTask();
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-
   const deleteTask = useDeleteTask(leadId);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const handleToggle = (taskId: string, isCompleted: boolean) => {
     updateTask.mutate({ taskId, data: { isCompleted: !isCompleted } });
   };
 
+  const pendingCount = tasks.filter((t) => !t.isCompleted).length;
+  const overdueCount = countOverdueTasks(tasks);
+
+  const isOverdue = (task: Task) => {
+    if (task.isCompleted) return false;
+    return countOverdueTasks([task]) > 0;
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          پیگیری‌ها
-        </CardTitle>
+    <Card className={overdueCount > 0 ? "border-red-200 ring-1 ring-red-100" : ""}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            پیگیری‌ها
+          </CardTitle>
+          <div className="flex items-center gap-1.5">
+            {pendingCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {pendingCount} فعال
+              </Badge>
+            )}
+            {overdueCount > 0 && (
+              <Badge variant="destructive" className="gap-1 text-xs">
+                <AlertTriangle className="h-3 w-3" />
+                {overdueCount} پیگیری نشده
+              </Badge>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {tasks.length === 0 ? (
           <p className="text-muted-foreground py-4 text-center text-sm">پیگیری‌ای ثبت نشده</p>
         ) : (
           <div className="space-y-2">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${
-                  task.isCompleted ? "bg-muted/50" : "bg-muted"
-                }`}
-              >
+            {tasks.map((task) => {
+              const overdue = isOverdue(task);
+              return (
                 <div
-                  onClick={() => handleToggle(task.id, task.isCompleted)}
-                  className="cursor-pointer"
+                  key={task.id}
+                  className={`flex items-center gap-3 rounded-lg p-2.5 transition-all ${
+                    overdue
+                      ? "border border-red-200 bg-red-50/70 shadow-sm"
+                      : task.isCompleted
+                        ? "bg-muted/30"
+                        : "bg-muted/80 hover:bg-muted"
+                  }`}
                 >
-                  {task.isCompleted ? (
-                    <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
-                  ) : (
-                    <Clock className="h-5 w-5 shrink-0 text-orange-500" />
-                  )}
-                </div>
-                <div
-                  className="min-w-0 flex-1"
-                  onClick={() => handleToggle(task.id, task.isCompleted)}
-                >
-                  <p
-                    className={`cursor-pointer text-sm ${task.isCompleted ? "text-muted-foreground line-through" : ""}`}
+                  <div
+                    onClick={() => handleToggle(task.id, task.isCompleted)}
+                    className="cursor-pointer"
                   >
-                    {task.title}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {formatDate(new Date(task.dueDate))}
-                  </p>
+                    {overdue ? (
+                      <AlertTriangle className="h-5 w-5 shrink-0 text-red-500" />
+                    ) : task.isCompleted ? (
+                      <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
+                    ) : (
+                      <Clock className="h-5 w-5 shrink-0 text-orange-500" />
+                    )}
+                  </div>
+                  <div
+                    className="min-w-0 flex-1"
+                    onClick={() => handleToggle(task.id, task.isCompleted)}
+                  >
+                    <p
+                      className={`cursor-pointer text-sm ${
+                        overdue
+                          ? "font-semibold text-red-800"
+                          : task.isCompleted
+                            ? "text-muted-foreground line-through"
+                            : "font-medium"
+                      }`}
+                    >
+                      {task.title}
+                    </p>
+                    <p
+                      className={`text-xs ${
+                        overdue ? "font-medium text-red-500" : "text-muted-foreground"
+                      }`}
+                    >
+                      {overdue
+                        ? `گذشته از موعد - ${formatDate(new Date(task.dueDate))}`
+                        : formatDate(new Date(task.dueDate))}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0 opacity-50 hover:opacity-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget(task.id);
+                    }}
+                  >
+                    <Trash2 className="text-destructive h-3 w-3" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteTarget(task.id);
-                  }}
-                >
-                  <Trash2 className="text-destructive h-3 w-3" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

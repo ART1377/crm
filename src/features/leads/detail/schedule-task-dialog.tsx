@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
+import { PersianDatePicker } from "@/components/shared/persian-date-picker";
+
 import { useCreateTask } from "@/hooks/use-tasks";
 
 interface ScheduleTaskDialogProps {
@@ -54,7 +56,11 @@ export function ScheduleTaskDialog({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <PersianDatePicker
+            value={dueDate}
+            onChange={setDueDate}
+            placeholder="تاریخ پیگیری"
+          />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

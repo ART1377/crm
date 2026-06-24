@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useUpdateLead } from "@/hooks/use-leads";
+import { useChangeLeadStatus } from "@/hooks/use-leads";
 
 import { BulkActionsBar } from "./bulk-actions-bar";
 import { DeleteLeadDialog } from "./delete-dialog";
@@ -50,19 +50,23 @@ export function LeadsPage() {
     handleClearFilters,
   } = useLeadsPage();
 
-  const updateLead = useUpdateLead();
+  const changeStatus = useChangeLeadStatus();
 
   const handleStatusChange = (id: string, status: string) => {
-    updateLead.mutate({ id, data: { status } });
+    const lead = leads.find((l) => l.id === id);
+    changeStatus.mutate({ id, status, previousStatus: lead?.status });
   };
 
   const handleBulkStatusChange = useCallback(
     (status: string) => {
       if (!status) return;
-      selectedIds.forEach((id) => updateLead.mutate({ id, data: { status } }));
+      selectedIds.forEach((id) => {
+        const lead = leads.find((l) => l.id === id);
+        changeStatus.mutate({ id, status, previousStatus: lead?.status });
+      });
       handleClearSelection();
     },
-    [selectedIds, updateLead, handleClearSelection]
+    [selectedIds, leads, changeStatus, handleClearSelection]
   );
 
   if (isLoading) return <LeadsPageSkeleton />;

@@ -10,7 +10,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { leadsService } from "@/services/leads.service";
 
-import { LEADS_PAGE_SIZE } from "@/lib/constants";
+import { LEADS_PAGE_SIZE, LEAD_STATUSES } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
@@ -92,6 +92,43 @@ export function useDeleteLead() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       toast.success("سرنخ با موفقیت حذف شد");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useChangeLeadStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      previousStatus,
+    }: {
+      id: string;
+      status: string;
+      previousStatus?: string;
+    }) => {
+      await leadsService.update(id, { status });
+      const newLabel = LEAD_STATUSES.find((s) => s.value === status)?.label || status;
+      const oldLabel = previousStatus
+        ? LEAD_STATUSES.find((s) => s.value === previousStatus)?.label || previousStatus
+        : null;
+
+      await apiClient.post(`/leads/${id}/activities`, {
+        type: "STATUS_CHANGE",
+        summary: oldLabel
+          ? `تغییر وضعیت از "${oldLabel}" به "${newLabel}"`
+          : `تغییر وضعیت به "${newLabel}"`,
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, variables.id] });
+      toast.success("وضعیت بروزرسانی شد");
     },
     onError: (error: Error) => {
       toast.error(error.message);

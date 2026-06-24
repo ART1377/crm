@@ -1,7 +1,6 @@
-"use client";
-
 import Link from "next/link";
 
+import { ROUTES } from "@/routes/routes";
 import { Building2, Phone, Plus, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ export function DashboardPage() {
           title="داشبورد"
           description="خلاصه‌ای از وضعیت سرنخ‌ها و فعالیت‌های امروز"
           actions={
-            <Link href="/leads/new">
+            <Link href={ROUTES.leads.new}>
               <Button size="lg">
                 <Plus className="ml-2 h-5 w-5" />
                 افزودن سرنخ جدید

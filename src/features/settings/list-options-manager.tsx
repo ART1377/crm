@@ -1,10 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
-
-import apiClient from "@/config/axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { List, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,18 +8,11 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
-import { useListOptions } from "@/hooks/use-list-options";
+import { useDeleteListOption, useListOptions, useSaveListOption } from "@/hooks/use-list-options";
 
 interface ListOptionsManagerProps {
   type: "SOURCE" | "INDUSTRY";
@@ -31,35 +20,16 @@ interface ListOptionsManagerProps {
 }
 
 export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
-  const { data: options = [] } = useListOptions(type);
-  const queryClient = useQueryClient();
+  const { data: options = [], isLoading } = useListOptions(type);
+  const saveOption = useSaveListOption(type);
+  const deleteOption = useDeleteListOption(type);
+
   const [editing, setEditing] = useState<{ id: string; value: string } | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
 
-  const saveOption = useMutation({
-    mutationFn: (data: { value: string }) =>
-      editing
-        ? apiClient.patch(`/list-options/${editing.id}`, data)
-        : apiClient.post("/list-options", { ...data, type }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["list-options", type] });
-      toast.success(editing ? "گزینه بروزرسانی شد" : "گزینه اضافه شد");
-      setIsDialogOpen(false);
-      setEditing(null);
-      setNewValue("");
-    },
-  });
-
-  const deleteOption = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/list-options/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["list-options", type] });
-      toast.success("گزینه حذف شد");
-      setDeleting(null);
-    },
-  });
+  if (isLoading) return null;
 
   return (
     <>
@@ -82,9 +52,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       </CardHeader>
       <CardContent>
         {options.length === 0 ? (
-          <p className="text-muted-foreground py-6 text-center text-sm">
-            هیچ گزینه‌ای ثبت نشده است
-          </p>
+          <p className="py-6 text-center text-sm text-muted-foreground">هیچ گزینه‌ای ثبت نشده است</p>
         ) : (
           <Table>
             <TableHeader>
@@ -117,7 +85,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
                         className="h-8 w-8"
                         onClick={() => setDeleting(opt.id)}
                       >
-                        <Trash2 className="text-destructive h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   </TableCell>
@@ -128,7 +96,6 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
         )}
       </CardContent>
 
-      {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -145,7 +112,18 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
             </div>
             <Button
               className="w-full"
-              onClick={() => saveOption.mutate({ value: newValue })}
+              onClick={() => {
+                saveOption.mutate(
+                  editing ? { id: editing.id, value: newValue } : { value: newValue },
+                  {
+                    onSuccess: () => {
+                      setIsDialogOpen(false);
+                      setEditing(null);
+                      setNewValue("");
+                    },
+                  }
+                );
+              }}
               disabled={!newValue.trim()}
             >
               {editing ? "بروزرسانی" : "افزودن"}
@@ -157,7 +135,12 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       <DeleteConfirmDialog
         open={!!deleting}
         onClose={() => setDeleting(null)}
-        onConfirm={() => deleting && deleteOption.mutate(deleting)}
+        onConfirm={() => {
+          if (deleting) {
+            deleteOption.mutate(deleting);
+            setDeleting(null);
+          }
+        }}
         title="حذف گزینه"
         isPending={deleteOption.isPending}
       />

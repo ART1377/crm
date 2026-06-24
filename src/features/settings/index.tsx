@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-
 import { List, MessageSquare, Settings2 } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -11,27 +8,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useSaveSettings, useSettings } from "@/hooks/use-settings";
-
-import { SenderFormValues, SenderInfoForm } from "./info-form";
+import { useSettingsPage } from "./hooks/use-settings-page";
+import { SenderInfoForm } from "./info-form";
 import { ListOptionsManager } from "./list-options-manager";
-import { MessengersTable } from "./messangers-table";
+import { MessengersTable } from "./messengers-table";
+import { SettingsPageSkeleton } from "./skeleton";
+
+const TABS = [
+  { value: "general", label: "فرستنده", icon: Settings2 },
+  { value: "messengers", label: "پیام‌رسان‌ها", icon: MessageSquare },
+  { value: "sources", label: "منابع", icon: List },
+  { value: "industries", label: "حوزه‌ها", icon: List },
+] as const;
 
 export function SettingsPage() {
-  const { data: settings = {}, isLoading } = useSettings();
-  const saveSettings = useSaveSettings();
-  const { register, handleSubmit, reset } = useForm<SenderFormValues>();
-  const [activeTab, setActiveTab] = useState("general");
+  const { isLoading, activeTab, setActiveTab, register, handleSubmit, onSubmit, isPending } =
+    useSettingsPage();
 
-  useEffect(() => {
-    if (Object.keys(settings).length > 0) reset(settings);
-  }, []);
-
-  const onSubmit = (data: SenderFormValues) => {
-    saveSettings.mutate({ ...data });
-  };
-
-  if (isLoading) return null;
+  if (isLoading) return <SettingsPageSkeleton />;
 
   return (
     <PageWrapper
@@ -42,31 +36,21 @@ export function SettingsPage() {
         />
       }
     >
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col space-y-6">
         <TabsList className="bg-muted/50 w-full flex-nowrap justify-start gap-1 overflow-x-auto rounded-lg p-1">
-          <TabsTrigger value="general" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
-            <Settings2 className="h-3.5 w-3.5" />
-            فرستنده
-          </TabsTrigger>
-          <TabsTrigger value="messengers" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
-            <MessageSquare className="h-3.5 w-3.5" />
-            پیام‌رسان‌ها
-          </TabsTrigger>
-          <TabsTrigger value="sources" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
-            <List className="h-3.5 w-3.5" />
-            منابع
-          </TabsTrigger>
-          <TabsTrigger value="industries" className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
-            <List className="h-3.5 w-3.5" />
-            حوزه‌ها
-          </TabsTrigger>
+          {TABS.map(({ value, label, icon: Icon }) => (
+            <TabsTrigger key={value} value={value} className="shrink-0 gap-1.5 px-3 py-1.5 text-xs">
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="general">
           <SenderInfoForm
             register={register}
             onSubmit={handleSubmit(onSubmit)}
-            isPending={saveSettings.isPending}
+            isPending={isPending}
           />
         </TabsContent>
 

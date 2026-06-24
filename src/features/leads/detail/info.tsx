@@ -9,24 +9,21 @@ import { useCopyToClipboard } from "@/hooks/use-copy";
 import { EditLeadDialog } from "../edit-lead-dialog";
 import { InfoItem } from "./info-item";
 
-interface LeadInfoProps {
-  lead: Lead;
-}
-
-export function LeadInfo({ lead }: LeadInfoProps) {
+export function LeadInfo({ lead }: { lead: Lead }) {
   const { copy, copied: primaryCopied } = useCopyToClipboard();
   const { copy: copySecondary, copied: secondaryCopied } = useCopyToClipboard();
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5" />
-          اطلاعات تماس
+          اطلاعات
         </CardTitle>
         <EditLeadDialog lead={lead}>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Pencil className="h-4 w-4" />
+          <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+            <Pencil className="h-3.5 w-3.5" />
+            ویرایش
           </Button>
         </EditLeadDialog>
       </CardHeader>

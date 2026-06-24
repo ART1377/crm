@@ -1,17 +1,15 @@
-// src/features/settings/messenger-dialog.tsx
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
-
-import apiClient from "@/config/axios";
-import type { Messenger } from "@/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+import { useSaveMessenger } from "@/hooks/use-messengers";
+
+import type { Messenger } from "@/types";
 
 interface MessengerDialogProps {
   open: boolean;
@@ -21,27 +19,27 @@ interface MessengerDialogProps {
 }
 
 export function MessengerDialog({ open, onOpenChange, messenger, onClose }: MessengerDialogProps) {
-  const queryClient = useQueryClient();
+  const save = useSaveMessenger();
   const isEditing = !!messenger;
 
   const [name, setName] = useState(messenger?.name ?? "");
   const [key, setKey] = useState(messenger?.key ?? "");
   const [linkTemplate, setLinkTemplate] = useState(messenger?.linkTemplate ?? "");
 
-  const save = useMutation({
-    mutationFn: (data: { name: string; key: string; linkTemplate: string }) =>
+  const handleSubmit = () => {
+    save.mutate(
       isEditing
-        ? apiClient.patch(`/messengers/${messenger!.id}`, data)
-        : apiClient.post("/messengers", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messengers"] });
-      toast.success(isEditing ? "پیام‌رسان بروزرسانی شد" : "پیام‌رسان اضافه شد");
-      onOpenChange(false);
-      onClose();
-    },
-  });
+        ? { id: messenger!.id, data: { name, key, linkTemplate } }
+        : { data: { name, key, linkTemplate } },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          onClose();
+        },
+      }
+    );
+  };
 
-  const handleSubmit = () => save.mutate({ name, key, linkTemplate });
   const isValid = name && key && linkTemplate;
 
   return (
@@ -53,11 +51,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>نام</Label>
-            <Input
-              placeholder="مثال: واتساپ"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <Input placeholder="مثال: واتساپ" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>کلید (لاتین)</Label>
@@ -77,7 +71,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
               onChange={(e) => setLinkTemplate(e.target.value)}
             />
           </div>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-xs text-muted-foreground">
             از {"{phone}"} و {"{message}"} در لینک استفاده کنید
           </p>
           <Button className="w-full" onClick={handleSubmit} disabled={!isValid}>

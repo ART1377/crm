@@ -1,9 +1,9 @@
 "use client";
 
-import toast from "react-hot-toast";
-
 import type { Lead } from "@/types";
+import { AlertTriangle } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -14,33 +14,32 @@ import {
 
 import { PageHeader } from "@/components/shared/page-header";
 
-import { useCreateActivity } from "@/hooks/use-activities";
-import { useUpdateLead } from "@/hooks/use-leads";
+import { useChangeLeadStatus } from "@/hooks/use-leads";
 
 import { LEAD_STATUSES } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import { countOverdueTasks, formatDate } from "@/lib/utils";
 
-interface LeadHeaderProps {
-  lead: Lead;
-  leadId: string;
-}
+export function LeadHeader({ lead, leadId }: { lead: Lead; leadId: string }) {
+  const changeStatus = useChangeLeadStatus();
+  const overdueCount = countOverdueTasks(lead.tasks);
 
-export function LeadHeader({ lead, leadId }: LeadHeaderProps) {
-  const updateLead = useUpdateLead();
-  const createActivity = useCreateActivity(leadId);
-
-  const handleStatusChange = async (newStatus: string) => {
-    await updateLead.mutateAsync({ id: leadId, data: { status: newStatus } });
-    await createActivity.mutateAsync({
-      type: "STATUS_CHANGE",
-      summary: `تغییر وضعیت به ${LEAD_STATUSES.find((s) => s.value === newStatus)?.label}`,
-    });
-    toast.success("وضعیت بروزرسانی شد");
+  const handleStatusChange = (newStatus: string) => {
+    changeStatus.mutate({ id: leadId, status: newStatus, previousStatus: lead.status });
   };
 
   return (
     <PageHeader
-      title={lead.businessName}
+      title={
+        <span className="inline-flex items-center gap-2">
+          {lead.businessName}
+          {overdueCount > 0 && (
+            <Badge variant="destructive" className="gap-1 text-xs">
+              <AlertTriangle className="h-3 w-3" />
+              {overdueCount} پیگیری نشده
+            </Badge>
+          )}
+        </span>
+      }
       description={`آخرین بروزرسانی: ${formatDate(new Date(lead.updatedAt))}`}
       actions={
         <Select value={lead.status} onValueChange={handleStatusChange}>

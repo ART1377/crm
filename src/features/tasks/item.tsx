@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 import type { Task } from "@/types";
@@ -9,12 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { useUpdateTask } from "@/hooks/use-tasks";
+import { ROUTES } from "@/routes/routes";
 
-interface TaskItemProps {
-  task: Task;
-}
-
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task }: { task: Task }) {
   const updateTask = useUpdateTask();
 
   return (
@@ -44,7 +39,7 @@ export function TaskItem({ task }: TaskItemProps) {
           {task.isCompleted ? "انجام شد" : "در انتظار"}
         </Badge>
         {task.lead && (
-          <Link href={`/leads/${task.leadId}`}>
+          <Link href={ROUTES.leads.detail(task.leadId)}>
             <Button variant="outline" size="sm">
               مشاهده
             </Button>

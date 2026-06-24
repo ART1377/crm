@@ -147,13 +147,14 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
                 icon={<Hash className="h-4 w-4" />}
               />
             </div>
+          </div>
             <div className="space-y-2">
               <Label>وضعیت</Label>
               <Select
                 value={form.status}
                 onValueChange={(value) => setForm({ ...form, status: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,7 +166,6 @@ export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
           <div className="space-y-2">
             <Label>یادداشت</Label>

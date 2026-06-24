@@ -64,6 +64,6 @@ export const TEMPLATE_PURPOSES = [
   { value: "FOLLOW_UP", label: "پیگیری" },
   { value: "CLOSING", label: "تشکر نهایی" },
   { value: "CUSTOM", label: "سفارشی" },
-];
+] as const;
 
 export const LEADS_PAGE_SIZE = 20;
