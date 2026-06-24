@@ -39,3 +39,18 @@ export function useDeleteActivity(leadId: string) {
     },
   });
 }
+
+export function useDeleteAllActivities(leadId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => activitiesService.deleteAll(leadId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
+      toast.success("همه فعالیت‌ها حذف شدند");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}

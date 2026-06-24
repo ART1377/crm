@@ -1,6 +1,7 @@
 // src/lib/utils.ts
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { OVERDUE_DAYS } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -76,6 +77,6 @@ export function countOverdueTasks(tasks?: { isCompleted: boolean; dueDate: strin
     const dueDate = new Date(t.dueDate);
     dueDate.setHours(0, 0, 0, 0);
     const diffDays = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-    return diffDays > 14;
+    return diffDays > OVERDUE_DAYS;
   }).length;
 }

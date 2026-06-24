@@ -3,22 +3,25 @@
 import { useState } from "react";
 
 import type { Task } from "@/types";
-import { AlertTriangle, Calendar, CheckCircle, Clock, Trash2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle, Clock, Pencil, Trash2 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
-import { useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
+import { useDeleteAllTasks, useDeleteTask, useUpdateTask } from "@/hooks/use-tasks";
 
 import { countOverdueTasks, formatDate } from "@/lib/utils";
+
+import { EditTaskDialog } from "./edit-task-dialog";
 
 export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }) {
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask(leadId);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showDeleteAll, setShowDeleteAll] = useState(false);
+  const deleteAllTasks = useDeleteAllTasks(leadId);
 
   const handleToggle = (taskId: string, isCompleted: boolean) => {
     updateTask.mutate({ taskId, data: { isCompleted: !isCompleted } });
@@ -41,16 +44,17 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
             پیگیری‌ها
           </CardTitle>
           <div className="flex items-center gap-1.5">
-            {pendingCount > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {pendingCount} فعال
-              </Badge>
-            )}
-            {overdueCount > 0 && (
-              <Badge variant="destructive" className="gap-1 text-xs">
-                <AlertTriangle className="h-3 w-3" />
-                {overdueCount} پیگیری نشده
-              </Badge>
+            {/* existing badges */}
+            {tasks.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-destructive h-7 gap-1 text-xs"
+                onClick={() => setShowDeleteAll(true)}
+              >
+                <Trash2 className="h-3 w-3" />
+                حذف همه
+              </Button>
             )}
           </div>
         </div>
@@ -110,6 +114,16 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
                         : formatDate(new Date(task.dueDate))}
                     </p>
                   </div>
+                  <EditTaskDialog task={task}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 shrink-0 opacity-50 hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  </EditTaskDialog>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -138,6 +152,17 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
         }}
         title="حذف پیگیری"
         isPending={deleteTask.isPending}
+      />
+      <DeleteConfirmDialog
+        open={showDeleteAll}
+        onClose={() => setShowDeleteAll(false)}
+        onConfirm={() => {
+          deleteAllTasks.mutate();
+          setShowDeleteAll(false);
+        }}
+        title="حذف همه پیگیری‌ها"
+        description="آیا از حذف تمام پیگیری‌های این سرنخ اطمینان دارید؟"
+        isPending={deleteAllTasks.isPending}
       />
     </Card>
   );

@@ -67,3 +67,4 @@ export const TEMPLATE_PURPOSES = [
 ] as const;
 
 export const LEADS_PAGE_SIZE = 20;
+export const OVERDUE_DAYS = 20;

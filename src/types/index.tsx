@@ -113,7 +113,9 @@ export interface CreateTaskData {
 }
 
 export interface UpdateTaskData {
-  isCompleted: boolean;
+  isCompleted?: boolean;
+  title?: string;
+  dueDate?: string;
 }
 
 export interface Messenger {

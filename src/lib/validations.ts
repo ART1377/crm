@@ -28,3 +28,8 @@ export const templateSchema = z.object({
   content: z.string().min(1, "متن پیام الزامی است"),
   type: z.enum(["WHATSAPP", "SMS", "ETA", "BALE", "RUBIKA"]),
 });
+
+export const editTaskSchema = z.object({
+  title: z.string().min(1, "عنوان الزامی است"),
+  dueDate: z.string().min(1, "تاریخ الزامی است"),
+});

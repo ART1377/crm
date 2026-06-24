@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
-import { useDeleteActivity } from "@/hooks/use-activities";
+import { useDeleteActivity, useDeleteAllActivities } from "@/hooks/use-activities";
 
 import { formatDate } from "@/lib/utils";
 
@@ -28,12 +28,25 @@ const iconMap = {
 
 export function ActivityTimeline({ activities, leadId }: ActivityTimelineProps) {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showDeleteAll, setShowDeleteAll] = useState(false);
   const deleteActivity = useDeleteActivity(leadId);
+  const deleteAllActivities = useDeleteAllActivities(leadId);
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>تاریخچه فعالیت‌ها</CardTitle>
+        {activities.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-destructive h-8 gap-1.5 text-xs"
+            onClick={() => setShowDeleteAll(true)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            حذف همه
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {activities.length === 0 ? (
@@ -88,6 +101,17 @@ export function ActivityTimeline({ activities, leadId }: ActivityTimelineProps) 
         title="حذف فعالیت"
         description="آیا از حذف این فعالیت اطمینان دارید؟"
         isPending={deleteActivity.isPending}
+      />
+      <DeleteConfirmDialog
+        open={showDeleteAll}
+        onClose={() => setShowDeleteAll(false)}
+        onConfirm={() => {
+          deleteAllActivities.mutate();
+          setShowDeleteAll(false);
+        }}
+        title="حذف همه فعالیت‌ها"
+        description="آیا از حذف تمام فعالیت‌های این سرنخ اطمینان دارید؟"
+        isPending={deleteAllActivities.isPending}
       />
     </Card>
   );

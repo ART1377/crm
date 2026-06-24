@@ -3,7 +3,7 @@
 
 import toast from "react-hot-toast";
 
-import type { CreateTaskData, UpdateTaskData } from "@/types";
+import type { CreateTaskData } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { tasksService } from "@/services/tasks.service";
@@ -46,12 +46,17 @@ export function useUpdateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskData }) =>
-      tasksService.update(taskId, data),
+    mutationFn: ({
+      taskId,
+      data,
+    }: {
+      taskId: string;
+      data: { isCompleted?: boolean; title?: string; dueDate?: string };
+    }) => tasksService.update(taskId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      toast.success("وضعیت تسک بروزرسانی شد");
+      toast.success("تسک بروزرسانی شد");
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -67,6 +72,21 @@ export function useDeleteTask(leadId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
       toast.success("پیگیری حذف شد");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useDeleteAllTasks(leadId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => tasksService.deleteAll(leadId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
+      toast.success("همه پیگیری‌ها حذف شدند");
     },
     onError: (error: Error) => {
       toast.error(error.message);

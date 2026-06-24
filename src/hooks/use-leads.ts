@@ -10,7 +10,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { leadsService } from "@/services/leads.service";
 
-import { LEADS_PAGE_SIZE, LEAD_STATUSES } from "@/lib/constants";
+import { LEADS_PAGE_SIZE, LEAD_STATUSES, OVERDUE_DAYS } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
@@ -38,7 +38,6 @@ export function useLeadsStats() {
         active: number;
         customers: number;
       }>,
-    staleTime: 30 * 1000,
   });
 }
 
@@ -118,12 +117,23 @@ export function useChangeLeadStatus() {
         ? LEAD_STATUSES.find((s) => s.value === previousStatus)?.label || previousStatus
         : null;
 
+      // Log activity
       await apiClient.post(`/leads/${id}/activities`, {
         type: "STATUS_CHANGE",
         summary: oldLabel
           ? `تغییر وضعیت از "${oldLabel}" به "${newLabel}"`
           : `تغییر وضعیت به "${newLabel}"`,
       });
+
+      // Auto-create follow-up task for CALLED or MESSAGED
+      if (status === "CALLED" || status === "MESSAGED") {
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
+        await apiClient.post(`/leads/${id}/tasks`, {
+          title: status === "CALLED" ? "پیگیری تماس" : "پیگیری پیام",
+          dueDate: dueDate.toISOString().split("T")[0],
+        });
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
