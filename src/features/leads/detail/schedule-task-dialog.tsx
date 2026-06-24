@@ -56,11 +56,7 @@ export function ScheduleTaskDialog({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <PersianDatePicker
-            value={dueDate}
-            onChange={setDueDate}
-            placeholder="تاریخ پیگیری"
-          />
+          <PersianDatePicker value={dueDate} onChange={setDueDate} placeholder="تاریخ پیگیری" />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

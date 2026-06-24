@@ -26,10 +26,7 @@ export function useSaveMessenger() {
     }: {
       id?: string;
       data: { name: string; key: string; linkTemplate: string };
-    }) =>
-      id
-        ? apiClient.patch(`/messengers/${id}`, data)
-        : apiClient.post("/messengers", data),
+    }) => (id ? apiClient.patch(`/messengers/${id}`, data) : apiClient.post("/messengers", data)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MESSENGER_QUERY_KEY] });
       toast.success("پیام‌رسان ذخیره شد");

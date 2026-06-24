@@ -1,13 +1,12 @@
 import Link from "next/link";
 
+import { ROUTES } from "@/routes/routes";
 import { AlertCircle, Calendar } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-import { ROUTES } from "@/routes/routes";
 
 import { useTodayTasks } from "@/hooks/use-tasks";
 
@@ -30,7 +29,7 @@ export function TodayTasks() {
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex items-center justify-center py-8 text-muted-foreground">
+          <div className="text-muted-foreground flex items-center justify-center py-8">
             <AlertCircle className="ml-2 h-5 w-5" />
             پیگیری‌ای برای امروز ندارید
           </div>
@@ -39,18 +38,20 @@ export function TodayTasks() {
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center justify-between rounded-lg bg-muted p-3"
+                className="bg-muted flex items-center justify-between rounded-lg p-3"
               >
                 <div>
                   <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-muted-foreground">{task.lead?.businessName}</p>
+                  <p className="text-muted-foreground text-sm">{task.lead?.businessName}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={task.isCompleted ? "secondary" : "default"}>
                     {task.isCompleted ? "انجام شد" : "در انتظار"}
                   </Badge>
                   <Link href={ROUTES.leads.detail(task.leadId)}>
-                    <Button variant="outline" size="sm">مشاهده</Button>
+                    <Button variant="outline" size="sm">
+                      مشاهده
+                    </Button>
                   </Link>
                 </div>
               </div>

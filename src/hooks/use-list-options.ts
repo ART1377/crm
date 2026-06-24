@@ -25,13 +25,7 @@ export function useSaveListOption(type: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      value,
-    }: {
-      id?: string;
-      value: string;
-    }) =>
+    mutationFn: ({ id, value }: { id?: string; value: string }) =>
       id
         ? apiClient.patch(`/list-options/${id}`, { value })
         : apiClient.post("/list-options", { value, type }),

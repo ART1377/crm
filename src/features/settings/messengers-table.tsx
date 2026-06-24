@@ -1,19 +1,27 @@
 "use client";
 
 import { useState } from "react";
+
+import type { Messenger } from "@/types";
 import { Pencil, Plus, Settings2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
 import { useDeleteMessenger, useMessengers, useToggleMessenger } from "@/hooks/use-messengers";
 
 import { MessengerDialog } from "./messenger-dialog";
-import type { Messenger } from "@/types";
 
 export function MessengersTable() {
   const { data: messengers = [], isLoading } = useMessengers();
@@ -80,7 +88,7 @@ export function MessengersTable() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => setDeleting(m.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="text-destructive h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { List, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,14 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
@@ -52,7 +60,9 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       </CardHeader>
       <CardContent>
         {options.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">هیچ گزینه‌ای ثبت نشده است</p>
+          <p className="text-muted-foreground py-6 text-center text-sm">
+            هیچ گزینه‌ای ثبت نشده است
+          </p>
         ) : (
           <Table>
             <TableHeader>
@@ -85,7 +95,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
                         className="h-8 w-8"
                         onClick={() => setDeleting(opt.id)}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="text-destructive h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

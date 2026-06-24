@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ROUTES } from "@/routes/routes";
 import type { Task } from "@/types";
 import { CheckCircle, Clock } from "lucide-react";
 
@@ -7,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { useUpdateTask } from "@/hooks/use-tasks";
-import { ROUTES } from "@/routes/routes";
 
 export function TaskItem({ task }: { task: Task }) {
   const updateTask = useUpdateTask();

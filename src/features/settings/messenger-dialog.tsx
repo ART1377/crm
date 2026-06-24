@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 
+import type { Messenger } from "@/types";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useSaveMessenger } from "@/hooks/use-messengers";
-
-import type { Messenger } from "@/types";
 
 interface MessengerDialogProps {
   open: boolean;
@@ -51,7 +51,11 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>نام</Label>
-            <Input placeholder="مثال: واتساپ" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input
+              placeholder="مثال: واتساپ"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>کلید (لاتین)</Label>
@@ -71,7 +75,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
               onChange={(e) => setLinkTemplate(e.target.value)}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             از {"{phone}"} و {"{message}"} در لینک استفاده کنید
           </p>
           <Button className="w-full" onClick={handleSubmit} disabled={!isValid}>
