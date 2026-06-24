@@ -3,7 +3,6 @@
 
 import toast from "react-hot-toast";
 
-import apiClient from "@/config/axios";
 import type { CreateLeadData, LeadFilters, UpdateLeadData } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,6 +11,7 @@ import { leadsService } from "@/services/leads.service";
 
 import { LEADS_PAGE_SIZE, LEAD_STATUSES, OVERDUE_DAYS } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
+import { activitiesService } from "@/services/activities.service";
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
   return useInfiniteQuery({
@@ -31,13 +31,7 @@ export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: 
 export function useLeadsStats() {
   return useQuery({
     queryKey: [LEADS_QUERY_KEY, "stats"],
-    queryFn: () =>
-      apiClient.get("/leads/stats") as Promise<{
-        total: number;
-        newLeads: number;
-        active: number;
-        customers: number;
-      }>,
+    queryFn: () => leadsService.getStats(),
   });
 }
 
@@ -118,7 +112,7 @@ export function useChangeLeadStatus() {
         : null;
 
       // Log activity
-      await apiClient.post(`/leads/${id}/activities`, {
+      await activitiesService.create(id, {
         type: "STATUS_CHANGE",
         summary: oldLabel
           ? `تغییر وضعیت از "${oldLabel}" به "${newLabel}"`
@@ -129,7 +123,7 @@ export function useChangeLeadStatus() {
       if (status === "CALLED" || status === "MESSAGED") {
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
-        await apiClient.post(`/leads/${id}/tasks`, {
+        await leadsService.createTask(id, {
           title: status === "CALLED" ? "پیگیری تماس" : "پیگیری پیام",
           dueDate: dueDate.toISOString().split("T")[0],
         });

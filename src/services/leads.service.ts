@@ -1,6 +1,6 @@
 // src/services/leads.service.ts
 import apiClient from "@/config/axios";
-import type { CreateLeadData, Lead, LeadFilters, UpdateLeadData } from "@/types";
+import type { CreateLeadData, Lead, LeadFilters, Task, UpdateLeadData } from "@/types";
 
 import { LEADS_PAGE_SIZE } from "@/lib/constants";
 
@@ -51,5 +51,18 @@ export const leadsService = {
 
   async delete(id: string) {
     return apiClient.delete(`${LEADS_ENDPOINT}/${id}`) as Promise<void>;
+  },
+
+  async getStats() {
+    return apiClient.get(`${LEADS_ENDPOINT}/stats`) as Promise<{
+      total: number;
+      newLeads: number;
+      active: number;
+      customers: number;
+    }>;
+  },
+
+  async createTask(leadId: string, data: { title: string; dueDate: string }) {
+    return apiClient.post(`/leads/${leadId}/tasks`, data) as Promise<Task>;
   },
 };

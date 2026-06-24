@@ -24,6 +24,6 @@ export const tasksService = {
   },
 
   async deleteAll(leadId: string) {
-    return apiClient.delete(`/tasks?leadId=${leadId}`) as Promise<void>;
+    return apiClient.delete(`/tasks/lead/${leadId}`) as Promise<void>;
   },
 };

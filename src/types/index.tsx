@@ -125,3 +125,9 @@ export interface Messenger {
   linkTemplate: string;
   isActive: boolean;
 }
+
+export interface ListOption {
+  id: string;
+  type: string;
+  value: string;
+}
