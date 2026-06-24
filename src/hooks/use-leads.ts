@@ -7,11 +7,11 @@ import type { CreateLeadData, LeadFilters, UpdateLeadData } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+import { activitiesService } from "@/services/activities.service";
 import { leadsService } from "@/services/leads.service";
 
 import { LEADS_PAGE_SIZE, LEAD_STATUSES, OVERDUE_DAYS } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
-import { activitiesService } from "@/services/activities.service";
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
   return useInfiniteQuery({
