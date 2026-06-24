@@ -27,7 +27,6 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
     updateTask.mutate({ taskId, data: { isCompleted: !isCompleted } });
   };
 
-  const pendingCount = tasks.filter((t) => !t.isCompleted).length;
   const overdueCount = countOverdueTasks(tasks);
 
   const isOverdue = (task: Task) => {
