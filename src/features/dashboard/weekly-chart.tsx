@@ -4,6 +4,7 @@ import ReactECharts from "echarts-for-react";
 import { Activity } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TooltipFormatterCallback } from "echarts/types/dist/shared";
 
 interface WeeklyCalendarProps {
   data: { date: string; count: number }[];
@@ -31,11 +32,11 @@ export function WeeklyCalendar({ data }: WeeklyCalendarProps) {
     tooltip: {
       position: "top",
       textStyle: { fontFamily: "Vazirmatn, sans-serif", fontSize: 12 },
-      formatter: (params: any) => {
+      formatter: ((params: { value: [string, number] }) => {
         const date = new Date(params.value[0]);
         const persianDate = date.toLocaleDateString("fa-IR", { dateStyle: "full" });
         return `${persianDate}<br/>${params.value[1]} فعالیت`;
-      },
+      }) as TooltipFormatterCallback<unknown>,
     },
     visualMap: {
       min: 0,
