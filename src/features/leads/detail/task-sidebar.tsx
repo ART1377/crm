@@ -48,7 +48,7 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-muted-foreground hover:text-destructive h-7 gap-1 text-xs"
+                className="text-destructive bg-destructive/10 hover:bg-destructive/15 hover:text-destructive h-7 gap-1 text-xs"
                 onClick={() => setShowDeleteAll(true)}
               >
                 <Trash2 className="h-3 w-3" />
@@ -67,7 +67,6 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
               const overdue = isOverdue(task);
               return (
                 <div
-                  key={task.id}
                   className={`flex items-center gap-3 rounded-lg p-2.5 transition-all ${
                     overdue
                       ? "border border-red-200 bg-red-50/70 shadow-sm"
@@ -76,43 +75,46 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
                         : "bg-muted/80 hover:bg-muted"
                   }`}
                 >
-                  <div
-                    onClick={() => handleToggle(task.id, task.isCompleted)}
-                    className="cursor-pointer"
-                  >
+                  {/* Status icon - not clickable */}
+                  <div className="shrink-0">
                     {overdue ? (
-                      <AlertTriangle className="h-5 w-5 shrink-0 text-red-500" />
+                      <AlertTriangle className="h-5 w-5 text-red-500" />
                     ) : task.isCompleted ? (
-                      <CheckCircle className="h-5 w-5 shrink-0 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-green-500" />
                     ) : (
-                      <Clock className="h-5 w-5 shrink-0 text-orange-500" />
+                      <Clock className="h-5 w-5 text-orange-500" />
                     )}
                   </div>
-                  <div
-                    className="min-w-0 flex-1"
-                    onClick={() => handleToggle(task.id, task.isCompleted)}
-                  >
+
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
                     <p
-                      className={`cursor-pointer text-sm ${
-                        overdue
-                          ? "font-semibold text-red-800"
-                          : task.isCompleted
-                            ? "text-muted-foreground line-through"
-                            : "font-medium"
-                      }`}
+                      className={`text-sm ${overdue ? "font-semibold text-red-800" : task.isCompleted ? "text-muted-foreground line-through" : "font-medium"}`}
                     >
                       {task.title}
                     </p>
                     <p
-                      className={`text-xs ${
-                        overdue ? "font-medium text-red-500" : "text-muted-foreground"
-                      }`}
+                      className={`text-xs ${overdue ? "font-medium text-red-500" : "text-muted-foreground"}`}
                     >
                       {overdue
                         ? `گذشته از موعد - ${formatDate(new Date(task.dueDate))}`
                         : formatDate(new Date(task.dueDate))}
                     </p>
                   </div>
+
+                  {/* Actions */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0 opacity-50 hover:opacity-100"
+                    onClick={() => handleToggle(task.id, task.isCompleted)}
+                  >
+                    {task.isCompleted ? (
+                      <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                    ) : (
+                      <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-orange-400" />
+                    )}
+                  </Button>
                   <EditTaskDialog task={task}>
                     <Button
                       variant="ghost"

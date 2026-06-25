@@ -65,4 +65,11 @@ export const leadsService = {
   async createTask(leadId: string, data: { title: string; dueDate: string }) {
     return apiClient.post(`/leads/${leadId}/tasks`, data) as Promise<Task>;
   },
+
+  async getAnalytics() {
+    return apiClient.get(`${LEADS_ENDPOINT}/analytics`) as Promise<{
+      industryStats: { industry: string; status: string; _count: { id: number } }[];
+      dailyActivity: { date: string; count: number }[];
+    }>;
+  },
 };

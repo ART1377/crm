@@ -89,10 +89,20 @@ export function PersianDatePicker({
             captionLayout="dropdown"
             startMonth={new Date(2020, 0)}
             endMonth={new Date(2030, 11)}
+            modifiers={{ today: new Date() }}
+            modifiersStyles={{
+              today: {
+                border: "2px solid hsl(var(--primary))",
+                borderRadius: "var(--rdp-day-radius)",
+                fontWeight: "bold",
+                backgroundColor: "#ddd",
+              },
+            }}
             style={
               {
                 "--rdp-accent-color": "hsl(var(--primary))",
                 "--rdp-accent-background-color": "hsl(var(--primary) / 0.9)",
+                "--rdp-day-radius": "8px",
               } as React.CSSProperties
             }
           />

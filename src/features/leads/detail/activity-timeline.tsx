@@ -40,7 +40,7 @@ export function ActivityTimeline({ activities, leadId }: ActivityTimelineProps) 
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-destructive h-8 gap-1.5 text-xs"
+            className="text-destructive bg-destructive/10 hover:bg-destructive/15 hover:text-destructive h-7 gap-1 text-xs"
             onClick={() => setShowDeleteAll(true)}
           >
             <Trash2 className="h-3.5 w-3.5" />

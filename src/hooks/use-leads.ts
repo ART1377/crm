@@ -139,3 +139,11 @@ export function useChangeLeadStatus() {
     },
   });
 }
+
+export function useLeadsAnalytics() {
+  return useQuery({
+    queryKey: [LEADS_QUERY_KEY, "analytics"],
+    queryFn: () => leadsService.getAnalytics(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
