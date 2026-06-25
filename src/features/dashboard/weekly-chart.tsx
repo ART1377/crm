@@ -1,10 +1,10 @@
 "use client";
 
 import ReactECharts from "echarts-for-react";
+import { TooltipFormatterCallback } from "echarts/types/dist/shared";
 import { Activity } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TooltipFormatterCallback } from "echarts/types/dist/shared";
 
 interface WeeklyCalendarProps {
   data: { date: string; count: number }[];
