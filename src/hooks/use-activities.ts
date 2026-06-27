@@ -2,7 +2,6 @@
 
 import toast from "react-hot-toast";
 
-import apiClient from "@/config/axios";
 import type { CreateActivityData } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -29,7 +28,7 @@ export function useDeleteActivity(leadId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (activityId: string) => apiClient.delete(`/activities/${activityId}`),
+    mutationFn: (activityId: string) => activitiesService.delete(activityId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
       toast.success("فعالیت حذف شد");

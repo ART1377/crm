@@ -9,4 +9,7 @@ export const activitiesService = {
   async deleteAll(leadId: string) {
     return apiClient.delete(`/activities/lead/${leadId}`) as Promise<void>;
   },
+  async delete(activityId: string) {
+    return apiClient.delete(`/activities/${activityId}`) as Promise<void>;
+  },
 };
