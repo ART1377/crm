@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, Calendar, Filter, Search, Tag, Trash2, X } from "lucide-react";
+import { ArrowUpDown, Filter, Search, Tag, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -137,7 +137,6 @@ export function LeadsFilters({
             </div>
 
             <div className="flex w-full items-center gap-1.5 sm:flex-1">
-              <Calendar className="text-muted-foreground h-4 w-4 shrink-0" />
               <PersianDatePicker
                 value={filters.dateFrom}
                 onChange={(date) => onFilterChange("dateFrom", date)}
