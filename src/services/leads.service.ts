@@ -72,4 +72,8 @@ export const leadsService = {
       dailyActivity: { date: string; count: number }[];
     }>;
   },
+
+  async changeStatus(id: string, data: { status: string; previousStatus?: string }) {
+    return apiClient.post(`/leads/${id}/change-status`, data) as Promise<void>;
+  },
 };

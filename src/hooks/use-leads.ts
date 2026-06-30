@@ -7,10 +7,9 @@ import type { CreateLeadData, LeadFilters, UpdateLeadData } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { activitiesService } from "@/services/activities.service";
 import { leadsService } from "@/services/leads.service";
 
-import { LEADS_PAGE_SIZE, LEAD_STATUSES, OVERDUE_DAYS } from "@/lib/constants";
+import { LEADS_PAGE_SIZE } from "@/lib/constants";
 import { LEADS_QUERY_KEY } from "@/lib/query-keys";
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
@@ -96,39 +95,11 @@ export function useChangeLeadStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      status,
-      previousStatus,
-    }: {
-      id: string;
-      status: string;
-      previousStatus?: string;
-    }) => {
-      await leadsService.update(id, { status });
-      const newLabel = LEAD_STATUSES.find((s) => s.value === status)?.label || status;
-      const oldLabel = previousStatus
-        ? LEAD_STATUSES.find((s) => s.value === previousStatus)?.label || previousStatus
-        : null;
-
-      // Log activity
-      await activitiesService.create(id, {
-        type: "STATUS_CHANGE",
-        summary: oldLabel
-          ? `تغییر وضعیت از "${oldLabel}" به "${newLabel}"`
-          : `تغییر وضعیت به "${newLabel}"`,
-      });
-
-      // Auto-create follow-up task for CALLED or MESSAGED
-      if (status === "CALLED" || status === "MESSAGED") {
-        const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
-        await leadsService.createTask(id, {
-          title: status === "CALLED" ? "پیگیری تماس" : "پیگیری پیام",
-          dueDate: dueDate.toISOString().split("T")[0],
-        });
-      }
-    },
+    mutationFn: (data: { id: string; status: string; previousStatus?: string }) =>
+      leadsService.changeStatus(data.id, {
+        status: data.status,
+        previousStatus: data.previousStatus,
+      }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, variables.id] });
