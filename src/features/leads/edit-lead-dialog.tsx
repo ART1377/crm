@@ -32,12 +32,7 @@ import { useListOptions } from "@/hooks/use-list-options";
 
 import { LEAD_STATUSES } from "@/lib/constants";
 
-interface EditLeadDialogProps {
-  lead: Lead;
-  children: React.ReactNode;
-}
-
-export function EditLeadDialog({ lead, children }: EditLeadDialogProps) {
+export function EditLeadDialog({ lead, children }: { lead: Lead; children: React.ReactNode }) {
   const updateLead = useUpdateLead();
   const { data: sourceOptions = [] } = useListOptions("SOURCE");
   const { data: industryOptions = [] } = useListOptions("INDUSTRY");

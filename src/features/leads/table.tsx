@@ -90,7 +90,10 @@ export function LeadsTable({
                 />
               </TableCell>
               <TableCell className="font-medium">
-                <Link href={`/leads/${lead.id}`} className="hover:text-primary transition-colors">
+                <Link
+                  href={ROUTES.leads.detail(lead.id)}
+                  className="hover:text-primary transition-colors"
+                >
                   {lead.businessName}
                 </Link>
               </TableCell>
@@ -136,7 +139,7 @@ export function LeadsTable({
                       <Eye className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <EditLeadDialog lead={lead}>
+                  <EditLeadDialog lead={lead} key={`${lead.id}-${lead.status}-${lead.updatedAt}`}>
                     <Button variant="ghost" size="icon">
                       <Pencil className="h-4 w-4" />
                     </Button>

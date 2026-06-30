@@ -1,3 +1,4 @@
+// src/services/settings.service.ts
 import apiClient from "@/config/axios";
 
 export const settingsService = {

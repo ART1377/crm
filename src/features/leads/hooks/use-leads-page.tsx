@@ -4,43 +4,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useDebounce } from "@/hooks/use-debounce";
 import { useDeleteLead, useLeads } from "@/hooks/use-leads";
-import { useQueryParams } from "@/hooks/use-query-params";
 
 import { leadsService } from "@/services/leads.service";
 
-const DEFAULTS = {
+const DEFAULT_FILTERS = {
   status: "",
   search: "",
   dateFrom: "",
   dateTo: "",
+  industry: "",
   sortBy: "createdAt",
   sortOrder: "desc",
 };
 
 export function useLeadsPage() {
-  const { params, setParams, resetParams } = useQueryParams(DEFAULTS);
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const debouncedSearch = useDebounce(params.search, 300);
+  const debouncedSearch = useDebounce(filters.search, 300);
 
   const queryFilters = useMemo(
     () => ({
-      status: params.status || undefined,
+      status: filters.status || undefined,
       search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
-      dateFrom: params.dateFrom || undefined,
-      dateTo: params.dateTo || undefined,
-      sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
+      dateFrom: filters.dateFrom || undefined,
+      dateTo: filters.dateTo || undefined,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      industry: filters.industry || undefined,
     }),
     [
-      params.status,
+      filters.status,
       debouncedSearch,
-      params.dateFrom,
-      params.dateTo,
-      params.sortBy,
-      params.sortOrder,
+      filters.dateFrom,
+      filters.dateTo,
+      filters.sortBy,
+      filters.sortOrder,
     ]
   );
 
@@ -72,20 +73,13 @@ export function useLeadsPage() {
     setDeleteId(null);
   };
 
-  const handleFilterChange = useCallback(
-    (field: string, value: string) => setParams({ [field]: value } as Partial<typeof DEFAULTS>),
-    [setParams]
-  );
+  const handleFilterChange = useCallback((field: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
-  const setSortBy = useCallback(
-    (value: string) => setParams({ sortBy: value } as Partial<typeof DEFAULTS>),
-    [setParams]
-  );
-
-  const setSortOrder = useCallback(
-    (value: string) => setParams({ sortOrder: value } as Partial<typeof DEFAULTS>),
-    [setParams]
-  );
+  const handleClearFilters = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+  }, []);
 
   useEffect(() => {
     const loader = loaderRef.current;
@@ -105,22 +99,25 @@ export function useLeadsPage() {
     totalCount,
     isLoading,
     filters: {
-      status: params.status,
-      search: params.search,
-      dateFrom: params.dateFrom,
-      dateTo: params.dateTo,
+      status: filters.status,
+      search: filters.search,
+      dateFrom: filters.dateFrom,
+      dateTo: filters.dateTo,
+      industry: filters.industry,
     },
-    sortBy: params.sortBy,
-    sortOrder: params.sortOrder,
+    sortBy: filters.sortBy,
+    sortOrder: filters.sortOrder,
     deleteId,
-    hasFilters: Boolean(params.search || params.status || params.dateFrom || params.dateTo),
+    hasFilters: Boolean(
+      filters.search || filters.status || filters.dateFrom || filters.dateTo || filters.industry
+    ),
     deleteIsPending: deleteLead.isPending,
     isFetchingNextPage,
     loaderRef,
     handleFilterChange,
-    setSortBy,
-    setSortOrder,
-    handleClearFilters: resetParams,
+    setSortBy: (value: string) => setFilters((prev) => ({ ...prev, sortBy: value })),
+    setSortOrder: (value: string) => setFilters((prev) => ({ ...prev, sortOrder: value })),
+    handleClearFilters,
     handleDelete,
     openDeleteDialog: setDeleteId,
     closeDeleteDialog: () => setDeleteId(null),

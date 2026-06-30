@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, Calendar, Filter, Search, Trash2, X } from "lucide-react";
+import { ArrowUpDown, Calendar, Filter, Search, Tag, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,14 +14,17 @@ import {
 } from "@/components/ui/select";
 
 import { PersianDatePicker } from "@/components/shared/persian-date-picker";
+import { ComboboxInput } from "@/components/shared/combobox-input";
+
+import { useListOptions } from "@/hooks/use-list-options";
 
 import { LEAD_STATUSES } from "@/lib/constants";
 
 interface LeadsFiltersProps {
-  filters: { status: string; search: string; dateFrom: string; dateTo: string };
+  filters: { status: string; search: string; dateFrom: string; dateTo: string; industry: string };
   sortBy: string;
   sortOrder: string;
-  onFilterChange: (field: "status" | "search" | "dateFrom" | "dateTo", value: string) => void;
+  onFilterChange: (field: "status" | "search" | "dateFrom" | "dateTo" | "industry", value: string) => void;
   onSortByChange: (value: string) => void;
   onSortOrderChange: (value: string) => void;
   onClearFilters: () => void;
@@ -38,6 +41,7 @@ const hasActiveFilters = (
   filters.status ||
   filters.dateFrom ||
   filters.dateTo ||
+  filters.industry ||
   sortBy !== "createdAt" ||
   sortOrder !== "desc";
 
@@ -50,16 +54,18 @@ export function LeadsFilters({
   onSortOrderChange,
   onClearFilters,
 }: LeadsFiltersProps) {
+  const { data: industryOptions = [] } = useListOptions("INDUSTRY");
+  const industries = industryOptions.map((o) => o.value);
   const showClear = hasActiveFilters(filters, sortBy, sortOrder);
 
   return (
     <Card className="overflow-visible">
       <CardContent className="p-4">
         <div className="space-y-3">
-          {/* Row 1: Search + Status (side by side on md+) */}
+          {/* Row 1: Search + Status + Industry */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="جستجو..."
                 value={filters.search}
@@ -70,7 +76,7 @@ export function LeadsFilters({
                 <button
                   type="button"
                   onClick={() => onFilterChange("search", "")}
-                  className="text-muted-foreground hover:text-foreground absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -89,9 +95,19 @@ export function LeadsFilters({
                 ))}
               </SelectContent>
             </Select>
+            <div className="w-full sm:w-44">
+              <ComboboxInput
+                value={filters.industry}
+                onChange={(value) => onFilterChange("industry", value)}
+                options={industries}
+                placeholder="صنعت"
+                className="cursor-pointer"
+                icon={<Tag className="h-4 w-4" />}
+              />
+            </div>
           </div>
 
-          {/* Row 2: Sort + Date + Clear */}
+          {/* Row 2: Sort + Date */}
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <div className="flex w-full gap-2 sm:w-auto sm:flex-1">
               <Select value={sortBy} onValueChange={onSortByChange}>
@@ -118,14 +134,14 @@ export function LeadsFilters({
             </div>
 
             <div className="flex w-full items-center gap-1.5 sm:flex-1">
-              <Calendar className="text-muted-foreground h-4 w-4 shrink-0" />
+              <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
               <PersianDatePicker
                 value={filters.dateFrom}
                 onChange={(date) => onFilterChange("dateFrom", date)}
                 placeholder="از تاریخ"
                 className="flex-1"
               />
-              <span className="text-muted-foreground shrink-0 text-xs">تا</span>
+              <span className="shrink-0 text-xs text-muted-foreground">تا</span>
               <PersianDatePicker
                 value={filters.dateTo}
                 onChange={(date) => onFilterChange("dateTo", date)}
