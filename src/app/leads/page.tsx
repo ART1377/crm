@@ -1,5 +1,12 @@
+import { Suspense } from "react";
+
 import { LeadsPage } from "@/features/leads";
+import { LeadsPageSkeleton } from "@/features/leads/skeleton";
 
 export default function Leads() {
-  return <LeadsPage />;
+  return (
+    <Suspense fallback={<LeadsPageSkeleton />}>
+      <LeadsPage />
+    </Suspense>
+  );
 }
