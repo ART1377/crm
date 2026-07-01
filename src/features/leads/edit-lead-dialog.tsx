@@ -27,13 +27,15 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { ComboboxInput } from "@/components/shared/combobox-input";
 
-import { useUpdateLead } from "@/hooks/use-leads";
+import { useChangeLeadStatus, useUpdateLead } from "@/hooks/use-leads";
 import { useListOptions } from "@/hooks/use-list-options";
 
 import { LEAD_STATUSES } from "@/lib/constants";
 
 export function EditLeadDialog({ lead, children }: { lead: Lead; children: React.ReactNode }) {
   const updateLead = useUpdateLead();
+  const changeStatus = useChangeLeadStatus();
+
   const { data: sourceOptions = [] } = useListOptions("SOURCE");
   const { data: industryOptions = [] } = useListOptions("INDUSTRY");
   const sources = sourceOptions.map((o) => o.value);
@@ -58,6 +60,13 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
       return;
     }
     await updateLead.mutateAsync({ id: lead.id, data: form });
+    if (form.status !== lead.status) {
+      await changeStatus.mutateAsync({
+        id: lead.id,
+        status: form.status,
+        previousStatus: lead.status,
+      });
+    }
     setOpen(false);
   };
 

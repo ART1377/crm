@@ -67,6 +67,7 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
               const overdue = isOverdue(task);
               return (
                 <div
+                  key={task.id}
                   className={`flex items-center gap-3 rounded-lg p-2.5 transition-all ${
                     overdue
                       ? "border border-red-200 bg-red-50/70 shadow-sm"
