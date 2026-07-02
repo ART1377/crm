@@ -1,6 +1,6 @@
 import apiClient from "@/config/axios";
-import { Messenger } from "../types/settings-types";
 
+import { Messenger } from "../types/settings-types";
 
 export const messengersService = {
   async getAll() {

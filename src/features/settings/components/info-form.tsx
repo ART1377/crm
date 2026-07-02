@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-import Field from "./field";
 import { SenderFormValues } from "../types/settings-types";
+import Field from "./field";
 
 interface SenderInfoFormProps {
   register: UseFormRegister<SenderFormValues>;

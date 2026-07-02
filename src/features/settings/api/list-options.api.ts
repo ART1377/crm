@@ -1,6 +1,6 @@
 import apiClient from "@/config/axios";
-import { ListOption } from "../types/settings-types";
 
+import { ListOption } from "../types/settings-types";
 
 export const listOptionsService = {
   async getAll(type: string) {

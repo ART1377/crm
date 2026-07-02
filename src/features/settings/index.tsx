@@ -8,11 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useSettingsPage } from "./hooks/use-settings-page";
-import { SettingsPageSkeleton } from "./components/skeleton";
+import { SenderInfoForm } from "./components/info-form";
 import { ListOptionsManager } from "./components/list-options-manager";
 import { MessengersTable } from "./components/messengers-table";
-import { SenderInfoForm } from "./components/info-form";
+import { SettingsPageSkeleton } from "./components/skeleton";
+import { useSettingsPage } from "./hooks/use-settings-page";
 
 const TABS = [
   { value: "general", label: "فرستنده", icon: Settings2 },
