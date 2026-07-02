@@ -1,7 +1,6 @@
-// src/services/activities.service.ts
 import apiClient from "@/config/axios";
 
-import type { Activity, CreateActivityData } from "@/types/types";
+import { Activity, CreateActivityData } from "../types/leads-types";
 
 export const activitiesService = {
   async create(leadId: string, data: CreateActivityData) {

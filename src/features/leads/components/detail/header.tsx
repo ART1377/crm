@@ -17,8 +17,8 @@ import { useChangeLeadStatus } from "@/features/leads/hooks/use-leads";
 
 import { countOverdueTasks, formatDate } from "@/lib/utils";
 
-import { Lead } from "../../types/leads-types";
 import { LEAD_STATUSES } from "../../constants/leads-constants";
+import { Lead } from "../../types/leads-types";
 
 export function LeadHeader({ lead, leadId }: { lead: Lead; leadId: string }) {
   const changeStatus = useChangeLeadStatus();
