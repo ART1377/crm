@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useSaveSettings, useSettings } from "@/hooks/use-settings";
+import { useSaveSettings, useSettings } from "@/features/settings/hooks/use-settings";
 
-import type { SenderFormValues } from "../info-form";
+import { SenderFormValues } from "../types/settings-types";
 
 export function useSettingsPage() {
   const { data: settings = {}, isLoading } = useSettings();

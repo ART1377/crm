@@ -9,10 +9,10 @@ import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
 import { useSettingsPage } from "./hooks/use-settings-page";
-import { SenderInfoForm } from "./info-form";
-import { ListOptionsManager } from "./list-options-manager";
-import { MessengersTable } from "./messengers-table";
-import { SettingsPageSkeleton } from "./skeleton";
+import { SettingsPageSkeleton } from "./components/skeleton";
+import { ListOptionsManager } from "./components/list-options-manager";
+import { MessengersTable } from "./components/messengers-table";
+import { SenderInfoForm } from "./components/info-form";
 
 const TABS = [
   { value: "general", label: "فرستنده", icon: Settings2 },

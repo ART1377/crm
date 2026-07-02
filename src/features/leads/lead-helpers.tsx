@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 
-import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
+import { LEAD_SOURCES, LEAD_STATUSES } from "./constants/leads-constants";
 
 export const getStatusBadge = (status: string) => {
   const statusConfig = LEAD_STATUSES.find((s) => s.value === status);

@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useTemplates } from "@/hooks/use-templates";
+import { useTemplates } from "@/features/templates/hooks/use-templates";
 
-import { TemplateCard } from "./card";
-import { CreateTemplateDialog } from "./create-dialog";
-import { TemplatesSkeleton } from "./skeleton";
+import { TemplateCard } from "./components/card";
+import { CreateTemplateDialog } from "./components/create-dialog";
+import { TemplatesSkeleton } from "./components/skeleton";
 
 export function TemplatesPage() {
   const { data: templates = [], isLoading } = useTemplates();

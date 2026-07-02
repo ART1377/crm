@@ -2,7 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { OVERDUE_DAYS } from "./constants";
+import { OVERDUE_DAYS } from "../constants/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

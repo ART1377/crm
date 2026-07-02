@@ -21,14 +21,14 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useLeadsAnalytics, useLeadsStats } from "@/hooks/use-leads";
-import { useTodayTasks } from "@/hooks/use-tasks";
+import { useLeadsAnalytics, useLeadsStats } from "./hooks/use-dashboard";
+import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
 
-import { StatCard } from "./card";
-import { IndustryChart } from "./industry-chart";
-import { DashboardSkeleton } from "./skeleton";
-import { TodayTasks } from "./today-tasks";
-import { WeeklyCalendar } from "./weekly-chart";
+import { StatCard } from "./components/card";
+import { IndustryChart } from "./components/industry-chart";
+import { DashboardSkeleton } from "./components/skeleton";
+import { TodayTasks } from "./components/today-tasks";
+import { WeeklyCalendar } from "./components/weekly-chart";
 
 export function DashboardPage() {
   const { data: stats, isLoading } = useLeadsStats();

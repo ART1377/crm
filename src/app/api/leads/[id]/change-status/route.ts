@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { LEAD_STATUSES, OVERDUE_DAYS } from "@/lib/constants";
+import { LEAD_STATUSES, OVERDUE_DAYS } from "@/constants/constants";
+
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
