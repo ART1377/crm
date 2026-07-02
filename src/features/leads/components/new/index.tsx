@@ -11,10 +11,8 @@ import { PageWrapper } from "@/components/shared/page-wrapper";
 
 import { useCreateLead } from "@/features/leads/hooks/use-leads";
 
-import { leadSchema } from "@/lib/validations";
-
-import type { CreateLeadData } from "@/types/types";
-
+import { leadSchema } from "../../schemas/leads-schemas";
+import { CreateLeadData } from "../../types/leads-types";
 import { LeadFormActions } from "./actions";
 import { LeadForm } from "./form";
 
@@ -23,7 +21,7 @@ export function NewLeadPage() {
 
   const form = useForm<CreateLeadData>({
     resolver: zodResolver(leadSchema),
-    mode: "onChange", // Validate on change after first touch
+    mode: "onChange",
     defaultValues: {
       businessName: "",
       contactPerson: "",

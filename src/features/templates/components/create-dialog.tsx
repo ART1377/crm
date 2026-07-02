@@ -21,8 +21,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { useCreateTemplate } from "@/features/templates/hooks/use-templates";
-import { MessengerType } from "../types/templates-types";
+
 import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "../constants/templates-constants";
+import { MessengerType } from "../types/templates-types";
 
 interface CreateTemplateDialogProps {
   open: boolean;

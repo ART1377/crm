@@ -3,7 +3,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { LEAD_STATUSES } from "@/constants/constants";
 import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,8 +28,9 @@ import { ComboboxInput } from "@/components/shared/combobox-input";
 
 import { useChangeLeadStatus, useUpdateLead } from "@/features/leads/hooks/use-leads";
 import { useListOptions } from "@/features/settings/hooks/use-list-options";
+import { LEAD_STATUSES } from "../../constants/leads-constants";
+import { Lead } from "../../types/leads-types";
 
-import type { Lead } from "@/types/types";
 
 export function EditLeadDialog({ lead, children }: { lead: Lead; children: React.ReactNode }) {
   const updateLead = useUpdateLead();

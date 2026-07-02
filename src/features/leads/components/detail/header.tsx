@@ -1,6 +1,5 @@
 "use client";
 
-import { LEAD_STATUSES } from "@/constants/constants";
 import { AlertTriangle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +17,8 @@ import { useChangeLeadStatus } from "@/features/leads/hooks/use-leads";
 
 import { countOverdueTasks, formatDate } from "@/lib/utils";
 
-import type { Lead } from "@/types/types";
+import { Lead } from "../../types/leads-types";
+import { LEAD_STATUSES } from "../../constants/leads-constants";
 
 export function LeadHeader({ lead, leadId }: { lead: Lead; leadId: string }) {
   const changeStatus = useChangeLeadStatus();

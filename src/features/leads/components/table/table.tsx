@@ -28,9 +28,10 @@ import {
 import { getSourceLabel } from "@/features/leads/lead-helpers";
 
 import { formatDate } from "@/lib/utils";
-import { EditLeadDialog } from "./edit-lead-dialog";
+
 import { LEAD_STATUSES } from "../../constants/leads-constants";
 import { Lead } from "../../types/leads-types";
+import { EditLeadDialog } from "./edit-lead-dialog";
 
 interface LeadsTableProps {
   leads: Lead[];

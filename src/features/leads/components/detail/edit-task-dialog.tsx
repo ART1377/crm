@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,12 +19,8 @@ import { Label } from "@/components/ui/label";
 import { PersianDatePicker } from "@/components/shared/persian-date-picker";
 
 import { useUpdateTask } from "@/features/tasks/hooks/use-tasks";
-
-import { editTaskSchema } from "@/lib/validations";
-
-import type { Task } from "@/types/types";
-
-type EditTaskFormData = z.infer<typeof editTaskSchema>;
+import { EditTaskFormData, editTaskSchema } from "@/features/tasks/schemas/tasks-schemas";
+import { Task } from "@/features/tasks/types/tasks-types";
 
 export function EditTaskDialog({ task, children }: { task: Task; children: React.ReactNode }) {
   const updateTask = useUpdateTask();
