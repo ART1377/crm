@@ -1,6 +1,6 @@
 import apiClient from "@/config/axios";
-import { CreateTaskData, Task, UpdateTaskData } from "../types/tasks-types";
 
+import { CreateTaskData, Task, UpdateTaskData } from "../types/tasks-types";
 
 export const tasksService = {
   async getByLeadId(leadId: string) {
