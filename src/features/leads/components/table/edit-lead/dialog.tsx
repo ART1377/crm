@@ -6,23 +6,30 @@ import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 import { ComboboxInput } from "@/components/shared/combobox-input";
 
-
-import { useEditLead } from "./hooks/use-edit-lead";
-import { Lead } from "@/features/leads/types/leads-types";
 import { LEAD_STATUSES } from "@/features/leads/constants/leads-constants";
-import FieldWithIcon from "./field";
+import { Lead } from "@/features/leads/types/leads-types";
 
+import FieldWithIcon from "./field";
+import { useEditLead } from "./hooks/use-edit-lead";
 
 export function EditLeadDialog({ lead, children }: { lead: Lead; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -107,7 +114,9 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
               </SelectTrigger>
               <SelectContent>
                 {LEAD_STATUSES.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

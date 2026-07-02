@@ -4,7 +4,11 @@ import { MessageSquare } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 import { useTemplates } from "@/features/templates/hooks/use-templates";
@@ -33,7 +37,8 @@ export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateS
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />قالب‌های پیام
+          <MessageSquare className="h-5 w-5" />
+          قالب‌های پیام
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -43,7 +48,9 @@ export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateS
           </SelectTrigger>
           <SelectContent>
             {activeMessengers.map((m) => (
-              <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              <SelectItem key={m.id} value={m.id}>
+                {m.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
