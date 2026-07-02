@@ -9,7 +9,7 @@ import { templatesService } from "@/features/templates/api/templates.api";
 
 import { TEMPLATES_QUERY_KEY } from "@/lib/query-keys";
 
-import type { MessageTemplate } from "@/types/types";
+import { MessageTemplate } from "../types/templates-types";
 
 export function useTemplates() {
   return useQuery({

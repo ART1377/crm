@@ -10,10 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
 
 import { useDeleteAllTasks, useDeleteTask, useUpdateTask } from "@/features/tasks/hooks/use-tasks";
+import { Task } from "@/features/tasks/types/tasks-types";
 
 import { countOverdueTasks, formatDate } from "@/lib/utils";
-
-import type { Task } from "@/types/types";
 
 import { EditTaskDialog } from "./edit-task-dialog";
 

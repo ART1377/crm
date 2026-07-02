@@ -17,7 +17,7 @@ import { useCopyToClipboard } from "@/hooks/use-copy";
 
 import { replaceTemplateVars } from "@/lib/utils";
 
-import type { MessageTemplate } from "@/types/types";
+import { MessageTemplate } from "../types/templates-types";
 
 const PURPOSE_LABELS: Record<string, string> = {
   INITIAL: "معرفی",

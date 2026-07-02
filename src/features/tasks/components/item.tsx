@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { useUpdateTask } from "@/features/tasks/hooks/use-tasks";
 
-import type { Task } from "@/types/types";
+import { Task } from "../types/tasks-types";
 
 export function TaskItem({ task }: { task: Task }) {
   const updateTask = useUpdateTask();

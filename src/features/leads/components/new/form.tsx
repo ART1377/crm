@@ -11,15 +11,10 @@ import { ComboboxInput } from "@/components/shared/combobox-input";
 
 import { useListOptions } from "@/features/settings/hooks/use-list-options";
 
-import type { CreateLeadData } from "@/types/types";
-
+import { CreateLeadData } from "../../types/leads-types";
 import { FormField } from "./form-field";
 
-interface LeadFormProps {
-  form: UseFormReturn<CreateLeadData>;
-}
-
-export function LeadForm({ form }: LeadFormProps) {
+export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
   const { data: sourceOptions = [] } = useListOptions("SOURCE");
   const { data: industryOptions = [] } = useListOptions("INDUSTRY");
   const sources = sourceOptions.map((o) => o.value);

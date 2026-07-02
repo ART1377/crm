@@ -1,7 +1,6 @@
-// src/services/templates.service.ts
 import apiClient from "@/config/axios";
 
-import type { MessageTemplate } from "@/types/types";
+import { MessageTemplate } from "../types/templates-types";
 
 export const templatesService = {
   async getAll() {

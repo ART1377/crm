@@ -9,17 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useCreateActivity } from "@/features/leads/hooks/use-activities";
 
-import type { Lead } from "@/types/types";
-
+import { Lead } from "../../types/leads-types";
 import { LogCallDialog } from "./log-call-dialog";
 import { ScheduleTaskDialog } from "./schedule-task-dialog";
 
-interface LeadQuickActionsProps {
-  lead: Lead;
-  leadId: string;
-}
-
-export function LeadQuickActions({ lead, leadId }: LeadQuickActionsProps) {
+export function LeadQuickActions({ lead, leadId }: { lead: Lead; leadId: string }) {
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
 

@@ -22,8 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import type { Lead } from "@/types/types";
-
+import { Lead } from "../../types/leads-types";
 import {
   ALL_COLUMNS,
   type ColumnKey,
@@ -32,12 +31,13 @@ import {
   exportToText,
 } from "../../utils/export-utils";
 
-interface ExportDialogProps {
+export function ExportDialog({
+  totalCount,
+  onExportAll,
+}: {
   totalCount: number;
   onExportAll: () => Promise<Lead[]>;
-}
-
-export function ExportDialog({ totalCount, onExportAll }: ExportDialogProps) {
+}) {
   const [format, setFormat] = useState<"csv" | "txt">("csv");
   const [columns, setColumns] = useState<ColumnKey[]>(DEFAULT_COLUMNS);
   const [open, setOpen] = useState(false);
