@@ -7,7 +7,7 @@ export async function GET() {
     prisma.lead.count(),
     prisma.lead.count({ where: { status: "NEW" } }),
     prisma.lead.count({
-      where: { status: { in: ["CONTACTED", "FOLLOW_UP", "NEGOTIATION"] } },
+      where: { status: { in: ["CALLED", "FOLLOW_UP", "MESSAGED"] } },
     }),
     prisma.lead.count({ where: { status: "CUSTOMER" } }),
   ]);

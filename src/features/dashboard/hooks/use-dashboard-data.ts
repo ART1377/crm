@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { useLeadsAnalytics, useLeadsStats } from "@/features/dashboard/hooks/use-dashboard";
 import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
 
@@ -33,6 +35,15 @@ export function useDashboardData() {
     value: Object.values(statuses).reduce((a, b) => a + b, 0),
   }));
 
+  // محاسبه تعداد هر استاتوس از industryStats
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const item of analytics?.industryStats ?? []) {
+      counts[item.status] = (counts[item.status] ?? 0) + item._count.id;
+    }
+    return counts;
+  }, [analytics?.industryStats]);
+
   return {
     isLoading,
     stats: { total, newLeads, activeLeads, customers },
@@ -44,5 +55,6 @@ export function useDashboardData() {
     industryPieData,
     todayTasks,
     dailyActivity: analytics?.dailyActivity ?? [],
+    statusCounts,
   };
 }
