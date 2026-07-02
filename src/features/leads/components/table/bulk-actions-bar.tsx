@@ -1,6 +1,5 @@
 "use client";
 
-import { LEAD_STATUSES } from "@/constants/constants";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LEAD_STATUSES } from "../../constants/leads-constants";
 
 interface BulkActionsBarProps {
   selectedCount: number;

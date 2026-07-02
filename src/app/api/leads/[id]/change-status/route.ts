@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { LEAD_STATUSES, OVERDUE_DAYS } from "@/constants/constants";
+import { OVERDUE_DAYS } from "@/constants/constants";
+
+import { LEAD_STATUSES } from "@/features/leads/constants/leads-constants";
 
 import { prisma } from "@/lib/prisma";
 

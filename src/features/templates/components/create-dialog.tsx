@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "@/constants/constants";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,8 +21,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { useCreateTemplate } from "@/features/templates/hooks/use-templates";
-
-import type { MessengerType } from "@/types/types";
+import { MessengerType } from "../types/templates-types";
+import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "../constants/templates-constants";
 
 interface CreateTemplateDialogProps {
   open: boolean;

@@ -1,6 +1,5 @@
 "use client";
 
-import { LEAD_STATUSES } from "@/constants/constants";
 import { ArrowUpDown, Filter, Search, Tag, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { ComboboxInput } from "@/components/shared/combobox-input";
 import { PersianDatePicker } from "@/components/shared/persian-date-picker";
 
 import { useListOptions } from "@/features/settings/hooks/use-list-options";
+import { LEAD_STATUSES } from "../../constants/leads-constants";
 
 interface LeadsFiltersProps {
   filters: { status: string; search: string; dateFrom: string; dateTo: string; industry: string };

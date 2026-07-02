@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 
 import Link from "next/link";
 
-import { LEAD_STATUSES } from "@/constants/constants";
 import { ROUTES } from "@/routes/routes";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
@@ -29,10 +28,9 @@ import {
 import { getSourceLabel } from "@/features/leads/lead-helpers";
 
 import { formatDate } from "@/lib/utils";
-
-import type { Lead } from "@/types/types";
-
-import { EditLeadDialog } from "../../edit-lead-dialog";
+import { EditLeadDialog } from "./edit-lead-dialog";
+import { LEAD_STATUSES } from "../../constants/leads-constants";
+import { Lead } from "../../types/leads-types";
 
 interface LeadsTableProps {
   leads: Lead[];
