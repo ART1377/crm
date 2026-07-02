@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCopyToClipboard } from "@/hooks/use-copy";
 
 import { Lead } from "../../types/leads-types";
-import { EditLeadDialog } from "../table/edit-lead-dialog";
+import { EditLeadDialog } from "../table/edit-lead/dialog";
 import { InfoItem } from "./info-item";
 
 export function LeadInfo({ lead }: { lead: Lead }) {

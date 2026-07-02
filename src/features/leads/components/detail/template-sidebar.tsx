@@ -1,25 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import toast from "react-hot-toast";
-
 import { MessageSquare } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-import { useMessengers } from "@/features/settings/hooks/use-messengers";
-import { useSettings } from "@/features/settings/hooks/use-settings";
 import { useTemplates } from "@/features/templates/hooks/use-templates";
 
-import { getMessengerLink, replaceTemplateVars } from "@/lib/utils";
-
+import { useMessageSender } from "./hooks/use-message-sender";
 import { TemplateSidebarItem } from "./template-sidebar-item";
 
 interface TemplateSidebarProps {
@@ -30,44 +20,20 @@ interface TemplateSidebarProps {
 
 export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateSidebarProps) {
   const { data: templates = [] } = useTemplates();
-  const { data: settings = {} } = useSettings();
-  const { data: messengers = [] } = useMessengers();
-  const [selectedMessengerId, setSelectedMessengerId] = useState("");
-
-  const activeMessengers = messengers.filter((m) => m.isActive);
-  const selectedMessenger = activeMessengers.find((m) => m.id === selectedMessengerId);
-
-  const getMessage = (content: string) =>
-    replaceTemplateVars(content, {
-      senderName: settings.senderName || "صادقی",
-      senderPhone: settings.senderPhone || "09191234567",
-      senderCompany: settings.senderCompany || "حسابداری کیهان",
-      companyName,
-      contactPerson,
-    });
-
-  const handleSend = (content: string) => {
-    if (!selectedMessenger) {
-      toast.error("لطفاً پیام‌رسان را انتخاب کنید");
-      return;
-    }
-    window.open(
-      getMessengerLink(
-        selectedMessenger.key,
-        phone,
-        getMessage(content),
-        selectedMessenger.linkTemplate
-      ),
-      "_blank"
-    );
-  };
+  const {
+    getMessage,
+    handleSend,
+    canSend,
+    selectedMessengerId,
+    setSelectedMessengerId,
+    activeMessengers,
+  } = useMessageSender({ phone, companyName, contactPerson });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
-          قالب‌های پیام
+          <MessageSquare className="h-5 w-5" />قالب‌های پیام
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -77,9 +43,7 @@ export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateS
           </SelectTrigger>
           <SelectContent>
             {activeMessengers.map((m) => (
-              <SelectItem key={m.id} value={m.id}>
-                {m.name}
-              </SelectItem>
+              <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -92,7 +56,7 @@ export function TemplateSidebar({ phone, companyName, contactPerson }: TemplateS
               content={template.content}
               getMessage={getMessage}
               onSend={handleSend}
-              canSend={!!selectedMessengerId}
+              canSend={canSend}
             />
           ))}
         </div>

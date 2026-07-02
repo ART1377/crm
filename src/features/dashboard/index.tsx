@@ -21,40 +21,27 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
-
 import { StatCard } from "./components/card";
 import { IndustryChart } from "./components/industry-chart";
 import { DashboardSkeleton } from "./components/skeleton";
 import { TodayTasks } from "./components/today-tasks";
 import { WeeklyCalendar } from "./components/weekly-chart";
-import { useLeadsAnalytics, useLeadsStats } from "./hooks/use-dashboard";
+import { useDashboardData } from "./hooks/use-dashboard-data";
 
 export function DashboardPage() {
-  const { data: stats, isLoading } = useLeadsStats();
-  const { data: analytics } = useLeadsAnalytics();
-  const { data: todayTasks = [] } = useTodayTasks();
+  const {
+    isLoading,
+    stats,
+    conversionRate,
+    taskProgress,
+    pendingTasks,
+    completedTasks,
+    industryMap,
+    industryPieData,
+    dailyActivity,
+  } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
-
-  const total = stats?.total ?? 0;
-  const customers = stats?.customers ?? 0;
-  const conversionRate = total > 0 ? Math.round((customers / total) * 100) : 0;
-  const pendingTasks = todayTasks.filter((t) => !t.isCompleted).length;
-  const completedTasks = todayTasks.filter((t) => t.isCompleted).length;
-  const taskProgress =
-    todayTasks.length > 0 ? Math.round((completedTasks / todayTasks.length) * 100) : 0;
-
-  const industryMap: Record<string, Record<string, number>> = {};
-  for (const item of analytics?.industryStats ?? []) {
-    if (!industryMap[item.industry]) industryMap[item.industry] = {};
-    industryMap[item.industry][item.status] = item._count.id;
-  }
-
-  const industryPieData = Object.entries(industryMap).map(([name, statuses]) => ({
-    name,
-    value: Object.values(statuses).reduce((a, b) => a + b, 0),
-  }));
 
   return (
     <PageWrapper
@@ -75,24 +62,24 @@ export function DashboardPage() {
     >
       {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard title="کل سرنخ‌ها" value={total} subtitle="تعداد کل" icon={Users} />
+        <StatCard title="کل سرنخ‌ها" value={stats.total} subtitle="تعداد کل" icon={Users} />
         <StatCard
           title="جدید"
-          value={stats?.newLeads ?? 0}
+          value={stats.newLeads}
           subtitle="در انتظار تماس"
           icon={Plus}
           iconColor="text-blue-500"
         />
         <StatCard
           title="در حال پیگیری"
-          value={stats?.active ?? 0}
+          value={stats.activeLeads}
           subtitle="تماس و مذاکره"
           icon={Phone}
           iconColor="text-orange-500"
         />
         <StatCard
           title="مشتریان"
-          value={customers}
+          value={stats.customers}
           subtitle="تبدیل شده"
           icon={Building2}
           iconColor="text-green-500"
@@ -112,7 +99,7 @@ export function DashboardPage() {
             <div className="flex items-end justify-between">
               <div className="text-2xl font-bold">{conversionRate}%</div>
               <span className="text-muted-foreground text-xs">
-                {customers} از {total} سرنخ
+                {stats.customers} از {stats.total} سرنخ
               </span>
             </div>
             <Progress value={conversionRate} className="mt-3 h-2" />
@@ -144,9 +131,9 @@ export function DashboardPage() {
       </div>
 
       {/* Weekly Chart */}
-      <WeeklyCalendar data={analytics?.dailyActivity ?? []} />
+      <WeeklyCalendar data={dailyActivity} />
 
-      {/* Industry Table + Pie */}
+      {/* Industry Table + Chart */}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="min-h-fit flex-1">
           <CardHeader className="pb-2">
@@ -185,7 +172,6 @@ export function DashboardPage() {
             </Table>
           </CardContent>
         </Card>
-
         <IndustryChart data={industryPieData} />
       </div>
 
