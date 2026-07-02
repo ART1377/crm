@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { ROUTES } from "@/routes/routes";
 import { BarChart3, Building2, Phone, PieChart, Plus, TrendingUp, Users } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -20,16 +21,15 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-
-import { useDashboardData } from "./hooks/use-dashboard-data";
-import { DashboardSkeleton } from "./components/skeleton";
-import { ROUTES } from "@/routes/routes";
-import { StatCard } from "./components/card";
-import { LEAD_STATUSES } from "../leads/constants/leads-constants";
-import { WeeklyCalendar } from "./components/weekly-chart";
-import { IndustryChart } from "./components/industry-chart";
-import { TodayTasks } from "./components/today-tasks";
 import { cn } from "@/lib/utils";
+
+import { LEAD_STATUSES } from "../leads/constants/leads-constants";
+import { StatCard } from "./components/card";
+import { IndustryChart } from "./components/industry-chart";
+import { DashboardSkeleton } from "./components/skeleton";
+import { TodayTasks } from "./components/today-tasks";
+import { WeeklyCalendar } from "./components/weekly-chart";
+import { useDashboardData } from "./hooks/use-dashboard-data";
 
 export function DashboardPage() {
   const {
@@ -56,7 +56,8 @@ export function DashboardPage() {
           actions={
             <Link href={ROUTES.leads.new}>
               <Button size="lg">
-                <Plus className="ml-2 h-5 w-5" />افزودن سرنخ جدید
+                <Plus className="ml-2 h-5 w-5" />
+                افزودن سرنخ جدید
               </Button>
             </Link>
           }
@@ -66,9 +67,27 @@ export function DashboardPage() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard title="کل سرنخ‌ها" value={stats.total} subtitle="تعداد کل" icon={Users} />
-        <StatCard title="جدید" value={stats.newLeads} subtitle="در انتظار تماس" icon={Plus} iconColor="text-blue-500" />
-        <StatCard title="در حال پیگیری" value={stats.activeLeads} subtitle="تماس و مذاکره" icon={Phone} iconColor="text-orange-500" />
-        <StatCard title="مشتریان" value={stats.customers} subtitle="تبدیل شده" icon={Building2} iconColor="text-green-500" />
+        <StatCard
+          title="جدید"
+          value={stats.newLeads}
+          subtitle="در انتظار تماس"
+          icon={Plus}
+          iconColor="text-blue-500"
+        />
+        <StatCard
+          title="در حال پیگیری"
+          value={stats.activeLeads}
+          subtitle="تماس و مذاکره"
+          icon={Phone}
+          iconColor="text-orange-500"
+        />
+        <StatCard
+          title="مشتریان"
+          value={stats.customers}
+          subtitle="تبدیل شده"
+          icon={Building2}
+          iconColor="text-green-500"
+        />
       </div>
 
       {/* Status Counts */}
@@ -91,13 +110,16 @@ export function DashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <TrendingUp className="h-4 w-4 text-green-500" />نرخ تبدیل
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              نرخ تبدیل
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
               <div className="text-2xl font-bold">{conversionRate}%</div>
-              <span className="text-xs text-muted-foreground">{stats.customers} از {stats.total} سرنخ</span>
+              <span className="text-muted-foreground text-xs">
+                {stats.customers} از {stats.total} سرنخ
+              </span>
             </div>
             <Progress value={conversionRate} className="mt-3 h-2" />
           </CardContent>
@@ -106,15 +128,20 @@ export function DashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <BarChart3 className="h-4 w-4 text-blue-500" />تسک‌های امروز
+              <BarChart3 className="h-4 w-4 text-blue-500" />
+              تسک‌های امروز
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
               <div className="text-2xl font-bold">{taskProgress}%</div>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">{completedTasks} انجام شده</Badge>
-                <Badge variant="outline" className="text-xs">{pendingTasks} در انتظار</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {completedTasks} انجام شده
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {pendingTasks} در انتظار
+                </Badge>
               </div>
             </div>
             <Progress value={taskProgress} className="mt-3 h-2" />
@@ -130,7 +157,8 @@ export function DashboardPage() {
         <Card className="min-h-fit flex-1">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <PieChart className="h-4 w-4 text-purple-500" />وضعیت بر اساس صنعت
+              <PieChart className="h-4 w-4 text-purple-500" />
+              وضعیت بر اساس صنعت
             </CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
