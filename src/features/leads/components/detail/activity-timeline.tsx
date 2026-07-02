@@ -13,12 +13,7 @@ import { useDeleteActivity, useDeleteAllActivities } from "@/features/leads/hook
 
 import { formatDate } from "@/lib/utils";
 
-import type { Activity } from "@/types/types";
-
-interface ActivityTimelineProps {
-  activities: Activity[];
-  leadId: string;
-}
+import { Activity } from "../../types/leads-types";
 
 const iconMap = {
   CALL: { Icon: PhoneCall, color: "text-blue-500" },
@@ -27,7 +22,13 @@ const iconMap = {
   STATUS_CHANGE: { Icon: Tag, color: "text-purple-500" },
 };
 
-export function ActivityTimeline({ activities, leadId }: ActivityTimelineProps) {
+export function ActivityTimeline({
+  activities,
+  leadId,
+}: {
+  activities: Activity[];
+  leadId: string;
+}) {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [showDeleteAll, setShowDeleteAll] = useState(false);
   const deleteActivity = useDeleteActivity(leadId);
