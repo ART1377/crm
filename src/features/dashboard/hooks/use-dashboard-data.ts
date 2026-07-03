@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useLeadsAnalytics, useLeadsStats } from "@/features/dashboard/hooks/use-dashboard";
 import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
@@ -9,6 +9,7 @@ export function useDashboardData() {
   const { data: stats, isLoading: statsLoading } = useLeadsStats();
   const { data: analytics } = useLeadsAnalytics();
   const { data: todayTasks = [], isLoading: tasksLoading } = useTodayTasks();
+  const [industrySortBy, setIndustrySortBy] = useState<string>("total");
 
   const isLoading = statsLoading || tasksLoading;
 
@@ -44,6 +45,16 @@ export function useDashboardData() {
     return counts;
   }, [analytics?.industryStats]);
 
+  const sortedIndustryEntries = useMemo(() => {
+    return Object.entries(industryMap).sort(([, a], [, b]) => {
+      const aTotal = Object.values(a).reduce((sum, v) => sum + v, 0);
+      const bTotal = Object.values(b).reduce((sum, v) => sum + v, 0);
+
+      if (industrySortBy === "total") return bTotal - aTotal;
+      return (b[industrySortBy] ?? 0) - (a[industrySortBy] ?? 0);
+    });
+  }, [industryMap, industrySortBy]);
+
   return {
     isLoading,
     stats: { total, newLeads, activeLeads, customers },
@@ -56,5 +67,8 @@ export function useDashboardData() {
     todayTasks,
     dailyActivity: analytics?.dailyActivity ?? [],
     statusCounts,
+    sortedIndustryEntries,
+    industrySortBy,
+    setIndustrySortBy,
   };
 }

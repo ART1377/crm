@@ -74,7 +74,7 @@ export function Navbar() {
         )}
       >
         {/* Brand */}
-        <div className="border-b p-6">
+        <div className="border-b p-6 pb-8">
           <div className="mb-1 flex items-center gap-2">
             <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
               <Sparkles className="text-primary-foreground h-4 w-4" />

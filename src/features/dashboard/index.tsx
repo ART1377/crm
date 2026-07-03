@@ -3,7 +3,16 @@
 import Link from "next/link";
 
 import { ROUTES } from "@/routes/routes";
-import { BarChart3, Building2, Phone, PieChart, Plus, TrendingUp, Users } from "lucide-react";
+import {
+  ArrowUpDown,
+  BarChart3,
+  Building2,
+  Phone,
+  PieChart,
+  Plus,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,10 +48,12 @@ export function DashboardPage() {
     taskProgress,
     pendingTasks,
     completedTasks,
-    industryMap,
     industryPieData,
     dailyActivity,
     statusCounts,
+    sortedIndustryEntries,
+    industrySortBy,
+    setIndustrySortBy,
   } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
@@ -91,7 +102,7 @@ export function DashboardPage() {
       </div>
 
       {/* Status Counts */}
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+      <div className="grid grid-cols-3 gap-3 lg:grid-cols-6">
         {LEAD_STATUSES.map(({ value, label, color }) => {
           const count = statusCounts[value] ?? 0;
           return (
@@ -166,15 +177,55 @@ export function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-start">صنعت</TableHead>
-                  <TableHead className="text-center">کل</TableHead>
-                  <TableHead className="text-center">مشتری</TableHead>
-                  <TableHead className="text-center">شماره گرفت</TableHead>
-                  <TableHead className="text-center">پیام گذاشتم</TableHead>
-                  <TableHead className="text-center">جدید</TableHead>
+                  <TableHead
+                    className="hover:text-foreground cursor-pointer text-center"
+                    onClick={() => setIndustrySortBy("total")}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      کل
+                      {industrySortBy === "total" && <ArrowUpDown className="h-3 w-3" />}
+                    </span>
+                  </TableHead>
+                  <TableHead
+                    className="hover:text-foreground cursor-pointer text-center"
+                    onClick={() => setIndustrySortBy("CUSTOMER")}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      مشتری
+                      {industrySortBy === "CUSTOMER" && <ArrowUpDown className="h-3 w-3" />}
+                    </span>
+                  </TableHead>
+                  <TableHead
+                    className="hover:text-foreground cursor-pointer text-center"
+                    onClick={() => setIndustrySortBy("CALLED")}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      شماره گرفت
+                      {industrySortBy === "CALLED" && <ArrowUpDown className="h-3 w-3" />}
+                    </span>
+                  </TableHead>
+                  <TableHead
+                    className="hover:text-foreground cursor-pointer text-center"
+                    onClick={() => setIndustrySortBy("MESSAGED")}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      پیام گذاشتم
+                      {industrySortBy === "MESSAGED" && <ArrowUpDown className="h-3 w-3" />}
+                    </span>
+                  </TableHead>
+                  <TableHead
+                    className="hover:text-foreground cursor-pointer text-center"
+                    onClick={() => setIndustrySortBy("NEW")}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      جدید
+                      {industrySortBy === "NEW" && <ArrowUpDown className="h-3 w-3" />}
+                    </span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {Object.entries(industryMap).map(([industry, statuses]) => {
+                {sortedIndustryEntries.map(([industry, statuses]) => {
                   const total = Object.values(statuses).reduce((a, b) => a + b, 0);
                   return (
                     <TableRow key={industry}>
