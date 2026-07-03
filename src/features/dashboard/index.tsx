@@ -3,39 +3,20 @@
 import Link from "next/link";
 
 import { ROUTES } from "@/routes/routes";
-import {
-  ArrowUpDown,
-  BarChart3,
-  Building2,
-  Phone,
-  PieChart,
-  Plus,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { Building2, Phone, Plus, Users } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PageWrapper } from "@/components/shared/page-wrapper";
 
-import { cn } from "@/lib/utils";
-
-import { LEAD_STATUSES } from "../leads/constants/leads-constants";
 import { StatCard } from "./components/card";
+import { ConversionCard } from "./components/conversion-card";
 import { IndustryChart } from "./components/industry-chart";
+import { IndustryTable } from "./components/industry-table";
 import { DashboardSkeleton } from "./components/skeleton";
+import { StatusCards } from "./components/status-cards";
+import { TasksProgressCard } from "./components/tasks-progress-card";
 import { TodayTasks } from "./components/today-tasks";
 import { WeeklyCalendar } from "./components/weekly-chart";
 import { useDashboardData } from "./hooks/use-dashboard-data";
@@ -54,6 +35,7 @@ export function DashboardPage() {
     sortedIndustryEntries,
     industrySortBy,
     setIndustrySortBy,
+    industrySortDirection,
   } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
@@ -75,7 +57,6 @@ export function DashboardPage() {
         />
       }
     >
-      {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard title="کل سرنخ‌ها" value={stats.total} subtitle="تعداد کل" icon={Users} />
         <StatCard
@@ -101,147 +82,26 @@ export function DashboardPage() {
         />
       </div>
 
-      {/* Status Counts */}
-      <div className="grid grid-cols-3 gap-3 lg:grid-cols-6">
-        {LEAD_STATUSES.map(({ value, label, color }) => {
-          const count = statusCounts[value] ?? 0;
-          return (
-            <Card key={value} className="min-h-fit flex-1">
-              <CardContent className="p-3 text-center">
-                <div className="text-lg font-bold">{count}</div>
-                <Badge className={cn("mt-1 text-[10px]", color)}>{label}</Badge>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <StatusCards statusCounts={statusCounts} />
 
-      {/* Conversion + Task Progress */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              نرخ تبدیل
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end justify-between">
-              <div className="text-2xl font-bold">{conversionRate}%</div>
-              <span className="text-muted-foreground text-xs">
-                {stats.customers} از {stats.total} سرنخ
-              </span>
-            </div>
-            <Progress value={conversionRate} className="mt-3 h-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <BarChart3 className="h-4 w-4 text-blue-500" />
-              تسک‌های امروز
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end justify-between">
-              <div className="text-2xl font-bold">{taskProgress}%</div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  {completedTasks} انجام شده
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  {pendingTasks} در انتظار
-                </Badge>
-              </div>
-            </div>
-            <Progress value={taskProgress} className="mt-3 h-2" />
-          </CardContent>
-        </Card>
+        <ConversionCard rate={conversionRate} customers={stats.customers} total={stats.total} />
+        <TasksProgressCard
+          progress={taskProgress}
+          completed={completedTasks}
+          pending={pendingTasks}
+        />
       </div>
 
-      {/* Weekly Chart */}
       <WeeklyCalendar data={dailyActivity} />
 
-      {/* Industry Table + Chart */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="min-h-fit flex-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <PieChart className="h-4 w-4 text-purple-500" />
-              وضعیت بر اساس صنعت
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-start">صنعت</TableHead>
-                  <TableHead
-                    className="hover:text-foreground cursor-pointer text-center"
-                    onClick={() => setIndustrySortBy("total")}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      کل
-                      {industrySortBy === "total" && <ArrowUpDown className="h-3 w-3" />}
-                    </span>
-                  </TableHead>
-                  <TableHead
-                    className="hover:text-foreground cursor-pointer text-center"
-                    onClick={() => setIndustrySortBy("CUSTOMER")}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      مشتری
-                      {industrySortBy === "CUSTOMER" && <ArrowUpDown className="h-3 w-3" />}
-                    </span>
-                  </TableHead>
-                  <TableHead
-                    className="hover:text-foreground cursor-pointer text-center"
-                    onClick={() => setIndustrySortBy("CALLED")}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      شماره گرفت
-                      {industrySortBy === "CALLED" && <ArrowUpDown className="h-3 w-3" />}
-                    </span>
-                  </TableHead>
-                  <TableHead
-                    className="hover:text-foreground cursor-pointer text-center"
-                    onClick={() => setIndustrySortBy("MESSAGED")}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      پیام گذاشتم
-                      {industrySortBy === "MESSAGED" && <ArrowUpDown className="h-3 w-3" />}
-                    </span>
-                  </TableHead>
-                  <TableHead
-                    className="hover:text-foreground cursor-pointer text-center"
-                    onClick={() => setIndustrySortBy("NEW")}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      جدید
-                      {industrySortBy === "NEW" && <ArrowUpDown className="h-3 w-3" />}
-                    </span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedIndustryEntries.map(([industry, statuses]) => {
-                  const total = Object.values(statuses).reduce((a, b) => a + b, 0);
-                  return (
-                    <TableRow key={industry}>
-                      <TableCell className="font-medium">{industry}</TableCell>
-                      <TableCell className="text-center">{total}</TableCell>
-                      <TableCell className="text-center">{statuses.CUSTOMER ?? 0}</TableCell>
-                      <TableCell className="text-center">{statuses.CALLED ?? 0}</TableCell>
-                      <TableCell className="text-center">{statuses.MESSAGED ?? 0}</TableCell>
-                      <TableCell className="text-center">{statuses.NEW ?? 0}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <IndustryTable
+          entries={sortedIndustryEntries}
+          sortBy={industrySortBy}
+          sortDirection={industrySortDirection}
+          onSortChange={setIndustrySortBy}
+        />
         <IndustryChart data={industryPieData} />
       </div>
 

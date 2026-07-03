@@ -59,7 +59,10 @@ export const leadsService = {
     return apiClient.get(`${LEADS_ENDPOINT}/stats`) as Promise<{
       total: number;
       newLeads: number;
-      active: number;
+      called: number;
+      followedUp: number;
+      messaged: number;
+      contacted: number;
       customers: number;
     }>;
   },

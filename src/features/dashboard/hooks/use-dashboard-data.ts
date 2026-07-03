@@ -10,12 +10,13 @@ export function useDashboardData() {
   const { data: analytics } = useLeadsAnalytics();
   const { data: todayTasks = [], isLoading: tasksLoading } = useTodayTasks();
   const [industrySortBy, setIndustrySortBy] = useState<string>("total");
+  const [industrySortDirection, setIndustrySortDirection] = useState<"asc" | "desc">("desc");
 
   const isLoading = statsLoading || tasksLoading;
 
   const total = stats?.total ?? 0;
   const newLeads = stats?.newLeads ?? 0;
-  const activeLeads = stats?.active ?? 0;
+  const activeLeads = (stats?.called ?? 0) + (stats?.followedUp ?? 0) + (stats?.messaged ?? 0);
   const customers = stats?.customers ?? 0;
 
   const conversionRate = total > 0 ? Math.round((customers / total) * 100) : 0;
@@ -50,10 +51,23 @@ export function useDashboardData() {
       const aTotal = Object.values(a).reduce((sum, v) => sum + v, 0);
       const bTotal = Object.values(b).reduce((sum, v) => sum + v, 0);
 
-      if (industrySortBy === "total") return bTotal - aTotal;
-      return (b[industrySortBy] ?? 0) - (a[industrySortBy] ?? 0);
+      const aValue = industrySortBy === "total" ? aTotal : (a[industrySortBy] ?? 0);
+      const bValue = industrySortBy === "total" ? bTotal : (b[industrySortBy] ?? 0);
+
+      return industrySortDirection === "desc" ? bValue - aValue : aValue - bValue;
     });
-  }, [industryMap, industrySortBy]);
+  }, [industryMap, industrySortBy, industrySortDirection]);
+
+  const handleIndustrySort = (column: string) => {
+    if (industrySortBy === column) {
+      // اگه روی همون ستون کلیک کرد، جهت رو برعکس کن
+      setIndustrySortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
+    } else {
+      // اگه ستون جدید انتخاب کرد، پیش‌فرض نزولی
+      setIndustrySortBy(column);
+      setIndustrySortDirection("desc");
+    }
+  };
 
   return {
     isLoading,
@@ -69,6 +83,7 @@ export function useDashboardData() {
     statusCounts,
     sortedIndustryEntries,
     industrySortBy,
-    setIndustrySortBy,
+    setIndustrySortBy: handleIndustrySort,
+    industrySortDirection,
   };
 }
