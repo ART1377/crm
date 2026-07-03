@@ -1,14 +1,14 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ROUTES } from "@/routes/routes";
-import { CheckCircle, Clock } from "lucide-react";
+import { ROUTES } from '@/routes/routes';
+import { CheckCircle, Clock } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-import { useUpdateTask } from "@/features/tasks/hooks/use-tasks";
+import { useUpdateTask } from '@/features/tasks/hooks/use-tasks';
 
-import { Task } from "../types/tasks-types";
+import { Task } from '../types/tasks-types';
 
 export function TaskItem({ task }: { task: Task }) {
   const updateTask = useUpdateTask();
@@ -29,15 +29,15 @@ export function TaskItem({ task }: { task: Task }) {
           )}
         </div>
         <div>
-          <p className={task.isCompleted ? "text-muted-foreground line-through" : ""}>
+          <p className={task.isCompleted ? 'text-muted-foreground line-through' : ''}>
             {task.title}
           </p>
           {task.lead && <p className="text-muted-foreground text-sm">{task.lead.businessName}</p>}
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant={task.isCompleted ? "secondary" : "default"}>
-          {task.isCompleted ? "انجام شد" : "در انتظار"}
+        <Badge variant={task.isCompleted ? 'secondary' : 'default'}>
+          {task.isCompleted ? 'انجام شد' : 'در انتظار'}
         </Badge>
         {task.lead && (
           <Link href={ROUTES.leads.detail(task.leadId)}>

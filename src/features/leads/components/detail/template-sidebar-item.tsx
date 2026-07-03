@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Copy, Send } from "lucide-react";
+import { Copy, Send } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-import { useCopyToClipboard } from "@/hooks/use-copy";
+import { useCopyToClipboard } from '@/hooks/use-copy';
 
 interface TemplateSidebarItemProps {
   title: string;
@@ -24,7 +24,7 @@ export function TemplateSidebarItem({
 }: TemplateSidebarItemProps) {
   const { copy } = useCopyToClipboard();
 
-  const handleCopy = () => copy(getMessage(content), "متن پیام کپی شد");
+  const handleCopy = () => copy(getMessage(content), 'متن پیام کپی شد');
 
   return (
     <div className="bg-muted rounded-lg p-3">

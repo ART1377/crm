@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from 'react';
 
-import { parseAsString, useQueryStates } from "nuqs";
+import { parseAsString, useQueryStates } from 'nuqs';
 
-import { leadsService } from "@/features/leads/api/leads.api";
-import { useDeleteLead, useLeads } from "@/features/leads/hooks/use-leads";
+import { leadsService } from '@/features/leads/api/leads.api';
+import { useDeleteLead, useLeads } from '@/features/leads/hooks/use-leads';
 
-import { useDebounce } from "@/hooks/use-debounce";
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { useDebounce } from '@/hooks/use-debounce';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 export function useLeadsPage() {
   const [params, setParams] = useQueryStates(
     {
-      status: parseAsString.withDefault(""),
-      search: parseAsString.withDefault(""),
-      dateFrom: parseAsString.withDefault(""),
-      dateTo: parseAsString.withDefault(""),
-      industry: parseAsString.withDefault(""),
-      sortBy: parseAsString.withDefault("createdAt"),
-      sortOrder: parseAsString.withDefault("desc"),
+      status: parseAsString.withDefault(''),
+      search: parseAsString.withDefault(''),
+      dateFrom: parseAsString.withDefault(''),
+      dateTo: parseAsString.withDefault(''),
+      industry: parseAsString.withDefault(''),
+      sortBy: parseAsString.withDefault('createdAt'),
+      sortOrder: parseAsString.withDefault('desc'),
     },
-    { history: "push", shallow: false }
+    { history: 'push', shallow: false }
   );
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -94,13 +94,13 @@ export function useLeadsPage() {
 
   const handleClearFilters = useCallback(() => {
     setParams({
-      status: "",
-      search: "",
-      dateFrom: "",
-      dateTo: "",
-      industry: "",
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      status: '',
+      search: '',
+      dateFrom: '',
+      dateTo: '',
+      industry: '',
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     });
   }, [setParams]);
 

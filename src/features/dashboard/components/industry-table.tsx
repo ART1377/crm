@@ -1,6 +1,6 @@
-import { ArrowDown, ArrowUp, ArrowUpDown, PieChart, TrendingUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, PieChart, TrendingUp } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -8,22 +8,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-import { LEAD_STATUSES } from "@/features/leads/constants/leads-constants";
+import { LEAD_STATUSES } from '@/features/leads/constants/leads-constants';
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface IndustryTableProps {
   entries: [string, Record<string, number>][];
   sortBy: string;
-  sortDirection: "asc" | "desc";
+  sortDirection: 'asc' | 'desc';
   onSortChange: (column: string) => void;
 }
 
 const SORT_COLUMNS = [
-  { key: "total", label: "کل" },
+  { key: 'total', label: 'کل' },
   ...LEAD_STATUSES.map((s) => ({ key: s.value, label: s.label })),
 ] as const;
 
@@ -61,15 +61,15 @@ export function IndustryTable({
                   <TableHead
                     key={key}
                     className={cn(
-                      "hover:text-foreground cursor-pointer text-center transition-colors",
-                      isActive && "text-foreground"
+                      'hover:text-foreground cursor-pointer text-center transition-colors',
+                      isActive && 'text-foreground'
                     )}
                     onClick={() => onSortChange(key)}
                   >
                     <span className="inline-flex items-center gap-1">
                       {label}
                       {isActive ? (
-                        sortDirection === "desc" ? (
+                        sortDirection === 'desc' ? (
                           <ArrowDown className="h-3 w-3 text-purple-500" />
                         ) : (
                           <ArrowUp className="h-3 w-3 text-purple-500" />
@@ -92,8 +92,8 @@ export function IndustryTable({
                 <TableRow
                   key={industry}
                   className={cn(
-                    "group hover:bg-muted/50 relative transition-colors",
-                    index % 2 === 0 && "bg-muted/20"
+                    'group hover:bg-muted/50 relative transition-colors',
+                    index % 2 === 0 && 'bg-muted/20'
                   )}
                 >
                   <TableCell className="font-medium">
@@ -125,8 +125,8 @@ export function IndustryTable({
                     <TableCell key={value} className="text-center">
                       <span
                         className={cn(
-                          "inline-flex h-6 min-w-8 items-center justify-center rounded-full px-2 text-xs font-medium tabular-nums",
-                          statuses[value] ? color : "text-muted-foreground/40"
+                          'inline-flex h-6 min-w-8 items-center justify-center rounded-full px-2 text-xs font-medium tabular-nums',
+                          statuses[value] ? color : 'text-muted-foreground/40'
                         )}
                       >
                         {statuses[value] ?? 0}

@@ -1,14 +1,14 @@
-import apiClient from "@/config/axios";
+import apiClient from '@/config/axios';
 
-import { MessageTemplate } from "../types/templates-types";
+import { MessageTemplate } from '../types/templates-types';
 
 export const templatesService = {
   async getAll() {
-    return apiClient.get("/templates") as Promise<MessageTemplate[]>;
+    return apiClient.get('/templates') as Promise<MessageTemplate[]>;
   },
 
   async create(data: { title: string; content: string; type: string; purpose: string }) {
-    return apiClient.post("/templates", data) as Promise<MessageTemplate>;
+    return apiClient.post('/templates', data) as Promise<MessageTemplate>;
   },
 
   async update(id: string, data: Partial<MessageTemplate>) {

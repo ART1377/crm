@@ -1,6 +1,6 @@
-import apiClient from "@/config/axios";
+import apiClient from '@/config/axios';
 
-import { Activity, CreateActivityData } from "../types/leads-types";
+import { Activity, CreateActivityData } from '../types/leads-types';
 
 export const activitiesService = {
   async create(leadId: string, data: CreateActivityData) {

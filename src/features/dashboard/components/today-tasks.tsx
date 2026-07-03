@@ -1,13 +1,13 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ROUTES } from "@/routes/routes";
-import { ArrowLeft, Calendar, CheckCircle2, Clock } from "lucide-react";
+import { ROUTES } from '@/routes/routes';
+import { ArrowLeft, Calendar, CheckCircle2, Clock } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
+import { useTodayTasks } from '@/features/tasks/hooks/use-tasks';
 
 export function TodayTasks() {
   const { data: tasks = [], isLoading } = useTodayTasks();
@@ -55,14 +55,14 @@ export function TodayTasks() {
                 {/* Status indicator line */}
                 <div
                   className={`absolute top-1/2 right-0 h-8 w-1 -translate-y-1/2 rounded-full ${
-                    task.isCompleted ? "bg-green-400" : "bg-orange-400"
+                    task.isCompleted ? 'bg-green-400' : 'bg-orange-400'
                   }`}
                 />
 
                 {/* Icon */}
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                    task.isCompleted ? "bg-green-50 text-green-600" : "bg-orange-50 text-orange-600"
+                    task.isCompleted ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'
                   }`}
                 >
                   {task.isCompleted ? (
@@ -76,7 +76,7 @@ export function TodayTasks() {
                 <div className="min-w-0 flex-1">
                   <p
                     className={`text-sm font-medium ${
-                      task.isCompleted ? "text-muted-foreground line-through" : ""
+                      task.isCompleted ? 'text-muted-foreground line-through' : ''
                     }`}
                   >
                     {task.title}
@@ -91,10 +91,10 @@ export function TodayTasks() {
                 {/* Badge + Arrow */}
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={task.isCompleted ? "secondary" : "default"}
+                    variant={task.isCompleted ? 'secondary' : 'default'}
                     className="shrink-0 text-[10px] font-medium"
                   >
-                    {task.isCompleted ? "انجام شد" : "در انتظار"}
+                    {task.isCompleted ? 'انجام شد' : 'در انتظار'}
                   </Badge>
                   <ArrowLeft className="text-muted-foreground h-3.5 w-3.5 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
                 </div>

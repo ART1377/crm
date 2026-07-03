@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface LogCallDialogProps {
   open: boolean;
@@ -30,13 +30,13 @@ export function LogCallDialog({
   onSubmit,
   children,
 }: LogCallDialogProps) {
-  const [summary, setSummary] = useState("");
-  const [detail, setDetail] = useState("");
+  const [summary, setSummary] = useState('');
+  const [detail, setDetail] = useState('');
 
   const handleSubmit = () => {
     onSubmit(summary, detail);
-    setSummary("");
-    setDetail("");
+    setSummary('');
+    setDetail('');
   };
 
   return (

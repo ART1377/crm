@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from '@prisma/client';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const task = await prisma.task.update({ where: { id }, data: updateData });
     return NextResponse.json(task);
   } catch {
-    return NextResponse.json({ error: "خطا در بروزرسانی تسک" }, { status: 400 });
+    return NextResponse.json({ error: 'خطا در بروزرسانی تسک' }, { status: 400 });
   }
 }
 
@@ -34,6 +34,6 @@ export async function DELETE(
     await prisma.task.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: "خطا در حذف تسک" }, { status: 500 });
+    return NextResponse.json({ error: 'خطا در حذف تسک' }, { status: 500 });
   }
 }

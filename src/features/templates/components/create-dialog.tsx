@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
-import { useCreateTemplate } from "@/features/templates/hooks/use-templates";
+import { useCreateTemplate } from '@/features/templates/hooks/use-templates';
 
-import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from "../constants/templates-constants";
-import { MessengerType } from "../types/templates-types";
+import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from '../constants/templates-constants';
+import { MessengerType } from '../types/templates-types';
 
 interface CreateTemplateDialogProps {
   open: boolean;
@@ -33,18 +33,18 @@ interface CreateTemplateDialogProps {
 
 export function CreateTemplateDialog({ open, onOpenChange, children }: CreateTemplateDialogProps) {
   const createTemplate = useCreateTemplate();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [purpose, setPurpose] = useState("CUSTOM");
-  const [type, setType] = useState<MessengerType>("WHATSAPP");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [purpose, setPurpose] = useState('CUSTOM');
+  const [type, setType] = useState<MessengerType>('WHATSAPP');
 
   const handleCreate = async () => {
     await createTemplate.mutateAsync({ title, content, type, purpose });
     onOpenChange(false);
-    setTitle("");
-    setContent("");
-    setPurpose("CUSTOM");
-    setType("WHATSAPP");
+    setTitle('');
+    setContent('');
+    setPurpose('CUSTOM');
+    setType('WHATSAPP');
   };
 
   return (
@@ -81,8 +81,8 @@ export function CreateTemplateDialog({ open, onOpenChange, children }: CreateTem
             className="min-h-25"
           />
           <p className="text-muted-foreground -mt-2 text-xs">
-            متغیرهای قابل استفاده: {"{senderName}"} {"{senderPhone}"} {"{senderCompany}"}{" "}
-            {"{companyName}"} {"{contactPerson}"}
+            متغیرهای قابل استفاده: {'{senderName}'} {'{senderPhone}'} {'{senderCompany}'}{' '}
+            {'{companyName}'} {'{contactPerson}'}
           </p>
 
           <Select value={type} onValueChange={(value) => setType(value as MessengerType)}>

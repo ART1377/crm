@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Calendar, PhoneCall } from "lucide-react";
+import { Calendar, PhoneCall } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useCreateActivity } from "@/features/leads/hooks/use-activities";
+import { useCreateActivity } from '@/features/leads/hooks/use-activities';
 
-import { Lead } from "../../types/leads-types";
-import { LogCallDialog } from "./log-call-dialog";
-import { ScheduleTaskDialog } from "./schedule-task-dialog";
+import { Lead } from '../../types/leads-types';
+import { LogCallDialog } from './log-call-dialog';
+import { ScheduleTaskDialog } from './schedule-task-dialog';
 
 export function LeadQuickActions({ lead, leadId }: { lead: Lead; leadId: string }) {
   const [showCallDialog, setShowCallDialog] = useState(false);
@@ -31,7 +31,7 @@ export function LeadQuickActions({ lead, leadId }: { lead: Lead; leadId: string 
             onOpenChange={setShowCallDialog}
             leadName={lead.businessName}
             onSubmit={(summary, detail) => {
-              addActivity.mutate({ type: "CALL", summary, detail });
+              addActivity.mutate({ type: 'CALL', summary, detail });
               setShowCallDialog(false);
             }}
           >

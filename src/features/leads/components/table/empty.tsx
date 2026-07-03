@@ -1,8 +1,8 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, Plus } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 interface LeadsEmptyStateProps {
   hasFilters: boolean;
@@ -14,7 +14,7 @@ export function LeadsEmptyState({ hasFilters }: LeadsEmptyStateProps) {
       <AlertCircle className="mb-4 h-12 w-12" />
       <p className="text-lg font-medium">سرنخی پیدا نشد</p>
       <p className="mt-1 text-sm">
-        {hasFilters ? "با فیلترهای فعلی سرنخی یافت نشد" : "هنوز هیچ سرنخی ثبت نکرده‌اید"}
+        {hasFilters ? 'با فیلترهای فعلی سرنخی یافت نشد' : 'هنوز هیچ سرنخی ثبت نکرده‌اید'}
       </p>
       {!hasFilters && (
         <Link href="/leads/new" className="mt-4">

@@ -1,4 +1,4 @@
-export type MessengerType = "WHATSAPP" | "SMS" | "ETA" | "BALE" | "RUBIKA";
+export type MessengerType = 'WHATSAPP' | 'SMS' | 'ETA' | 'BALE' | 'RUBIKA';
 
 export interface MessageTemplate {
   id: string;

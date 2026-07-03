@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { OVERDUE_DAYS } from "@/constants/constants";
+import { OVERDUE_DAYS } from '@/constants/constants';
 
-import { LEAD_STATUSES } from "@/features/leads/constants/leads-constants";
+import { LEAD_STATUSES } from '@/features/leads/constants/leads-constants';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await prisma.activity.create({
       data: {
         leadId: id,
-        type: "STATUS_CHANGE",
+        type: 'STATUS_CHANGE',
         summary: oldLabel
           ? `تغییر وضعیت از "${oldLabel}" به "${newLabel}"`
           : `تغییر وضعیت به "${newLabel}"`,
@@ -32,13 +32,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     // Auto-create follow-up task
-    if (status === "CALLED" || status === "MESSAGED") {
+    if (status === 'CALLED' || status === 'MESSAGED') {
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
       await prisma.task.create({
         data: {
           leadId: id,
-          title: status === "CALLED" ? "پیگیری تماس" : "پیگیری پیام",
+          title: status === 'CALLED' ? 'پیگیری تماس' : 'پیگیری پیام',
           dueDate,
         },
       });
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("POST /api/leads/[id]/change-status error:", error);
-    return NextResponse.json({ error: "خطا در تغییر وضعیت" }, { status: 400 });
+    console.error('POST /api/leads/[id]/change-status error:', error);
+    return NextResponse.json({ error: 'خطا در تغییر وضعیت' }, { status: 400 });
   }
 }

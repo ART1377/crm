@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { useChangeLeadStatus } from "@/features/leads/hooks/use-leads";
+import { useChangeLeadStatus } from '@/features/leads/hooks/use-leads';
 
-import { useLeadsPage } from "../../hooks/use-leads-page";
-import { BulkActionsBar } from "./bulk-actions-bar";
-import { DeleteLeadDialog } from "./delete-dialog";
-import { LeadsEmptyState } from "./empty";
-import { ExportDialog } from "./export-dialog";
-import { LeadsFilters } from "./filters";
-import { LeadsPageSkeleton } from "./skeleton";
-import { LeadsTable } from "./table";
+import { useLeadsPage } from '../../hooks/use-leads-page';
+import { BulkActionsBar } from './bulk-actions-bar';
+import { DeleteLeadDialog } from './delete-dialog';
+import { LeadsEmptyState } from './empty';
+import { ExportDialog } from './export-dialog';
+import { LeadsFilters } from './filters';
+import { LeadsPageSkeleton } from './skeleton';
+import { LeadsTable } from './table';
 
 export function LeadsPage() {
   const {

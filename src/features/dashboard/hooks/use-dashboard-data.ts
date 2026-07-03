@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 
-import { useLeadsAnalytics, useLeadsStats } from "@/features/dashboard/hooks/use-dashboard";
-import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
+import { useLeadsAnalytics, useLeadsStats } from '@/features/dashboard/hooks/use-dashboard';
+import { useTodayTasks } from '@/features/tasks/hooks/use-tasks';
 
 export function useDashboardData() {
   const { data: stats, isLoading: statsLoading } = useLeadsStats();
   const { data: analytics } = useLeadsAnalytics();
   const { data: todayTasks = [], isLoading: tasksLoading } = useTodayTasks();
-  const [industrySortBy, setIndustrySortBy] = useState<string>("total");
-  const [industrySortDirection, setIndustrySortDirection] = useState<"asc" | "desc">("desc");
+  const [industrySortBy, setIndustrySortBy] = useState<string>('total');
+  const [industrySortDirection, setIndustrySortDirection] = useState<'asc' | 'desc'>('desc');
 
   const isLoading = statsLoading || tasksLoading;
 
@@ -51,21 +51,21 @@ export function useDashboardData() {
       const aTotal = Object.values(a).reduce((sum, v) => sum + v, 0);
       const bTotal = Object.values(b).reduce((sum, v) => sum + v, 0);
 
-      const aValue = industrySortBy === "total" ? aTotal : (a[industrySortBy] ?? 0);
-      const bValue = industrySortBy === "total" ? bTotal : (b[industrySortBy] ?? 0);
+      const aValue = industrySortBy === 'total' ? aTotal : (a[industrySortBy] ?? 0);
+      const bValue = industrySortBy === 'total' ? bTotal : (b[industrySortBy] ?? 0);
 
-      return industrySortDirection === "desc" ? bValue - aValue : aValue - bValue;
+      return industrySortDirection === 'desc' ? bValue - aValue : aValue - bValue;
     });
   }, [industryMap, industrySortBy, industrySortDirection]);
 
   const handleIndustrySort = (column: string) => {
     if (industrySortBy === column) {
       // اگه روی همون ستون کلیک کرد، جهت رو برعکس کن
-      setIndustrySortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
+      setIndustrySortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'));
     } else {
       // اگه ستون جدید انتخاب کرد، پیش‌فرض نزولی
       setIndustrySortBy(column);
-      setIndustrySortDirection("desc");
+      setIndustrySortDirection('desc');
     }
   };
 

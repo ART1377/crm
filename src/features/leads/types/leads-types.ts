@@ -1,22 +1,22 @@
-import { Task } from "@/features/tasks/types/tasks-types";
+import { Task } from '@/features/tasks/types/tasks-types';
 
 export type LeadStatus =
-  | "NEW"
-  | "CALLED"
-  | "MESSAGED"
-  | "CONTACTED"
-  | "FOLLOW_UP"
-  | "CUSTOMER"
-  | "NOT_INTERESTED"
-  | "INVALID";
+  | 'NEW'
+  | 'CALLED'
+  | 'MESSAGED'
+  | 'CONTACTED'
+  | 'FOLLOW_UP'
+  | 'CUSTOMER'
+  | 'NOT_INTERESTED'
+  | 'INVALID';
 
 export type LeadSource =
-  | "IRAN_SITE"
-  | "NIAZ_ROOZ"
-  | "KETAB_AVAL"
-  | "INSTAGRAM"
-  | "OTHER_DIRECTORY"
-  | "DIRECT";
+  | 'IRAN_SITE'
+  | 'NIAZ_ROOZ'
+  | 'KETAB_AVAL'
+  | 'INSTAGRAM'
+  | 'OTHER_DIRECTORY'
+  | 'DIRECT';
 
 export interface Lead {
   id: string;
@@ -35,7 +35,7 @@ export interface Lead {
   updatedAt: string;
 }
 
-export type ActivityType = "CALL" | "MESSAGE" | "NOTE" | "STATUS_CHANGE";
+export type ActivityType = 'CALL' | 'MESSAGE' | 'NOTE' | 'STATUS_CHANGE';
 
 export interface Activity {
   id: string;
@@ -69,7 +69,7 @@ export interface UpdateLeadData extends Partial<CreateLeadData> {
 }
 
 export interface CreateActivityData {
-  type: Activity["type"];
+  type: Activity['type'];
   summary: string;
   detail?: string;
 }

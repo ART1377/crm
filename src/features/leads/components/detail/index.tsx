@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { useLead } from "@/features/leads/hooks/use-leads";
+import { useLead } from '@/features/leads/hooks/use-leads';
 
-import { ActivityTimeline } from "./activity-timeline";
-import { LeadHeader } from "./header";
-import { LeadInfo } from "./info";
-import { NotFound } from "./not-found";
-import { LeadQuickActions } from "./quick-actions";
-import { LeadDetailSkeleton } from "./skeleton";
-import { TaskSidebar } from "./task-sidebar";
-import { TemplateSidebar } from "./template-sidebar";
+import { ActivityTimeline } from './activity-timeline';
+import { LeadHeader } from './header';
+import { LeadInfo } from './info';
+import { NotFound } from './not-found';
+import { LeadQuickActions } from './quick-actions';
+import { LeadDetailSkeleton } from './skeleton';
+import { TaskSidebar } from './task-sidebar';
+import { TemplateSidebar } from './template-sidebar';
 
 export function LeadDetailPage() {
   const params = useParams();

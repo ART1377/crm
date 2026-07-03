@@ -1,7 +1,7 @@
 // src/app/api/settings/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   const settings = await prisma.setting.findMany();

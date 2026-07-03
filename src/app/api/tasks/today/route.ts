@@ -1,7 +1,7 @@
 // src/app/api/tasks/today/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -28,13 +28,13 @@ export async function GET() {
         },
       },
       orderBy: {
-        dueDate: "asc",
+        dueDate: 'asc',
       },
     });
 
     return NextResponse.json(tasks);
   } catch (error) {
-    console.error("GET /api/tasks/today error:", error);
-    return NextResponse.json({ error: "خطا در دریافت تسک‌ها" }, { status: 500 });
+    console.error('GET /api/tasks/today error:', error);
+    return NextResponse.json({ error: 'خطا در دریافت تسک‌ها' }, { status: 500 });
   }
 }

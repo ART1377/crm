@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { useSaveSettings, useSettings } from "@/features/settings/hooks/use-settings";
+import { useSaveSettings, useSettings } from '@/features/settings/hooks/use-settings';
 
-import { SenderFormValues } from "../types/settings-types";
+import { SenderFormValues } from '../types/settings-types';
 
 export function useSettingsPage() {
   const { data: settings = {}, isLoading } = useSettings();
   const saveSettings = useSaveSettings();
   const { register, handleSubmit, reset } = useForm<SenderFormValues>();
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     if (Object.keys(settings).length > 0) reset(settings);

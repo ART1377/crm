@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { AlertCircle, Calendar } from "lucide-react";
+import { AlertCircle, Calendar } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { useTodayTasks } from "@/features/tasks/hooks/use-tasks";
+import { useTodayTasks } from '@/features/tasks/hooks/use-tasks';
 
-import { TaskItem } from "./components/item";
-import { TasksSkeleton } from "./components/skeleton";
+import { TaskItem } from './components/item';
+import { TasksSkeleton } from './components/skeleton';
 
 export function TasksPage() {
   const { data: tasks = [], isLoading } = useTodayTasks();

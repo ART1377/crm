@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,12 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
-import { PersianDatePicker } from "@/components/shared/persian-date-picker";
+import { PersianDatePicker } from '@/components/shared/persian-date-picker';
 
-import { useCreateTask } from "@/features/tasks/hooks/use-tasks";
+import { useCreateTask } from '@/features/tasks/hooks/use-tasks';
 
 interface ScheduleTaskDialogProps {
   open: boolean;
@@ -32,14 +32,14 @@ export function ScheduleTaskDialog({
   children,
 }: ScheduleTaskDialogProps) {
   const createTask = useCreateTask();
-  const [title, setTitle] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [title, setTitle] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
   const handleSubmit = async () => {
     await createTask.mutateAsync({ leadId, data: { title, dueDate } });
     onOpenChange(false);
-    setTitle("");
-    setDueDate("");
+    setTitle('');
+    setDueDate('');
   };
 
   return (

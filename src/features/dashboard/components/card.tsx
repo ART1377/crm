@@ -1,6 +1,6 @@
-import { type LucideIcon } from "lucide-react";
+import { type LucideIcon } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface StatCardProps {
   title: string;
@@ -15,7 +15,7 @@ export function StatCard({
   value,
   subtitle,
   icon: Icon,
-  iconColor = "text-muted-foreground",
+  iconColor = 'text-muted-foreground',
 }: StatCardProps) {
   return (
     <Card className="min-h-fit flex-1">

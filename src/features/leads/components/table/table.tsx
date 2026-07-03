@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ROUTES } from "@/routes/routes";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { ROUTES } from '@/routes/routes';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -23,15 +23,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-import { getSourceLabel } from "@/features/leads/lead-helpers";
+import { getSourceLabel } from '@/features/leads/lead-helpers';
 
-import { formatDate } from "@/lib/utils";
+import { formatDate } from '@/lib/utils';
 
-import { LEAD_STATUSES } from "../../constants/leads-constants";
-import { Lead } from "../../types/leads-types";
-import { EditLeadDialog } from "./edit-lead/dialog";
+import { LEAD_STATUSES } from '../../constants/leads-constants';
+import { Lead } from '../../types/leads-types';
+import { EditLeadDialog } from './edit-lead/dialog';
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -56,7 +56,7 @@ export function LeadsTable({
 
   useEffect(() => {
     if (checkboxRef.current) {
-      const input = checkboxRef.current.querySelector("input");
+      const input = checkboxRef.current.querySelector('input');
       if (input) input.indeterminate = someSelected;
     }
   }, [someSelected]);
@@ -82,7 +82,7 @@ export function LeadsTable({
         </TableHeader>
         <TableBody>
           {leads.map((lead) => (
-            <TableRow key={lead.id} className={selectedIds.includes(lead.id) ? "bg-primary/5" : ""}>
+            <TableRow key={lead.id} className={selectedIds.includes(lead.id) ? 'bg-primary/5' : ''}>
               <TableCell>
                 <Checkbox
                   checked={selectedIds.includes(lead.id)}
@@ -97,7 +97,7 @@ export function LeadsTable({
                   {lead.businessName}
                 </Link>
               </TableCell>
-              <TableCell>{lead.contactPerson || "---"}</TableCell>
+              <TableCell>{lead.contactPerson || '---'}</TableCell>
               <TableCell>
                 <a href={`tel:${lead.phoneNumber}`} className="text-primary block hover:underline">
                   {lead.phoneNumber}

@@ -1,20 +1,19 @@
-"use client";
+'use client';
 
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 
-import { LEADS_PAGE_SIZE } from "@/constants/constants";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { LEADS_PAGE_SIZE } from '@/constants/constants';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { leadsService } from "@/features/leads/api/leads.api";
+import { leadsService } from '@/features/leads/api/leads.api';
 
-import { LEADS_QUERY_KEY } from "@/lib/query-keys";
+import { LEADS_QUERY_KEY } from '@/lib/query-keys';
 
-import { CreateLeadData, LeadFilters, UpdateLeadData } from "../types/leads-types";
+import { CreateLeadData, LeadFilters, UpdateLeadData } from '../types/leads-types';
 
 export function useLeads(filters?: LeadFilters & { sortBy?: string; sortOrder?: string }) {
   return useInfiniteQuery({
-    queryKey: [LEADS_QUERY_KEY, "infinite", filters],
+    queryKey: [LEADS_QUERY_KEY, 'infinite', filters],
     queryFn: ({ pageParam = 1 }) =>
       leadsService.getAll({
         ...filters,
@@ -42,7 +41,7 @@ export function useCreateLead() {
     mutationFn: (data: CreateLeadData) => leadsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      toast.success("سرنخ با موفقیت ایجاد شد");
+      toast.success('سرنخ با موفقیت ایجاد شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -61,7 +60,7 @@ export function useUpdateLead() {
       queryClient.invalidateQueries({
         queryKey: [LEADS_QUERY_KEY, variables.id],
       });
-      toast.success("سرنخ با موفقیت بروزرسانی شد");
+      toast.success('سرنخ با موفقیت بروزرسانی شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -76,7 +75,7 @@ export function useDeleteLead() {
     mutationFn: (id: string) => leadsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      toast.success("سرنخ با موفقیت حذف شد");
+      toast.success('سرنخ با موفقیت حذف شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -96,7 +95,7 @@ export function useChangeLeadStatus() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, variables.id] });
-      toast.success("وضعیت بروزرسانی شد");
+      toast.success('وضعیت بروزرسانی شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);

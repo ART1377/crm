@@ -1,6 +1,6 @@
-import apiClient from "@/config/axios";
+import apiClient from '@/config/axios';
 
-import { ListOption } from "../types/settings-types";
+import { ListOption } from '../types/settings-types';
 
 export const listOptionsService = {
   async getAll(type: string) {
@@ -8,7 +8,7 @@ export const listOptionsService = {
   },
 
   async create(data: { value: string; type: string }) {
-    return apiClient.post("/list-options", data) as Promise<ListOption>;
+    return apiClient.post('/list-options', data) as Promise<ListOption>;
   },
 
   async update(id: string, data: { value: string }) {

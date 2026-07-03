@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { MessageSquare } from "lucide-react";
+import { MessageSquare } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-import { useTemplates } from "@/features/templates/hooks/use-templates";
+import { useTemplates } from '@/features/templates/hooks/use-templates';
 
-import { useMessageSender } from "./hooks/use-message-sender";
-import { TemplateSidebarItem } from "./template-sidebar-item";
+import { useMessageSender } from './hooks/use-message-sender';
+import { TemplateSidebarItem } from './template-sidebar-item';
 
 interface TemplateSidebarProps {
   phone: string;

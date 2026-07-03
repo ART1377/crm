@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const type = request.nextUrl.searchParams.get("type");
+  const type = request.nextUrl.searchParams.get('type');
   const where = type ? { type } : {};
-  const options = await prisma.listOption.findMany({ where, orderBy: { value: "asc" } });
+  const options = await prisma.listOption.findMany({ where, orderBy: { value: 'asc' } });
   return NextResponse.json(options);
 }
 

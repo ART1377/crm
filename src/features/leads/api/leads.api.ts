@@ -1,12 +1,12 @@
 // src/services/leads.service.ts
-import apiClient from "@/config/axios";
-import { LEADS_PAGE_SIZE } from "@/constants/constants";
+import apiClient from '@/config/axios';
+import { LEADS_PAGE_SIZE } from '@/constants/constants';
 
-import { Task } from "@/features/tasks/types/tasks-types";
+import { Task } from '@/features/tasks/types/tasks-types';
 
-import { CreateLeadData, Lead, LeadFilters, UpdateLeadData } from "../types/leads-types";
+import { CreateLeadData, Lead, LeadFilters, UpdateLeadData } from '../types/leads-types';
 
-const LEADS_ENDPOINT = "/leads";
+const LEADS_ENDPOINT = '/leads';
 
 export const leadsService = {
   async getAll(
@@ -18,15 +18,15 @@ export const leadsService = {
     }
   ) {
     const params = new URLSearchParams();
-    if (filters?.status) params.append("status", filters.status);
-    if (filters?.search) params.append("search", filters.search);
-    if (filters?.industry) params.append("industry", filters.industry);
-    if (filters?.page) params.append("page", String(filters.page));
-    if (filters?.sortBy) params.append("sortBy", filters.sortBy);
-    if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
-    if (filters?.dateFrom) params.append("dateFrom", filters.dateFrom);
-    if (filters?.dateTo) params.append("dateTo", filters.dateTo);
-    params.append("limit", String(filters?.limit || LEADS_PAGE_SIZE));
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.industry) params.append('industry', filters.industry);
+    if (filters?.page) params.append('page', String(filters.page));
+    if (filters?.sortBy) params.append('sortBy', filters.sortBy);
+    if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+    params.append('limit', String(filters?.limit || LEADS_PAGE_SIZE));
 
     const queryString = params.toString();
     const url = queryString ? `${LEADS_ENDPOINT}?${queryString}` : LEADS_ENDPOINT;

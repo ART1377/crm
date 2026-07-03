@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
+import { Building2, Hash, Phone, StickyNote, Tag, User } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
-import { ComboboxInput } from "@/components/shared/combobox-input";
+import { ComboboxInput } from '@/components/shared/combobox-input';
 
-import { LEAD_STATUSES } from "@/features/leads/constants/leads-constants";
-import { Lead } from "@/features/leads/types/leads-types";
+import { LEAD_STATUSES } from '@/features/leads/constants/leads-constants';
+import { Lead } from '@/features/leads/types/leads-types';
 
-import FieldWithIcon from "./field";
-import { useEditLead } from "./hooks/use-edit-lead";
+import FieldWithIcon from './field';
+import { useEditLead } from './hooks/use-edit-lead';
 
 export function EditLeadDialog({ lead, children }: { lead: Lead; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -52,14 +52,14 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
               <Input
                 className="pr-10"
                 value={form.businessName}
-                onChange={(e) => updateField("businessName", e.target.value)}
+                onChange={(e) => updateField('businessName', e.target.value)}
               />
             </FieldWithIcon>
             <FieldWithIcon icon={User} label="شخص تماس">
               <Input
                 className="pr-10"
                 value={form.contactPerson}
-                onChange={(e) => updateField("contactPerson", e.target.value)}
+                onChange={(e) => updateField('contactPerson', e.target.value)}
               />
             </FieldWithIcon>
           </div>
@@ -70,7 +70,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
                 className="pr-10"
                 dir="ltr"
                 value={form.phoneNumber}
-                onChange={(e) => updateField("phoneNumber", e.target.value)}
+                onChange={(e) => updateField('phoneNumber', e.target.value)}
               />
             </FieldWithIcon>
             <FieldWithIcon icon={Phone} label="شماره دوم">
@@ -78,7 +78,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
                 className="pr-10"
                 dir="ltr"
                 value={form.secondaryPhone}
-                onChange={(e) => updateField("secondaryPhone", e.target.value)}
+                onChange={(e) => updateField('secondaryPhone', e.target.value)}
               />
             </FieldWithIcon>
           </div>
@@ -88,7 +88,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
               <Label>حوزه فعالیت *</Label>
               <ComboboxInput
                 value={form.industry}
-                onChange={(value) => updateField("industry", value)}
+                onChange={(value) => updateField('industry', value)}
                 options={industries}
                 placeholder="انتخاب صنعت"
                 icon={<Tag className="h-4 w-4" />}
@@ -98,7 +98,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
               <Label>منبع سرنخ</Label>
               <ComboboxInput
                 value={form.source}
-                onChange={(value) => updateField("source", value)}
+                onChange={(value) => updateField('source', value)}
                 options={sources}
                 placeholder="انتخاب منبع"
                 icon={<Hash className="h-4 w-4" />}
@@ -108,7 +108,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
 
           <div className="space-y-2">
             <Label>وضعیت</Label>
-            <Select value={form.status} onValueChange={(value) => updateField("status", value)}>
+            <Select value={form.status} onValueChange={(value) => updateField('status', value)}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -126,12 +126,12 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
             <Textarea
               className="min-h-24 pr-10"
               value={form.notes}
-              onChange={(e) => updateField("notes", e.target.value)}
+              onChange={(e) => updateField('notes', e.target.value)}
             />
           </FieldWithIcon>
 
           <Button className="w-full" onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
+            {isPending ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
           </Button>
         </div>
       </DialogContent>

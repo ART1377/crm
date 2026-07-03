@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { useCreateLead } from "@/features/leads/hooks/use-leads";
+import { useCreateLead } from '@/features/leads/hooks/use-leads';
 
-import { leadSchema } from "../../schemas/leads-schemas";
-import { CreateLeadData } from "../../types/leads-types";
-import { LeadFormActions } from "./actions";
-import { LeadForm } from "./form";
+import { leadSchema } from '../../schemas/leads-schemas';
+import { CreateLeadData } from '../../types/leads-types';
+import { LeadFormActions } from './actions';
+import { LeadForm } from './form';
 
 export function NewLeadPage() {
   const createLead = useCreateLead();
 
   const form = useForm<CreateLeadData>({
     resolver: zodResolver(leadSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      businessName: "",
-      contactPerson: "",
-      phoneNumber: "",
-      secondaryPhone: "",
-      industry: "",
-      source: "",
-      notes: "",
+      businessName: '',
+      contactPerson: '',
+      phoneNumber: '',
+      secondaryPhone: '',
+      industry: '',
+      source: '',
+      notes: '',
     },
   });
 

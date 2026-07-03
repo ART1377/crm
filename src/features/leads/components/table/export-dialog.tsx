@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Download } from "lucide-react";
+import { Download } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-import { Lead } from "../../types/leads-types";
+import { Lead } from '../../types/leads-types';
 import {
   ALL_COLUMNS,
   type ColumnKey,
   DEFAULT_COLUMNS,
   exportToCsv,
   exportToText,
-} from "../../utils/export-utils";
+} from '../../utils/export-utils';
 
 export function ExportDialog({
   totalCount,
@@ -38,14 +38,14 @@ export function ExportDialog({
   totalCount: number;
   onExportAll: () => Promise<Lead[]>;
 }) {
-  const [format, setFormat] = useState<"csv" | "txt">("csv");
+  const [format, setFormat] = useState<'csv' | 'txt'>('csv');
   const [columns, setColumns] = useState<ColumnKey[]>(DEFAULT_COLUMNS);
   const [open, setOpen] = useState(false);
 
   const handleExport = async () => {
     if (columns.length === 0) return;
     const allLeads = await onExportAll();
-    if (format === "txt") {
+    if (format === 'txt') {
       exportToText(allLeads, columns);
     } else {
       exportToCsv(allLeads, columns);
@@ -68,7 +68,7 @@ export function ExportDialog({
         <div className="space-y-6">
           <div className="space-y-2">
             <Label>فرمت خروجی</Label>
-            <Select value={format} onValueChange={(v) => setFormat(v as "csv" | "txt")}>
+            <Select value={format} onValueChange={(v) => setFormat(v as 'csv' | 'txt')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

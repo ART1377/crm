@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import {
   CheckSquare,
@@ -14,18 +14,18 @@ import {
   Sparkles,
   Users,
   X,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: "داشبورد", href: "/", icon: LayoutDashboard },
-  { name: "سرنخ‌ها", href: "/leads", icon: Users },
-  { name: "تسک‌ها", href: "/tasks", icon: CheckSquare },
-  { name: "قالب‌های پیام", href: "/templates", icon: MessageSquare },
-  { name: "تنظیمات", href: "/settings", icon: Settings },
+  { name: 'داشبورد', href: '/', icon: LayoutDashboard },
+  { name: 'سرنخ‌ها', href: '/leads', icon: Users },
+  { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare },
+  { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare },
+  { name: 'تنظیمات', href: '/settings', icon: Settings },
 ];
 
 export function Navbar() {
@@ -37,9 +37,9 @@ export function Navbar() {
 
   // Prevent scroll when mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -50,8 +50,8 @@ export function Navbar() {
         variant="ghost"
         size="icon"
         className={cn(
-          "bg-background fixed top-4 z-50 border shadow-md transition-all duration-300 lg:hidden",
-          isOpen ? "right-52 bg-gray-200" : "right-4"
+          'bg-background fixed top-4 z-50 border shadow-md transition-all duration-300 lg:hidden',
+          isOpen ? 'right-52 bg-gray-200' : 'right-4'
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -69,8 +69,8 @@ export function Navbar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-card fixed inset-y-0 right-0 z-40 flex w-64 flex-col border-l transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
-          isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
+          'bg-card fixed inset-y-0 right-0 z-40 flex w-64 flex-col border-l transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
+          isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         )}
       >
         {/* Brand */}
@@ -88,23 +88,23 @@ export function Navbar() {
         <nav className="flex-1 space-y-1 p-3">
           {navigation.map((item) => {
             const isActive =
-              pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={handleLinkClick}
                 className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 <item.icon
                   className={cn(
-                    "h-5 w-5 transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                    'h-5 w-5 transition-colors',
+                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
                   )}
                 />
                 {item.name}

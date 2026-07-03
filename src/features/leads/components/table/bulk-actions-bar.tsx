@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-import { LEAD_STATUSES } from "../../constants/leads-constants";
+import { LEAD_STATUSES } from '../../constants/leads-constants';
 
 interface BulkActionsBarProps {
   selectedCount: number;

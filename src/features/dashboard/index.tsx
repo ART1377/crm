@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ROUTES } from "@/routes/routes";
-import { Building2, Phone, Plus, Users } from "lucide-react";
+import { ROUTES } from '@/routes/routes';
+import { Building2, Phone, Plus, Users } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { StatCard } from "./components/card";
-import { ConversionCard } from "./components/conversion-card";
-import { IndustryChart } from "./components/industry-chart";
-import { IndustryTable } from "./components/industry-table";
-import { DashboardSkeleton } from "./components/skeleton";
-import { StatusCards } from "./components/status-cards";
-import { TasksProgressCard } from "./components/tasks-progress-card";
-import { TodayTasks } from "./components/today-tasks";
-import { WeeklyCalendar } from "./components/weekly-chart";
-import { useDashboardData } from "./hooks/use-dashboard-data";
+import { StatCard } from './components/card';
+import { ConversionCard } from './components/conversion-card';
+import { IndustryChart } from './components/industry-chart';
+import { IndustryTable } from './components/industry-table';
+import { DashboardSkeleton } from './components/skeleton';
+import { StatusCards } from './components/status-cards';
+import { TasksProgressCard } from './components/tasks-progress-card';
+import { TodayTasks } from './components/today-tasks';
+import { WeeklyCalendar } from './components/weekly-chart';
+import { useDashboardData } from './hooks/use-dashboard-data';
 
 export function DashboardPage() {
   const {

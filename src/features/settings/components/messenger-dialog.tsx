@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-import { useSaveMessenger } from "@/features/settings/hooks/use-messengers";
+import { useSaveMessenger } from '@/features/settings/hooks/use-messengers';
 
-import { Messenger } from "../types/settings-types";
+import { Messenger } from '../types/settings-types';
 
 interface MessengerDialogProps {
   open: boolean;
@@ -22,9 +22,9 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
   const save = useSaveMessenger();
   const isEditing = !!messenger;
 
-  const [name, setName] = useState(messenger?.name ?? "");
-  const [key, setKey] = useState(messenger?.key ?? "");
-  const [linkTemplate, setLinkTemplate] = useState(messenger?.linkTemplate ?? "");
+  const [name, setName] = useState(messenger?.name ?? '');
+  const [key, setKey] = useState(messenger?.key ?? '');
+  const [linkTemplate, setLinkTemplate] = useState(messenger?.linkTemplate ?? '');
 
   const handleSubmit = () => {
     save.mutate(
@@ -46,7 +46,7 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? "ویرایش پیام‌رسان" : "افزودن پیام‌رسان جدید"}</DialogTitle>
+          <DialogTitle>{isEditing ? 'ویرایش پیام‌رسان' : 'افزودن پیام‌رسان جدید'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -76,10 +76,10 @@ export function MessengerDialog({ open, onOpenChange, messenger, onClose }: Mess
             />
           </div>
           <p className="text-muted-foreground text-xs">
-            از {"{phone}"} و {"{message}"} در لینک استفاده کنید
+            از {'{phone}'} و {'{message}'} در لینک استفاده کنید
           </p>
           <Button className="w-full" onClick={handleSubmit} disabled={!isValid}>
-            {isEditing ? "بروزرسانی" : "افزودن"}
+            {isEditing ? 'بروزرسانی' : 'افزودن'}
           </Button>
         </div>
       </DialogContent>

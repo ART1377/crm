@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { tasksService } from "@/features/tasks/api/tasks.api";
+import { tasksService } from '@/features/tasks/api/tasks.api';
 
-import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from "@/lib/query-keys";
+import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from '@/lib/query-keys';
 
-import { CreateTaskData } from "../types/tasks-types";
+import { CreateTaskData } from '../types/tasks-types';
 
 export function useTasks(leadId: string) {
   return useQuery({
@@ -20,7 +20,7 @@ export function useTasks(leadId: string) {
 
 export function useTodayTasks() {
   return useQuery({
-    queryKey: [TASKS_QUERY_KEY, "today"],
+    queryKey: [TASKS_QUERY_KEY, 'today'],
     queryFn: () => tasksService.getTodayTasks(),
   });
 }
@@ -34,7 +34,7 @@ export function useCreateTask() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      toast.success("تسک با موفقیت ایجاد شد");
+      toast.success('تسک با موفقیت ایجاد شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -56,7 +56,7 @@ export function useUpdateTask() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      toast.success("تسک بروزرسانی شد");
+      toast.success('تسک بروزرسانی شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -71,7 +71,7 @@ export function useDeleteTask(leadId: string) {
     mutationFn: (taskId: string) => tasksService.delete(taskId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
-      toast.success("پیگیری حذف شد");
+      toast.success('پیگیری حذف شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -86,7 +86,7 @@ export function useDeleteAllTasks(leadId: string) {
     mutationFn: () => tasksService.deleteAll(leadId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
-      toast.success("همه پیگیری‌ها حذف شدند");
+      toast.success('همه پیگیری‌ها حذف شدند');
     },
     onError: (error: Error) => {
       toast.error(error.message);

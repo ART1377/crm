@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { Check } from "lucide-react";
+import { Check } from 'lucide-react';
 
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface ComboboxInputProps {
   value: string;
@@ -15,7 +15,7 @@ interface ComboboxInputProps {
   placeholder?: string;
   className?: string;
   icon?: React.ReactNode;
-  dir?: "rtl" | "ltr";
+  dir?: 'rtl' | 'ltr';
 }
 
 export function ComboboxInput({
@@ -40,25 +40,25 @@ export function ComboboxInput({
         setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {
-      if (e.key === "ArrowDown") setIsOpen(true);
+      if (e.key === 'ArrowDown') setIsOpen(true);
       return;
     }
     switch (e.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         e.preventDefault();
         setHighlightedIndex((prev) => Math.min(prev + 1, filtered.length - 1));
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
         setHighlightedIndex((prev) => Math.max(prev - 1, 0));
         break;
-      case "Enter":
+      case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0) {
           onChange(filtered[highlightedIndex]);
@@ -66,7 +66,7 @@ export function ComboboxInput({
           setHighlightedIndex(-1);
         }
         break;
-      case "Escape":
+      case 'Escape':
         setIsOpen(false);
         setHighlightedIndex(-1);
         break;
@@ -92,7 +92,7 @@ export function ComboboxInput({
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className={cn(icon && "pr-10", className)}
+          className={cn(icon && 'pr-10', className)}
           dir={dir}
         />
       </div>
@@ -116,9 +116,9 @@ export function ComboboxInput({
               key={opt}
               type="button"
               className={cn(
-                "hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-start text-sm transition-colors",
-                i === highlightedIndex && "bg-muted",
-                value === opt && "text-primary font-medium"
+                'hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-start text-sm transition-colors',
+                i === highlightedIndex && 'bg-muted',
+                value === opt && 'text-primary font-medium'
               )}
               onClick={() => {
                 onChange(opt);

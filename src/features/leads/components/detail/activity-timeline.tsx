@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Hash, MessageSquare, PhoneCall, Tag, Trash2 } from "lucide-react";
+import { Hash, MessageSquare, PhoneCall, Tag, Trash2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 
-import { useDeleteActivity, useDeleteAllActivities } from "@/features/leads/hooks/use-activities";
+import { useDeleteActivity, useDeleteAllActivities } from '@/features/leads/hooks/use-activities';
 
-import { formatDate } from "@/lib/utils";
+import { formatDate } from '@/lib/utils';
 
-import { Activity } from "../../types/leads-types";
+import { Activity } from '../../types/leads-types';
 
 const iconMap = {
-  CALL: { Icon: PhoneCall, color: "text-blue-500" },
-  MESSAGE: { Icon: MessageSquare, color: "text-green-500" },
-  NOTE: { Icon: Hash, color: "text-gray-500" },
-  STATUS_CHANGE: { Icon: Tag, color: "text-purple-500" },
+  CALL: { Icon: PhoneCall, color: 'text-blue-500' },
+  MESSAGE: { Icon: MessageSquare, color: 'text-green-500' },
+  NOTE: { Icon: Hash, color: 'text-gray-500' },
+  STATUS_CHANGE: { Icon: Tag, color: 'text-purple-500' },
 };
 
 export function ActivityTimeline({

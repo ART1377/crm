@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Pencil, Plus, Settings2, Trash2 } from "lucide-react";
+import { Pencil, Plus, Settings2, Trash2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { Button } from '@/components/ui/button';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -14,18 +14,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 
 import {
   useDeleteMessenger,
   useMessengers,
   useToggleMessenger,
-} from "@/features/settings/hooks/use-messengers";
+} from '@/features/settings/hooks/use-messengers';
 
-import { Messenger } from "../types/settings-types";
-import { MessengerDialog } from "./messenger-dialog";
+import { Messenger } from '../types/settings-types';
+import { MessengerDialog } from './messenger-dialog';
 
 export function MessengersTable() {
   const { data: messengers = [], isLoading } = useMessengers();
@@ -103,7 +103,7 @@ export function MessengersTable() {
       </CardContent>
 
       <MessengerDialog
-        key={editing?.id ?? "new"}
+        key={editing?.id ?? 'new'}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         messenger={editing}

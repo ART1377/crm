@@ -1,27 +1,27 @@
 // src/app/api/leads/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const search = searchParams.get("search");
-    const industry = searchParams.get("industry");
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "15");
+    const status = searchParams.get('status');
+    const search = searchParams.get('search');
+    const industry = searchParams.get('industry');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '15');
     const skip = (page - 1) * limit;
-    const sortBy = (searchParams.get("sortBy") as string) || "createdAt";
-    const sortOrder = (searchParams.get("sortOrder") as string) || "desc";
-    const dateFrom = searchParams.get("dateFrom");
-    const dateTo = searchParams.get("dateTo");
+    const sortBy = (searchParams.get('sortBy') as string) || 'createdAt';
+    const sortOrder = (searchParams.get('sortOrder') as string) || 'desc';
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
     const where: Prisma.LeadWhereInput = {};
 
-    if (status && status !== "all") where.status = status;
+    if (status && status !== 'all') where.status = status;
     if (industry) where.industry = industry;
     if (search) {
       where.OR = [
@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate sortBy to prevent injection
-    const allowedSortFields = ["createdAt", "businessName", "status", "industry"];
-    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
-    const safeSortOrder = sortOrder === "asc" ? "asc" : "desc";
+    const allowedSortFields = ['createdAt', 'businessName', 'status', 'industry'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortOrder = sortOrder === 'asc' ? 'asc' : 'desc';
 
     const [leads, total] = await Promise.all([
       prisma.lead.findMany({
@@ -68,8 +68,8 @@ export async function GET(request: NextRequest) {
       hasMore: skip + leads.length < total,
     });
   } catch (error) {
-    console.error("GET /api/leads error:", error);
-    return NextResponse.json({ error: "خطا در دریافت سرنخ‌ها" }, { status: 500 });
+    console.error('GET /api/leads error:', error);
+    return NextResponse.json({ error: 'خطا در دریافت سرنخ‌ها' }, { status: 500 });
   }
 }
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      const field = existing.phoneNumber === body.phoneNumber ? "شماره تماس" : "نام کسب‌وکار";
+      const field = existing.phoneNumber === body.phoneNumber ? 'شماره تماس' : 'نام کسب‌وکار';
       return NextResponse.json(
         { error: `${field} قبلاً ثبت شده است (${existing.businessName})` },
         { status: 409 }
@@ -101,13 +101,13 @@ export async function POST(request: NextRequest) {
         industry: body.industry,
         source: body.source || null,
         notes: body.notes || null,
-        status: "NEW",
+        status: 'NEW',
       },
     });
 
     return NextResponse.json(lead, { status: 201 });
   } catch (error) {
-    console.error("POST /api/leads error:", error);
-    return NextResponse.json({ error: "خطا در ایجاد سرنخ" }, { status: 400 });
+    console.error('POST /api/leads error:', error);
+    return NextResponse.json({ error: 'خطا در ایجاد سرنخ' }, { status: 400 });
   }
 }

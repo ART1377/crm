@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import type { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from 'react-hook-form';
 
-import { Building2, Hash, Phone, StickyNote, Tag, User } from "lucide-react";
+import { Building2, Hash, Phone, StickyNote, Tag, User } from 'lucide-react';
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
-import { ComboboxInput } from "@/components/shared/combobox-input";
+import { ComboboxInput } from '@/components/shared/combobox-input';
 
-import { useListOptions } from "@/features/settings/hooks/use-list-options";
+import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
-import { CreateLeadData } from "../../types/leads-types";
-import { FormField } from "./form-field";
+import { CreateLeadData } from '../../types/leads-types';
+import { FormField } from './form-field';
 
 export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
-  const { data: sourceOptions = [] } = useListOptions("SOURCE");
-  const { data: industryOptions = [] } = useListOptions("INDUSTRY");
+  const { data: sourceOptions = [] } = useListOptions('SOURCE');
+  const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const sources = sourceOptions.map((o) => o.value);
   const industries = industryOptions.map((o) => o.value);
 
@@ -36,7 +36,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
               id="businessName"
               placeholder="آهن‌فروشی فلاحی"
               className="pr-10"
-              {...register("businessName")}
+              {...register('businessName')}
             />
           </div>
         </FormField>
@@ -48,7 +48,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
               id="contactPerson"
               placeholder="نام و نام خانوادگی"
               className="pr-10"
-              {...register("contactPerson")}
+              {...register('contactPerson')}
             />
           </div>
         </FormField>
@@ -64,7 +64,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
               placeholder="0912 345 6789"
               dir="ltr"
               className="pr-10"
-              {...register("phoneNumber")}
+              {...register('phoneNumber')}
             />
           </div>
         </FormField>
@@ -77,7 +77,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
               placeholder="0912 345 6789"
               dir="ltr"
               className="pr-10"
-              {...register("secondaryPhone")}
+              {...register('secondaryPhone')}
             />
           </div>
         </FormField>
@@ -87,8 +87,8 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="حوزه فعالیت *" error={errors.industry?.message}>
           <ComboboxInput
-            value={form.watch("industry")}
-            onChange={(value) => form.setValue("industry", value)}
+            value={form.watch('industry')}
+            onChange={(value) => form.setValue('industry', value)}
             options={industries}
             placeholder="آهن‌آلات، پلیمر، الکترونیک..."
             icon={<Tag className="h-4 w-4" />}
@@ -97,8 +97,8 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
 
         <FormField label="منبع سرنخ" error={errors.source?.message}>
           <ComboboxInput
-            value={form.watch("source") ?? ""}
-            onChange={(value) => form.setValue("source", value)}
+            value={form.watch('source') ?? ''}
+            onChange={(value) => form.setValue('source', value)}
             options={sources}
             placeholder="انتخاب منبع"
             icon={<Hash className="h-4 w-4" />}
@@ -114,7 +114,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
             id="notes"
             placeholder="یادداشت‌های خود را وارد کنید..."
             className="min-h-28 pr-10"
-            {...register("notes")}
+            {...register('notes')}
           />
         </div>
       </FormField>

@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
-import { useChangeLeadStatus, useUpdateLead } from "@/features/leads/hooks/use-leads";
-import { Lead } from "@/features/leads/types/leads-types";
-import { useListOptions } from "@/features/settings/hooks/use-list-options";
+import { useChangeLeadStatus, useUpdateLead } from '@/features/leads/hooks/use-leads';
+import { Lead } from '@/features/leads/types/leads-types';
+import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
 export function useEditLead({ lead, onClose }: { lead: Lead; onClose: () => void }) {
   const updateLead = useUpdateLead();
   const changeStatus = useChangeLeadStatus();
 
-  const { data: sourceOptions = [] } = useListOptions("SOURCE");
-  const { data: industryOptions = [] } = useListOptions("INDUSTRY");
+  const { data: sourceOptions = [] } = useListOptions('SOURCE');
+  const { data: industryOptions = [] } = useListOptions('INDUSTRY');
 
   const sources = sourceOptions.map((o) => o.value);
   const industries = industryOptions.map((o) => o.value);
 
   const [form, setForm] = useState({
     businessName: lead.businessName,
-    contactPerson: lead.contactPerson || "",
+    contactPerson: lead.contactPerson || '',
     phoneNumber: lead.phoneNumber,
-    secondaryPhone: lead.secondaryPhone || "",
+    secondaryPhone: lead.secondaryPhone || '',
     industry: lead.industry,
     source: lead.source as string,
     status: lead.status as string,
-    notes: lead.notes || "",
+    notes: lead.notes || '',
   });
 
   const updateField = (field: string, value: string) => {
@@ -34,7 +34,7 @@ export function useEditLead({ lead, onClose }: { lead: Lead; onClose: () => void
 
   const handleSubmit = async () => {
     if (!form.businessName || !form.phoneNumber || !form.industry) {
-      toast.error("فیلدهای ستاره‌دار الزامی هستند");
+      toast.error('فیلدهای ستاره‌دار الزامی هستند');
       return;
     }
 

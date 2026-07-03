@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface PageHeaderProps {
   title: React.ReactNode;
@@ -13,7 +13,7 @@ export function PageHeader({ title, description, actions, className }: PageHeade
   return (
     <div
       className={cn(
-        "relative mt-8 mb-2 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between lg:mt-0",
+        'relative mt-8 mb-2 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between lg:mt-0',
         className
       )}
     >

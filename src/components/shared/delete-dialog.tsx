@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -23,8 +23,8 @@ export function DeleteConfirmDialog({
   open,
   onClose,
   onConfirm,
-  title = "حذف",
-  description = "آیا از حذف این آیتم اطمینان دارید؟ این عملیات قابل بازگشت نیست.",
+  title = 'حذف',
+  description = 'آیا از حذف این آیتم اطمینان دارید؟ این عملیات قابل بازگشت نیست.',
   isPending = false,
 }: DeleteConfirmDialogProps) {
   return (
@@ -39,7 +39,7 @@ export function DeleteConfirmDialog({
             انصراف
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
-            {isPending ? "در حال حذف..." : "حذف"}
+            {isPending ? 'در حال حذف...' : 'حذف'}
           </Button>
         </DialogFooter>
       </DialogContent>

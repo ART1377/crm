@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { List, MessageSquare, Settings2 } from "lucide-react";
+import { List, MessageSquare, Settings2 } from 'lucide-react';
 
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { SenderInfoForm } from "./components/info-form";
-import { ListOptionsManager } from "./components/list-options-manager";
-import { MessengersTable } from "./components/messengers-table";
-import { SettingsPageSkeleton } from "./components/skeleton";
-import { useSettingsPage } from "./hooks/use-settings-page";
+import { SenderInfoForm } from './components/info-form';
+import { ListOptionsManager } from './components/list-options-manager';
+import { MessengersTable } from './components/messengers-table';
+import { SettingsPageSkeleton } from './components/skeleton';
+import { useSettingsPage } from './hooks/use-settings-page';
 
 const TABS = [
-  { value: "general", label: "فرستنده", icon: Settings2 },
-  { value: "messengers", label: "پیام‌رسان‌ها", icon: MessageSquare },
-  { value: "sources", label: "منابع", icon: List },
-  { value: "industries", label: "حوزه‌ها", icon: List },
+  { value: 'general', label: 'فرستنده', icon: Settings2 },
+  { value: 'messengers', label: 'پیام‌رسان‌ها', icon: MessageSquare },
+  { value: 'sources', label: 'منابع', icon: List },
+  { value: 'industries', label: 'حوزه‌ها', icon: List },
 ] as const;
 
 export function SettingsPage() {

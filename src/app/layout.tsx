@@ -1,17 +1,17 @@
 // src/app/layout.tsx
-import { Toaster } from "react-hot-toast";
+import { Toaster } from 'react-hot-toast';
 
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { QueryProvider } from "@/providers/query-provider";
+import { QueryProvider } from '@/providers/query-provider';
 
-import { Navbar } from "@/components/layout/navbar";
+import { Navbar } from '@/components/layout/navbar';
 
-import "../styles/globals.css";
+import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  title: "CRM مدیریت سرنخ‌ها",
-  description: "سیستم مدیریت ارتباط با مشتریان برای فروش تلفنی",
+  title: 'CRM مدیریت سرنخ‌ها',
+  description: 'سیستم مدیریت ارتباط با مشتریان برای فروش تلفنی',
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
         <QueryProvider>
           <div className="flex h-screen max-h-screen">
             <Navbar />
-            <main className="flex-1 overflow-hidden">{children}</main>{" "}
+            <main className="flex-1 overflow-hidden">{children}</main>{' '}
           </div>
           <Toaster position="top-center" reverseOrder={false} />
         </QueryProvider>

@@ -1,8 +1,8 @@
 // src/lib/utils.ts
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-import { OVERDUE_DAYS } from "../constants/constants";
+import { OVERDUE_DAYS } from '../constants/constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,16 +10,16 @@ export function cn(...inputs: ClassValue[]) {
 
 // تابع کمکی برای فرمت کردن تاریخ شمسی (بعداً تکمیل می‌شه)
 export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("fa-IR").format(new Date(date));
+  return new Intl.DateTimeFormat('fa-IR').format(new Date(date));
 }
 
 // تابع کمکی برای دیپ لینک پیام‌رسان‌ها
 const DEFAULT_LINKS: Record<string, string> = {
-  WHATSAPP: "https://wa.me/{phone}?text={message}",
-  ETA: "https://eitaa.com/share?url={message}",
-  BALE: "https://ble.ir/share?text={message}",
-  RUBIKA: "https://rubika.ir/share?text={message}",
-  SMS: "sms:{phone}?body={message}",
+  WHATSAPP: 'https://wa.me/{phone}?text={message}',
+  ETA: 'https://eitaa.com/share?url={message}',
+  BALE: 'https://ble.ir/share?text={message}',
+  RUBIKA: 'https://rubika.ir/share?text={message}',
+  SMS: 'sms:{phone}?body={message}',
 };
 
 export function getMessengerLink(
@@ -30,8 +30,8 @@ export function getMessengerLink(
 ): string {
   const template = linkTemplate || DEFAULT_LINKS[type] || DEFAULT_LINKS.WHATSAPP;
   return template
-    .replace("{phone}", phone.replace(/[^0-9]/g, ""))
-    .replace("{message}", encodeURIComponent(message));
+    .replace('{phone}', phone.replace(/[^0-9]/g, ''))
+    .replace('{message}', encodeURIComponent(message));
 }
 
 export function replaceTemplateVars(
@@ -51,20 +51,20 @@ export function replaceTemplateVars(
   result = result.replace(/\{senderCompany\}/g, vars.senderCompany);
 
   if (!vars.contactPerson) {
-    result = result.replace(/خدمت \{contactPerson\} عزیز\n?/g, "");
-    result = result.replace(/\{contactPerson\}/g, "");
+    result = result.replace(/خدمت \{contactPerson\} عزیز\n?/g, '');
+    result = result.replace(/\{contactPerson\}/g, '');
   } else {
     result = result.replace(/\{contactPerson\}/g, vars.contactPerson);
   }
 
   if (!vars.companyName) {
-    result = result.replace(/با مجموعه \{companyName\}/g, "");
-    result = result.replace(/\{companyName\}/g, "");
+    result = result.replace(/با مجموعه \{companyName\}/g, '');
+    result = result.replace(/\{companyName\}/g, '');
   } else {
     result = result.replace(/\{companyName\}/g, vars.companyName);
   }
 
-  result = result.replace(/\n{3,}/g, "\n\n").trim();
+  result = result.replace(/\n{3,}/g, '\n\n').trim();
 
   return result;
 }

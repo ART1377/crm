@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Plus } from "lucide-react";
+import { Plus } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import { PageHeader } from "@/components/shared/page-header";
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
-import { useTemplates } from "@/features/templates/hooks/use-templates";
+import { useTemplates } from '@/features/templates/hooks/use-templates';
 
-import { TemplateCard } from "./components/card";
-import { CreateTemplateDialog } from "./components/create-dialog";
-import { TemplatesSkeleton } from "./components/skeleton";
+import { TemplateCard } from './components/card';
+import { CreateTemplateDialog } from './components/create-dialog';
+import { TemplatesSkeleton } from './components/skeleton';
 
 export function TemplatesPage() {
   const { data: templates = [], isLoading } = useTemplates();

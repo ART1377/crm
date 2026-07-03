@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from '@/components/shared/page-header';
 
-import { useChangeLeadStatus } from "@/features/leads/hooks/use-leads";
+import { useChangeLeadStatus } from '@/features/leads/hooks/use-leads';
 
-import { countOverdueTasks, formatDate } from "@/lib/utils";
+import { countOverdueTasks, formatDate } from '@/lib/utils';
 
-import { LEAD_STATUSES } from "../../constants/leads-constants";
-import { Lead } from "../../types/leads-types";
+import { LEAD_STATUSES } from '../../constants/leads-constants';
+import { Lead } from '../../types/leads-types';
 
 export function LeadHeader({ lead, leadId }: { lead: Lead; leadId: string }) {
   const changeStatus = useChangeLeadStatus();

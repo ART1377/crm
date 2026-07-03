@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import ReactECharts from "echarts-for-react";
-import { TooltipFormatterCallback } from "echarts/types/dist/shared";
-import { Activity } from "lucide-react";
+import ReactECharts from 'echarts-for-react';
+import { TooltipFormatterCallback } from 'echarts/types/dist/shared';
+import { Activity } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface WeeklyCalendarProps {
   data: { date: string; count: number }[];
@@ -17,7 +17,7 @@ function getCalendarData(data: { date: string; count: number }[]) {
   for (let i = 90; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    const key = date.toISOString().split("T")[0];
+    const key = date.toISOString().split('T')[0];
     const found = data.find((d) => d.date === key);
     result.push([key, found?.count ?? 0]);
   }
@@ -30,64 +30,64 @@ export function WeeklyCalendar({ data }: WeeklyCalendarProps) {
 
   const option = {
     tooltip: {
-      position: "top",
-      textStyle: { fontFamily: "Vazirmatn, sans-serif", fontSize: 12 },
+      position: 'top',
+      textStyle: { fontFamily: 'Vazirmatn, sans-serif', fontSize: 12 },
       formatter: ((params: { value: [string, number] }) => {
         const date = new Date(params.value[0]);
-        const persianDate = date.toLocaleDateString("fa-IR", { dateStyle: "full" });
+        const persianDate = date.toLocaleDateString('fa-IR', { dateStyle: 'full' });
         return `${persianDate}<br/>${params.value[1]} فعالیت`;
       }) as TooltipFormatterCallback<unknown>,
     },
     visualMap: {
       min: 0,
       max: Math.max(...calendarData.map((d) => d[1]), 1),
-      type: "piecewise",
-      orient: "horizontal",
-      left: "center",
+      type: 'piecewise',
+      orient: 'horizontal',
+      left: 'center',
       bottom: 0,
       textStyle: {
-        color: "hsl(var(--muted-foreground))",
-        fontFamily: "Vazirmatn, sans-serif",
+        color: 'hsl(var(--muted-foreground))',
+        fontFamily: 'Vazirmatn, sans-serif',
         fontSize: 10,
       },
       pieces: [
-        { min: 0, max: 0, color: "#f1f5f9", label: "بدون فعالیت" }, // light gray
-        { min: 1, max: 3, color: "#bfdbfe", label: "کم" }, // blue-100
-        { min: 4, max: 15, color: "#60a5fa", label: "متوسط" }, // blue-400
-        { min: 16, max: 25, color: "#3b82f6", label: "زیاد" }, // blue-500
-        { min: 26, max: 999, color: "#1d4ed8", label: "بسیار زیاد" }, // blue-700
+        { min: 0, max: 0, color: '#f1f5f9', label: 'بدون فعالیت' }, // light gray
+        { min: 1, max: 3, color: '#bfdbfe', label: 'کم' }, // blue-100
+        { min: 4, max: 15, color: '#60a5fa', label: 'متوسط' }, // blue-400
+        { min: 16, max: 25, color: '#3b82f6', label: 'زیاد' }, // blue-500
+        { min: 26, max: 999, color: '#1d4ed8', label: 'بسیار زیاد' }, // blue-700
       ],
     },
     calendar: {
       top: 20,
       left: 24,
       right: 24,
-      cellSize: ["auto", 16],
+      cellSize: ['auto', 16],
       range: [
-        new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString().split("T")[0],
-        new Date().toISOString().split("T")[0],
+        new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
       ],
       itemStyle: {
         borderRadius: 4,
-        borderColor: "hsl(var(--background))",
+        borderColor: 'hsl(var(--background))',
         borderWidth: 2,
       },
       yearLabel: { show: false },
       monthLabel: {
-        fontFamily: "Vazirmatn, sans-serif",
+        fontFamily: 'Vazirmatn, sans-serif',
         fontSize: 11,
-        color: "hsl(var(--muted-foreground))",
+        color: 'hsl(var(--muted-foreground))',
       },
       dayLabel: {
-        fontFamily: "Vazirmatn, sans-serif",
+        fontFamily: 'Vazirmatn, sans-serif',
         fontSize: 10,
-        color: "hsl(var(--muted-foreground))",
+        color: 'hsl(var(--muted-foreground))',
       },
     },
     series: [
       {
-        type: "heatmap",
-        coordinateSystem: "calendar",
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
         data: calendarData,
       },
     ],

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import type { UseFormRegister } from "react-hook-form";
+import type { UseFormRegister } from 'react-hook-form';
 
-import { Save } from "lucide-react";
+import { Save } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
-import { SenderFormValues } from "../types/settings-types";
-import Field from "./field";
+import { SenderFormValues } from '../types/settings-types';
+import Field from './field';
 
 interface SenderInfoFormProps {
   register: UseFormRegister<SenderFormValues>;
@@ -26,13 +26,13 @@ export function SenderInfoForm({ register, onSubmit, isPending }: SenderInfoForm
         </CardHeader>
         <CardContent className="space-y-4">
           <Field label="نام فرستنده">
-            <Input {...register("senderName")} />
+            <Input {...register('senderName')} />
           </Field>
           <Field label="شماره تماس">
-            <Input {...register("senderPhone")} dir="ltr" />
+            <Input {...register('senderPhone')} dir="ltr" />
           </Field>
           <Field label="نام شرکت">
-            <Input {...register("senderCompany")} />
+            <Input {...register('senderCompany')} />
           </Field>
           <Button type="submit" className="mt-4" disabled={isPending}>
             <Save className="ml-2 h-4 w-4" />

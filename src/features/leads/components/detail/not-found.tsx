@@ -1,9 +1,9 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ROUTES } from "@/routes/routes";
-import { AlertCircle } from "lucide-react";
+import { ROUTES } from '@/routes/routes';
+import { AlertCircle } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 export function NotFound() {
   return (

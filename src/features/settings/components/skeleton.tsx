@@ -1,6 +1,6 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { PageWrapper } from "@/components/shared/page-wrapper";
+import { PageWrapper } from '@/components/shared/page-wrapper';
 
 export function SettingsPageSkeleton() {
   return (

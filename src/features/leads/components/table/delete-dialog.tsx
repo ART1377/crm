@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface DeleteLeadDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export function DeleteLeadDialog({ open, onClose, onConfirm, isPending }: Delete
             انصراف
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
-            {isPending ? "در حال حذف..." : "حذف"}
+            {isPending ? 'در حال حذف...' : 'حذف'}
           </Button>
         </DialogFooter>
       </DialogContent>

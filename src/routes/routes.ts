@@ -1,11 +1,11 @@
 export const ROUTES = {
-  home: "/",
+  home: '/',
   leads: {
-    list: "/leads",
-    new: "/leads/new",
+    list: '/leads',
+    new: '/leads/new',
     detail: (id: string) => `/leads/${id}`,
   },
-  tasks: "/tasks",
-  templates: "/templates",
-  settings: "/settings",
+  tasks: '/tasks',
+  templates: '/templates',
+  settings: '/settings',
 } as const;

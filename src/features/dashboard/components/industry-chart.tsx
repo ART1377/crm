@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import ReactECharts from "echarts-for-react";
-import { PieChart } from "lucide-react";
+import ReactECharts from 'echarts-for-react';
+import { PieChart } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface IndustryNightingaleProps {
   data: { name: string; value: number }[];
@@ -16,17 +16,17 @@ export function IndustryChart({ data }: IndustryNightingaleProps) {
 
   const option = {
     tooltip: {
-      trigger: "item",
-      textStyle: { fontFamily: "Vazirmatn, sans-serif", fontSize: 12 },
-      formatter: "{b}: {c} سرنخ ({d}%)",
+      trigger: 'item',
+      textStyle: { fontFamily: 'Vazirmatn, sans-serif', fontSize: 12 },
+      formatter: '{b}: {c} سرنخ ({d}%)',
     },
     legend: {
-      top: "bottom",
-      left: "right",
+      top: 'bottom',
+      left: 'right',
       textStyle: {
-        fontFamily: "Vazirmatn, sans-serif",
+        fontFamily: 'Vazirmatn, sans-serif',
         fontSize: 10,
-        color: "hsl(var(--foreground))",
+        color: 'hsl(var(--foreground))',
       },
       itemGap: 16,
       itemWidth: 12,
@@ -34,27 +34,27 @@ export function IndustryChart({ data }: IndustryNightingaleProps) {
     },
     series: [
       {
-        top: "-10%",
-        name: "صنعت",
-        type: "pie",
-        radius: ["40%", "70%"],
-        center: ["50%", "45%"],
+        top: '-10%',
+        name: 'صنعت',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        center: ['50%', '45%'],
         avoidLabelOverlap: false,
         padAngle: 5,
         itemStyle: {
           borderRadius: 10,
-          borderColor: "hsl(var(--background))",
+          borderColor: 'hsl(var(--background))',
           borderWidth: 3,
         },
         label: {
           show: false,
-          position: "center",
+          position: 'center',
         },
         emphasis: {
           label: {
             show: true,
             fontSize: 24,
-            fontWeight: "bold",
+            fontWeight: 'bold',
           },
           scaleSize: 10,
         },
@@ -65,18 +65,18 @@ export function IndustryChart({ data }: IndustryNightingaleProps) {
       },
     ],
     color: [
-      "#3b82f6",
-      "#8b5cf6",
-      "#22c55e",
-      "#f59e0b",
-      "#ef4444",
-      "#06b6d4",
-      "#ec4899",
-      "#84cc16",
-      "#f97316",
-      "#14b8a6",
-      "#6366f1",
-      "#d946ef",
+      '#3b82f6',
+      '#8b5cf6',
+      '#22c55e',
+      '#f59e0b',
+      '#ef4444',
+      '#06b6d4',
+      '#ec4899',
+      '#84cc16',
+      '#f97316',
+      '#14b8a6',
+      '#6366f1',
+      '#d946ef',
     ],
   };
 

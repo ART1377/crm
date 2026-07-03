@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { List, Pencil, Plus, Trash2 } from "lucide-react";
+import { List, Pencil, Plus, Trash2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -16,18 +16,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 
 import {
   useDeleteListOption,
   useListOptions,
   useSaveListOption,
-} from "@/features/settings/hooks/use-list-options";
+} from '@/features/settings/hooks/use-list-options';
 
 interface ListOptionsManagerProps {
-  type: "SOURCE" | "INDUSTRY";
+  type: 'SOURCE' | 'INDUSTRY';
   title: string;
 }
 
@@ -39,7 +39,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
   const [editing, setEditing] = useState<{ id: string; value: string } | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newValue, setNewValue] = useState("");
+  const [newValue, setNewValue] = useState('');
 
   if (isLoading) return null;
 
@@ -54,7 +54,7 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
           size="sm"
           onClick={() => {
             setEditing(null);
-            setNewValue("");
+            setNewValue('');
             setIsDialogOpen(true);
           }}
         >
@@ -113,13 +113,13 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? "ویرایش گزینه" : "افزودن گزینه جدید"}</DialogTitle>
+            <DialogTitle>{editing ? 'ویرایش گزینه' : 'افزودن گزینه جدید'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>مقدار</Label>
               <Input
-                placeholder={type === "SOURCE" ? "مثال: اینستاگرام" : "مثال: پلیمر"}
+                placeholder={type === 'SOURCE' ? 'مثال: اینستاگرام' : 'مثال: پلیمر'}
                 value={newValue}
                 onChange={(e) => setNewValue(e.target.value)}
               />
@@ -133,14 +133,14 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
                     onSuccess: () => {
                       setIsDialogOpen(false);
                       setEditing(null);
-                      setNewValue("");
+                      setNewValue('');
                     },
                   }
                 );
               }}
               disabled={!newValue.trim()}
             >
-              {editing ? "بروزرسانی" : "افزودن"}
+              {editing ? 'بروزرسانی' : 'افزودن'}
             </Button>
           </div>
         </DialogContent>

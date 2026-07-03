@@ -1,13 +1,13 @@
-import { Building2, Check, Copy, Pencil, PhoneCall, Tag, User } from "lucide-react";
+import { Building2, Check, Copy, Pencil, PhoneCall, Tag, User } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useCopyToClipboard } from "@/hooks/use-copy";
+import { useCopyToClipboard } from '@/hooks/use-copy';
 
-import { Lead } from "../../types/leads-types";
-import { EditLeadDialog } from "../table/edit-lead/dialog";
-import { InfoItem } from "./info-item";
+import { Lead } from '../../types/leads-types';
+import { EditLeadDialog } from '../table/edit-lead/dialog';
+import { InfoItem } from './info-item';
 
 export function LeadInfo({ lead }: { lead: Lead }) {
   const { copy, copied: primaryCopied } = useCopyToClipboard();
@@ -29,7 +29,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <InfoItem icon={User} label="شخص تماس" value={lead.contactPerson || "---"} />
+          <InfoItem icon={User} label="شخص تماس" value={lead.contactPerson || '---'} />
           <InfoItem icon={Tag} label="صنعت" value={lead.industry} />
         </div>
 
@@ -58,7 +58,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => copy(lead.phoneNumber, "شماره کپی شد")}
+                onClick={() => copy(lead.phoneNumber, 'شماره کپی شد')}
               >
                 {primaryCopied ? (
                   <Check className="h-4 w-4 text-green-500" />
@@ -92,7 +92,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => copySecondary(lead.secondaryPhone!, "شماره کپی شد")}
+                  onClick={() => copySecondary(lead.secondaryPhone!, 'شماره کپی شد')}
                 >
                   {secondaryCopied ? (
                     <Check className="h-4 w-4 text-green-500" />

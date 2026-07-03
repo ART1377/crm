@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { AlertTriangle, Calendar, CheckCircle, Clock, Pencil, Trash2 } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle, Clock, Pencil, Trash2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 
-import { useDeleteAllTasks, useDeleteTask, useUpdateTask } from "@/features/tasks/hooks/use-tasks";
-import { Task } from "@/features/tasks/types/tasks-types";
+import { useDeleteAllTasks, useDeleteTask, useUpdateTask } from '@/features/tasks/hooks/use-tasks';
+import { Task } from '@/features/tasks/types/tasks-types';
 
-import { countOverdueTasks, formatDate } from "@/lib/utils";
+import { countOverdueTasks, formatDate } from '@/lib/utils';
 
-import { EditTaskDialog } from "./edit-task-dialog";
+import { EditTaskDialog } from './edit-task-dialog';
 
 export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }) {
   const updateTask = useUpdateTask();
@@ -35,7 +35,7 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
   };
 
   return (
-    <Card className={overdueCount > 0 ? "border-red-200 ring-1 ring-red-100" : ""}>
+    <Card className={overdueCount > 0 ? 'border-red-200 ring-1 ring-red-100' : ''}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -70,10 +70,10 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
                   key={task.id}
                   className={`flex items-center gap-3 rounded-lg p-2.5 transition-all ${
                     overdue
-                      ? "border border-red-200 bg-red-50/70 shadow-sm"
+                      ? 'border border-red-200 bg-red-50/70 shadow-sm'
                       : task.isCompleted
-                        ? "bg-muted/30"
-                        : "bg-muted/80 hover:bg-muted"
+                        ? 'bg-muted/30'
+                        : 'bg-muted/80 hover:bg-muted'
                   }`}
                 >
                   {/* Status icon - not clickable */}
@@ -90,12 +90,12 @@ export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }
                   {/* Content */}
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`text-sm ${overdue ? "font-semibold text-red-800" : task.isCompleted ? "text-muted-foreground line-through" : "font-medium"}`}
+                      className={`text-sm ${overdue ? 'font-semibold text-red-800' : task.isCompleted ? 'text-muted-foreground line-through' : 'font-medium'}`}
                     >
                       {task.title}
                     </p>
                     <p
-                      className={`text-xs ${overdue ? "font-medium text-red-500" : "text-muted-foreground"}`}
+                      className={`text-xs ${overdue ? 'font-medium text-red-500' : 'text-muted-foreground'}`}
                     >
                       {overdue
                         ? `گذشته از موعد - ${formatDate(new Date(task.dueDate))}`

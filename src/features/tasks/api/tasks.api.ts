@@ -1,6 +1,6 @@
-import apiClient from "@/config/axios";
+import apiClient from '@/config/axios';
 
-import { CreateTaskData, Task, UpdateTaskData } from "../types/tasks-types";
+import { CreateTaskData, Task, UpdateTaskData } from '../types/tasks-types';
 
 export const tasksService = {
   async getByLeadId(leadId: string) {
@@ -8,7 +8,7 @@ export const tasksService = {
   },
 
   async getTodayTasks() {
-    return apiClient.get("/tasks/today") as Promise<Task[]>;
+    return apiClient.get('/tasks/today') as Promise<Task[]>;
   },
 
   async create(leadId: string, data: CreateTaskData) {

@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2 } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { DeleteConfirmDialog } from "@/components/shared/delete-dialog";
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 
-import { useSettings } from "@/features/settings/hooks/use-settings";
-import { useDeleteTemplate } from "@/features/templates/hooks/use-templates";
+import { useSettings } from '@/features/settings/hooks/use-settings';
+import { useDeleteTemplate } from '@/features/templates/hooks/use-templates';
 
-import { useCopyToClipboard } from "@/hooks/use-copy";
+import { useCopyToClipboard } from '@/hooks/use-copy';
 
-import { replaceTemplateVars } from "@/lib/utils";
+import { replaceTemplateVars } from '@/lib/utils';
 
-import { MessageTemplate } from "../types/templates-types";
+import { MessageTemplate } from '../types/templates-types';
 
 const PURPOSE_LABELS: Record<string, string> = {
-  INITIAL: "معرفی",
-  FOLLOW_UP: "پیگیری",
-  CLOSING: "تشکر",
-  CUSTOM: "سفارشی",
+  INITIAL: 'معرفی',
+  FOLLOW_UP: 'پیگیری',
+  CLOSING: 'تشکر',
+  CUSTOM: 'سفارشی',
 };
 
 export function TemplateCard({ template }: { template: MessageTemplate }) {
@@ -34,14 +34,14 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
 
   // Preview with placeholder values
   const preview = replaceTemplateVars(template.content, {
-    senderName: settings.senderName || "صادقی",
-    senderPhone: settings.senderPhone || "09191234567",
-    senderCompany: settings.senderCompany || "حسابداری کیهان",
-    companyName: "شرکت نمونه",
-    contactPerson: "آقای نمونه",
+    senderName: settings.senderName || 'صادقی',
+    senderPhone: settings.senderPhone || '09191234567',
+    senderCompany: settings.senderCompany || 'حسابداری کیهان',
+    companyName: 'شرکت نمونه',
+    contactPerson: 'آقای نمونه',
   });
 
-  const handleCopy = () => copy(preview, "متن قالب کپی شد");
+  const handleCopy = () => copy(preview, 'متن قالب کپی شد');
 
   return (
     <Card className="group transition-shadow hover:shadow-md">
@@ -58,7 +58,7 @@ export function TemplateCard({ template }: { template: MessageTemplate }) {
         <div className="mt-4 flex items-center gap-2 border-t pt-3">
           <Button variant="outline" size="sm" className="flex-1" onClick={handleCopy}>
             <Copy className="ml-2 h-4 w-4" />
-            {copied ? "کپی شد" : "کپی قالب"}
+            {copied ? 'کپی شد' : 'کپی قالب'}
           </Button>
           <Button
             variant="ghost"

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import "react-day-picker/style.css";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import 'react-day-picker/style.css';
 
-import { DayPicker, faIR } from "@daypicker/persian";
-import { Calendar } from "lucide-react";
+import { DayPicker, faIR } from '@daypicker/persian';
+import { Calendar } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface PersianDatePickerProps {
   value: string; // YYYY-MM-DD (Gregorian)
@@ -20,7 +20,7 @@ interface PersianDatePickerProps {
 export function PersianDatePicker({
   value,
   onChange,
-  placeholder = "انتخاب تاریخ",
+  placeholder = 'انتخاب تاریخ',
   className,
 }: PersianDatePickerProps) {
   const [open, setOpen] = useState(false);
@@ -28,12 +28,12 @@ export function PersianDatePicker({
 
   const selected = value
     ? (() => {
-        const [y, m, d] = value.split("-").map(Number);
+        const [y, m, d] = value.split('-').map(Number);
         return new Date(y, m - 1, d); // month is 0-indexed
       })()
     : undefined;
 
-  const displayValue = value ? new Date(value).toLocaleDateString("fa-IR") : "";
+  const displayValue = value ? new Date(value).toLocaleDateString('fa-IR') : '';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -42,9 +42,9 @@ export function PersianDatePicker({
       }
     }
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
   const handleSelect = useCallback(
@@ -52,11 +52,11 @@ export function PersianDatePicker({
       if (date) {
         // Use local date components to avoid timezone issues
         const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
         onChange(`${yyyy}-${mm}-${dd}`);
       } else {
-        onChange("");
+        onChange('');
       }
       setOpen(false);
     },
@@ -64,14 +64,14 @@ export function PersianDatePicker({
   );
 
   return (
-    <div ref={wrapperRef} className={cn("relative", className)}>
+    <div ref={wrapperRef} className={cn('relative', className)}>
       <Button
         type="button"
         variant="outline"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "h-9 w-full justify-start px-3 text-right text-xs font-normal",
-          !value && "text-muted-foreground"
+          'h-9 w-full justify-start px-3 text-right text-xs font-normal',
+          !value && 'text-muted-foreground'
         )}
       >
         <Calendar className="ml-2 h-4 w-4 shrink-0" />
@@ -92,17 +92,17 @@ export function PersianDatePicker({
             modifiers={{ today: new Date() }}
             modifiersStyles={{
               today: {
-                border: "2px solid hsl(var(--primary))",
-                borderRadius: "var(--rdp-day-radius)",
-                fontWeight: "bold",
-                backgroundColor: "#ddd",
+                border: '2px solid hsl(var(--primary))',
+                borderRadius: 'var(--rdp-day-radius)',
+                fontWeight: 'bold',
+                backgroundColor: '#ddd',
               },
             }}
             style={
               {
-                "--rdp-accent-color": "hsl(var(--primary))",
-                "--rdp-accent-background-color": "hsl(var(--primary) / 0.9)",
-                "--rdp-day-radius": "8px",
+                '--rdp-accent-color': 'hsl(var(--primary))',
+                '--rdp-accent-background-color': 'hsl(var(--primary) / 0.9)',
+                '--rdp-day-radius': '8px',
               } as React.CSSProperties
             }
           />

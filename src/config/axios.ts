@@ -1,10 +1,10 @@
 // src/config/axios.ts
-import axios from "axios";
+import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: "/api",
+  baseURL: '/api',
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   timeout: 10000,
 });
@@ -25,8 +25,8 @@ apiClient.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    const message = error.response?.data?.error || "خطای سرور";
-    console.error("API Error:", message);
+    const message = error.response?.data?.error || 'خطای سرور';
+    console.error('API Error:', message);
     return Promise.reject(new Error(message));
   }
 );
