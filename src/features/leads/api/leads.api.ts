@@ -81,4 +81,26 @@ export const leadsService = {
   async changeStatus(id: string, data: { status: string; previousStatus?: string }) {
     return apiClient.post(`/leads/${id}/change-status`, data) as Promise<void>;
   },
+
+  async updateChannels(id: string, channels: string) {
+    return apiClient.patch(`/leads/${id}`, { channels }) as Promise<Lead>;
+  },
+
+  async bulkImport(
+    leads: Array<{
+      businessName: string;
+      phoneNumber: string;
+      industry: string;
+      source: string;
+      address?: string;
+      rating?: number | null;
+    }>
+  ) {
+    return apiClient.post(`/leads/bulk-import`, { leads }) as Promise<{
+      imported: number;
+      skipped: number;
+      errors: number;
+      details: Array<{ name: string; status: string; reason?: string }>;
+    }>;
+  },
 };

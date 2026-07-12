@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import {
   CheckSquare,
   LayoutDashboard,
+  MapPin,
   Menu,
   MessageSquare,
   Settings,
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare },
   { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare },
   { name: 'تنظیمات', href: '/settings', icon: Settings },
+  { name: 'جستجوی Maps', href: '/leads/import', icon: MapPin },
 ];
 
 export function Navbar() {

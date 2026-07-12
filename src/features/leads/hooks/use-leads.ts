@@ -102,3 +102,20 @@ export function useChangeLeadStatus() {
     },
   });
 }
+
+export function useUpdateChannels() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, channels }: { id: string; channels: string }) =>
+      leadsService.updateChannels(id, channels),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, variables.id] });
+      toast.success('روش‌های ارتباطی ذخیره شد');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}

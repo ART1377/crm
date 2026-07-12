@@ -1,4 +1,4 @@
-import { Building2, Check, Copy, Pencil, PhoneCall, Tag, User } from 'lucide-react';
+import { Building2, Check, Copy, Pencil, PhoneCall, Tag, Trash2, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from '../table/edit-lead/dialog';
 import { InfoItem } from './info-item';
 
-export function LeadInfo({ lead }: { lead: Lead }) {
+export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void }) {
   const { copy, copied: primaryCopied } = useCopyToClipboard();
   const { copy: copySecondary, copied: secondaryCopied } = useCopyToClipboard();
 
@@ -20,12 +20,23 @@ export function LeadInfo({ lead }: { lead: Lead }) {
           <Building2 className="h-5 w-5" />
           اطلاعات
         </CardTitle>
-        <EditLeadDialog lead={lead}>
-          <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-            <Pencil className="h-3.5 w-3.5" />
-            ویرایش
+        <div className="flex items-center gap-2">
+          <EditLeadDialog lead={lead}>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+              <Pencil className="h-3.5 w-3.5" />
+              ویرایش
+            </Button>
+          </EditLeadDialog>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive bg-destructive/10 hover:bg-destructive/15 hover:text-destructive h-8 gap-1.5 text-xs"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            حذف
           </Button>
-        </EditLeadDialog>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -49,6 +60,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
               <a
                 href={`tel:${lead.phoneNumber}`}
                 className="text-primary ltr block text-left text-lg font-semibold hover:underline"
+                dir="ltr"
               >
                 {lead.phoneNumber}
               </a>
@@ -69,6 +81,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
               <a
                 href={`tel:${lead.phoneNumber}`}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green-50 text-green-600 transition-all duration-200 hover:scale-110 hover:bg-green-200"
+                dir="ltr"
               >
                 <PhoneCall className="h-4 w-4" />
               </a>
@@ -83,6 +96,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
                 <a
                   href={`tel:${lead.secondaryPhone}`}
                   className="text-primary ltr block text-left text-lg font-semibold hover:underline"
+                  dir="ltr"
                 >
                   {lead.secondaryPhone}
                 </a>
@@ -103,6 +117,7 @@ export function LeadInfo({ lead }: { lead: Lead }) {
                 <a
                   href={`tel:${lead.secondaryPhone}`}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green-50 text-green-600 transition-all duration-200 hover:scale-110 hover:bg-green-200"
+                  dir="ltr"
                 >
                   <PhoneCall className="h-4 w-4" />
                 </a>

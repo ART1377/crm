@@ -22,7 +22,8 @@ model Lead {
   
   activities     Activity[]
   tasks          Task[]
-  
+  channels String @default("") // comma-separated: "WHATSAPP,SMS,CALL"
+
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 }

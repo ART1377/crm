@@ -99,7 +99,11 @@ export function LeadsTable({
               </TableCell>
               <TableCell>{lead.contactPerson || '---'}</TableCell>
               <TableCell>
-                <a href={`tel:${lead.phoneNumber}`} className="text-primary block hover:underline">
+                <a
+                  href={`tel:${lead.phoneNumber}`}
+                  className="text-primary block hover:underline"
+                  dir="ltr"
+                >
                   {lead.phoneNumber}
                 </a>
               </TableCell>
@@ -108,6 +112,7 @@ export function LeadsTable({
                   <a
                     href={`tel:${lead.secondaryPhone}`}
                     className="text-primary block hover:underline"
+                    dir="ltr"
                   >
                     {lead.secondaryPhone}
                   </a>
