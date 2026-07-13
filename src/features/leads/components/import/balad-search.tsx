@@ -19,18 +19,20 @@ interface Place {
   phoneNumber: string;
   address: string;
   category: string;
+  website: string;
   rating: number | null;
   ratingCount: number | null;
   isExisting?: boolean;
   [key: string]: unknown;
 }
 
-export function NeshanSearch() {
+export function BaladSearch() {
   const [industry, setIndustry] = useState('آهن‌آلات');
   const [keywords, setKeywords] = useState(INDUSTRY_KEYWORDS['آهن‌آلات']);
   const [latitude, setLatitude] = useState('35.6328');
   const [longitude, setLongitude] = useState('51.3072');
   const [radius, setRadius] = useState('10000');
+  const [count, setCount] = useState('20');
 
   const [query, setQuery] = useState('آهن‌آلات');
   const [places, setPlaces] = useState<Place[]>([]);
@@ -59,8 +61,9 @@ export function NeshanSearch() {
         lat: latitude,
         lng: longitude,
         radius,
+        count,
       });
-      const res = await fetch(`/api/leads/search-neshan?${params}`);
+      const res = await fetch(`/api/leads/search-balad?${params}`);
       const data = await res.json();
       setPlaces(data.places || []);
       setSelected(new Set());
@@ -103,8 +106,12 @@ export function NeshanSearch() {
       phoneNumber: places[i].phoneNumber || '',
       address: places[i].address || '',
       industry: query,
-      source: 'نشان',
-      notes: places[i].category ? `دسته: ${places[i].category}` : '',
+      source: 'بلد',
+      notes: places[i].category
+        ? `دسته: ${places[i].category}${places[i].website ? ` | وبسایت: ${places[i].website}` : ''}`
+        : places[i].website
+          ? `وبسایت: ${places[i].website}`
+          : '',
       rating: places[i].rating,
     }));
 
@@ -132,7 +139,7 @@ export function NeshanSearch() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <MapPin className="h-4 w-4 text-blue-500" />
+            <MapPin className="h-4 w-4 text-green-500" />
             پیکربندی جستجو
           </CardTitle>
         </CardHeader>
@@ -151,21 +158,33 @@ export function NeshanSearch() {
               onRadiusChange={setRadius}
             />
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Input
-                placeholder="جستجو در نشان..."
+                placeholder="جستجو در بلد..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="flex-1"
               />
-              <Button onClick={handleSearch} disabled={loading}>
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <select
+                  value={count}
+                  onChange={(e) => setCount(e.target.value)}
+                  className="border-input bg-background ring-offset-background rounded-md border px-3 py-1 text-xs"
+                >
+                  <option value="10">۱۰ تا</option>
+                  <option value="20">۲۰ تا</option>
+                  <option value="30">۳۰ تا</option>
+                  <option value="50">۵۰ تا</option>
+                </select>
+                <Button onClick={handleSearch} disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -176,7 +195,9 @@ export function NeshanSearch() {
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">نتایج ({places.length} مورد)</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                نتایج جستجو ({places.length} مورد)
+              </CardTitle>
               <div className="flex items-center gap-2">
                 <label className="text-muted-foreground flex cursor-pointer items-center gap-2 text-xs">
                   <Checkbox
@@ -265,6 +286,11 @@ export function NeshanSearch() {
                         <span className="text-muted-foreground text-[10px]">
                           ({place.ratingCount} نفر)
                         </span>
+                      )}
+                      {place.website && (
+                        <Badge variant="outline" className="text-[10px]">
+                          وبسایت
+                        </Badge>
                       )}
                     </div>
                     {place.address && (

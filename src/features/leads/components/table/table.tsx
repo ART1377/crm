@@ -69,15 +69,15 @@ export function LeadsTable({
             <TableHead className="w-10">
               <Checkbox ref={checkboxRef} checked={allSelected} onCheckedChange={onSelectAll} />
             </TableHead>
-            <TableHead className="text-start">نام کسب‌وکار</TableHead>
-            <TableHead className="text-start">شخص تماس</TableHead>
-            <TableHead className="text-start">شماره اصلی</TableHead>
-            <TableHead className="text-start">شماره دوم</TableHead>
-            <TableHead className="text-start">صنعت</TableHead>
-            <TableHead className="text-start">منبع</TableHead>
-            <TableHead className="text-start">وضعیت</TableHead>
-            <TableHead className="text-start">تاریخ ثبت</TableHead>
-            <TableHead className="text-start">عملیات</TableHead>
+            <TableHead className="max-w-60 min-w-50 text-start">نام کسب‌وکار</TableHead>
+            <TableHead className="min-w-30 text-start">شخص تماس</TableHead>
+            <TableHead className="min-w-32 text-start">شماره اصلی</TableHead>
+            <TableHead className="min-w-32 text-start">شماره دوم</TableHead>
+            <TableHead className="min-w-25 text-start">صنعت</TableHead>
+            <TableHead className="min-w-25 text-start">منبع</TableHead>
+            <TableHead className="min-w-32 text-start">وضعیت</TableHead>
+            <TableHead className="min-w-35 text-start">تاریخ ثبت</TableHead>
+            <TableHead className="min-w-28 text-start">عملیات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,15 +89,20 @@ export function LeadsTable({
                   onCheckedChange={() => onSelectOne(lead.id)}
                 />
               </TableCell>
-              <TableCell className="font-medium">
+              <TableCell className="max-w-60">
                 <Link
                   href={ROUTES.leads.detail(lead.id)}
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-primary block truncate font-medium transition-colors"
+                  title={lead.businessName}
                 >
                   {lead.businessName}
                 </Link>
               </TableCell>
-              <TableCell>{lead.contactPerson || '---'}</TableCell>
+              <TableCell>
+                <span className="block truncate" title={lead.contactPerson || undefined}>
+                  {lead.contactPerson || '---'}
+                </span>
+              </TableCell>
               <TableCell>
                 <a
                   href={`tel:${lead.phoneNumber}`}
@@ -120,11 +125,15 @@ export function LeadsTable({
                   <span className="text-muted-foreground">---</span>
                 )}
               </TableCell>
-              <TableCell>{lead.industry}</TableCell>
+              <TableCell>
+                <span className="block truncate" title={lead.industry}>
+                  {lead.industry}
+                </span>
+              </TableCell>
               <TableCell>{getSourceLabel(lead.source)}</TableCell>
               <TableCell>
                 <Select value={lead.status} onValueChange={(v) => onStatusChange(lead.id, v)}>
-                  <SelectTrigger className="h-8 w-40">
+                  <SelectTrigger className="h-8 w-36">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -136,7 +145,9 @@ export function LeadsTable({
                   </SelectContent>
                 </Select>
               </TableCell>
-              <TableCell>{formatDate(new Date(lead.createdAt))}</TableCell>
+              <TableCell className="whitespace-nowrap">
+                {formatDate(new Date(lead.createdAt))}
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
                   <Link href={ROUTES.leads.detail(lead.id)}>

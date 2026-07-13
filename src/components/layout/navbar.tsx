@@ -22,28 +22,33 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: 'داشبورد', href: '/', icon: LayoutDashboard },
-  { name: 'سرنخ‌ها', href: '/leads', icon: Users },
-  { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare },
-  { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare },
-  { name: 'تنظیمات', href: '/settings', icon: Settings },
-  { name: 'جستجوی Maps', href: '/leads/import', icon: MapPin },
+  { name: 'داشبورد', href: '/', icon: LayoutDashboard, exact: true },
+  { name: 'سرنخ‌ها', href: '/leads', icon: Users, exact: true },
+  { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare, exact: true },
+  { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare, exact: true },
+  { name: 'تنظیمات', href: '/settings', icon: Settings, exact: true },
+  { name: 'جستجوی Maps', href: '/leads/import', icon: MapPin, exact: false },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Close on link click instead of pathname effect
   const handleLinkClick = () => setIsOpen(false);
 
-  // Prevent scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+
+  const isActive = (item: (typeof navigation)[number]) => {
+    if (item.exact) {
+      return pathname === item.href;
+    }
+    return pathname.startsWith(item.href);
+  };
 
   return (
     <>
@@ -89,8 +94,7 @@ export function Navbar() {
         {/* Nav items */}
         <nav className="flex-1 space-y-1 p-3">
           {navigation.map((item) => {
-            const isActive =
-              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const active = isActive(item);
             return (
               <Link
                 key={item.name}
@@ -98,19 +102,19 @@ export function Navbar() {
                 onClick={handleLinkClick}
                 className={cn(
                   'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                  isActive
-                    ? 'bg-primary/10 text-primary'
+                  active
+                    ? 'bg-primary/10 text-primary shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 <item.icon
                   className={cn(
                     'h-5 w-5 transition-colors',
-                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                    active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
                   )}
                 />
                 {item.name}
-                {isActive && <span className="bg-primary mr-auto h-1.5 w-1.5 rounded-full" />}
+                {active && <span className="bg-primary mr-auto h-1.5 w-1.5 rounded-full" />}
               </Link>
             );
           })}

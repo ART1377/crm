@@ -45,6 +45,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (body.source !== undefined) updateData.source = body.source;
     if (body.status !== undefined) updateData.status = body.status;
     if (body.notes !== undefined) updateData.notes = body.notes;
+    if (body.channels !== undefined) updateData.channels = body.channels;
 
     const lead = await prisma.lead.update({
       where: { id },

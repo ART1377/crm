@@ -1,4 +1,3 @@
-// src/lib/utils.ts
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -8,9 +7,33 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// تابع کمکی برای فرمت کردن تاریخ شمسی (بعداً تکمیل می‌شه)
-export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('fa-IR').format(new Date(date));
+// تابع کمکی برای فرمت کردن تاریخ شمسی به وقت ایران
+export function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Tehran',
+    hour12: false,
+  };
+
+  return new Intl.DateTimeFormat('fa-IR', options).format(d);
+}
+
+// نسخه ساده‌تر - فقط تاریخ بدون ساعت
+export function formatDateOnly(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  return new Intl.DateTimeFormat('fa-IR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Tehran',
+  }).format(d);
 }
 
 // تابع کمکی برای دیپ لینک پیام‌رسان‌ها

@@ -141,9 +141,8 @@ export async function GET(request: NextRequest) {
         : undefined,
     }));
 
-    // فیلتر کردن نتایج بدون نام
-    const validPlaces = places.filter((p) => p.businessName !== 'بدون نام');
-
+    // فیلتر کردن نتایج بدون نام و بدون شماره تلفن
+    const validPlaces = places.filter((p) => p.businessName !== 'بدون نام' && p.phoneNumber);
     // چک کردن تکراری‌ها در دیتابیس
     const existingPhones = await prisma.lead.findMany({
       where: {
