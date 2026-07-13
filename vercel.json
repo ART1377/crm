@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "src/app/api/leads/search-neshan/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "src/app/api/leads/search-balad/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}

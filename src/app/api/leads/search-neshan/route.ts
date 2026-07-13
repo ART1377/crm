@@ -1,20 +1,20 @@
+import { getBrowser } from '@/lib/browser';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { chromium } from 'playwright';
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query') || 'آهن‌آلات';
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
-  const radius = searchParams.get('radius');
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    browser = await getBrowser();
     const page = await browser.newPage();
 
-    // اگه مختصات داشت، از NearBy استفاده کن
     let searchUrl: string;
     if (lat && lng) {
       searchUrl = `https://neshan.org/maps/@${lat},${lng},15z,0p/places/${lat},${lng}/search/${encodeURIComponent(query)}`;
@@ -23,23 +23,21 @@ export async function GET(request: NextRequest) {
     }
 
     await page.goto(searchUrl, {
-      waitUntil: 'networkidle',
+      waitUntil: 'networkidle2',
       timeout: 30000,
     });
 
     await page.waitForSelector('.nrFZBE4', { timeout: 15000 }).catch(() => {});
-    await page.waitForTimeout(2000);
+    await wait(2000);
 
-    // Scroll to load more
     for (let i = 0; i < 3; i++) {
       await page.evaluate(() => {
         const container = document.querySelector('.LmsM6Yo');
         if (container) container.scrollTop = container.scrollHeight;
       });
-      await page.waitForTimeout(1000);
+      await wait(1000);
     }
 
-    // Step 1: Get all place URLs
     const placeUrls = await page.evaluate(() => {
       const urls: string[] = [];
       document.querySelectorAll('.nrFZBE4 .WKMp5zo h2 a').forEach((link) => {
@@ -49,7 +47,6 @@ export async function GET(request: NextRequest) {
       return urls;
     });
 
-    // Step 2: Visit each place page to get phone number
     const places: Array<{
       businessName: string;
       phoneNumber: string;
@@ -61,21 +58,18 @@ export async function GET(request: NextRequest) {
 
     for (const url of placeUrls.slice(0, 20)) {
       try {
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 15000 });
-        await page.waitForTimeout(1000);
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await wait(1000);
 
         const details = await page.evaluate(() => {
           const name = document.querySelector('.ZzIY7hD')?.textContent?.trim() || '';
-
           const phoneElement = document.querySelector('.tSxcP7q .SWIQUYQ img[src*="call"]');
           const phone =
             phoneElement?.closest('.tSxcP7q')?.querySelector('span font')?.textContent?.trim() ||
             '';
-
           const addressElement = document.querySelector('.tSxcP7q .SWIQUYQ img[src*="pin"]');
           const address =
             addressElement?.closest('.tSxcP7q')?.querySelector('span')?.textContent?.trim() || '';
-
           const category = document.querySelector('.qpxuHlU')?.textContent?.trim() || '';
           const ratingText = document.querySelector('.PA1daCn')?.textContent?.trim() || '';
           const rating = ratingText ? parseFloat(ratingText.replace(',', '.')) : null;
@@ -93,12 +87,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    await browser.close();
+    await page.close();
 
-    // فیلتر کردن: فقط آیتم‌هایی که شماره تلفن دارن
     const placesWithPhone = places.filter((p) => p.phoneNumber);
 
-    // چک کردن تکراری‌ها در دیتابیس
     const existingLeads = await prisma.lead.findMany({
       where: {
         OR: [
@@ -126,7 +118,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Neshan scraping error:', error);
-    if (browser) await browser.close();
+    if (browser) {
+      try {
+        await browser.close();
+      } catch {}
+    }
     return NextResponse.json({ error: 'خطا در جستجوی نشان' }, { status: 500 });
   }
 }
