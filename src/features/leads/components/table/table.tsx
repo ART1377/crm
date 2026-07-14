@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 import { ROUTES } from '@/routes/routes';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Contact, Eye, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -27,8 +27,9 @@ import {
 
 import { getSourceLabel } from '@/features/leads/lead-helpers';
 
-import { formatDate } from '@/lib/utils';
+import { downloadVCard, formatDate } from '@/lib/utils';
 
+import { useCopyToClipboard } from '@/hooks/use-copy';
 import { LEAD_STATUSES } from '../../constants/leads-constants';
 import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from './edit-lead/dialog';
@@ -53,6 +54,7 @@ export function LeadsTable({
   const allSelected = leads.length > 0 && selectedIds.length === leads.length;
   const someSelected = selectedIds.length > 0 && selectedIds.length < leads.length;
   const checkboxRef = useRef<HTMLButtonElement>(null);
+  const { copy } = useCopyToClipboard();
 
   useEffect(() => {
     if (checkboxRef.current) {
@@ -77,7 +79,7 @@ export function LeadsTable({
             <TableHead className="min-w-25 text-start">منبع</TableHead>
             <TableHead className="min-w-32 text-start">وضعیت</TableHead>
             <TableHead className="min-w-35 text-start">تاریخ ثبت</TableHead>
-            <TableHead className="min-w-28 text-start">عملیات</TableHead>
+            <TableHead className="min-w-32 text-start">عملیات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -150,6 +152,17 @@ export function LeadsTable({
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      copy(lead.phoneNumber, 'شماره کپی شد');
+                      downloadVCard(lead);
+                    }}
+                    title="کپی شماره و ذخیره مخاطب"
+                  >
+                    <Contact className="h-4 w-4 text-blue-500" />
+                  </Button>
                   <Link href={ROUTES.leads.detail(lead.id)}>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />

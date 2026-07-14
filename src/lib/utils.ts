@@ -104,3 +104,65 @@ export function countOverdueTasks(tasks?: { isCompleted: boolean; dueDate: strin
     return diffDays > OVERDUE_DAYS;
   }).length;
 }
+
+export function generateVCard(
+  name: string,
+  phoneNumber: string,
+  options?: {
+    organization?: string;
+    secondaryPhone?: string;
+    address?: string;
+    notes?: string;
+  }
+): string {
+  const lines: string[] = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${name}`,
+    `TEL;TYPE=CELL:${phoneNumber.replace(/[^0-9+]/g, '')}`,
+  ];
+
+  if (options?.secondaryPhone) {
+    lines.push(`TEL;TYPE=CELL:${options.secondaryPhone.replace(/[^0-9+]/g, '')}`);
+  }
+
+  if (options?.organization) {
+    lines.push(`ORG:${options.organization}`);
+  }
+
+  if (options?.address) {
+    lines.push(`ADR;TYPE=WORK:;;${options.address};;;`);
+  }
+
+  if (options?.notes) {
+    lines.push(`NOTE:${options.notes}`);
+  }
+
+  lines.push('END:VCARD');
+
+  return lines.join('\n');
+}
+
+export function downloadVCard(lead: {
+  businessName: string;
+  phoneNumber: string;
+  secondaryPhone?: string | null;
+  industry?: string;
+  notes?: string | null;
+}) {
+  const vCardData = generateVCard(lead.businessName, lead.phoneNumber, {
+    organization: lead.industry || '',
+    secondaryPhone: lead.secondaryPhone || undefined,
+    notes: lead.notes || undefined,
+  });
+
+  const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${lead.businessName.replace(/\s+/g, '_')}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
