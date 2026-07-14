@@ -1,9 +1,21 @@
-import { Building2, Check, Copy, Pencil, PhoneCall, Tag, Trash2, User } from 'lucide-react';
+import {
+  Building2,
+  Check,
+  Contact,
+  Copy,
+  Pencil,
+  PhoneCall,
+  Tag,
+  Trash2,
+  User,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { useCopyToClipboard } from '@/hooks/use-copy';
+
+import { downloadVCard } from '@/lib/utils';
 
 import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from '../table/edit-lead/dialog';
@@ -21,6 +33,15 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
           اطلاعات
         </CardTitle>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={() => downloadVCard(lead)}
+          >
+            <Contact className="h-3.5 w-3.5" />
+            مخاطب
+          </Button>
           <EditLeadDialog lead={lead}>
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
               <Pencil className="h-3.5 w-3.5" />
