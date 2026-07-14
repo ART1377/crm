@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass, MapPin, Navigation } from 'lucide-react';
+import { Compass, Globe, MapPin, Navigation } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -9,11 +9,13 @@ import { PageWrapper } from '@/components/shared/page-wrapper';
 import { BaladSearch } from './balad-search';
 import { NeshanSearch } from './neshan-search';
 import { PlacesSearch } from './places-search';
+import { SearchAll } from './search-all';
 
 const TABS = [
   { value: 'google', label: 'گوگل مپ', icon: MapPin },
   { value: 'neshan', label: 'نشان', icon: Navigation },
   { value: 'balad', label: 'بلد', icon: Compass },
+  { value: 'all', label: 'جستجوی سراسری', icon: Globe },
 ] as const;
 
 export function ImportPage() {
@@ -45,6 +47,10 @@ export function ImportPage() {
 
         <TabsContent value="balad">
           <BaladSearch />
+        </TabsContent>
+
+        <TabsContent value="all">
+          <SearchAll />
         </TabsContent>
       </Tabs>
     </PageWrapper>
