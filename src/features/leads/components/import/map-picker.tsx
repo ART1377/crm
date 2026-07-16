@@ -14,6 +14,8 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { MapPin, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+type MapType = 'google' | 'balad';
+
 interface MapPickerProps {
   value: { lat: string; lng: string };
   onChange: (lat: string, lng: string) => void;
@@ -25,6 +27,7 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
   const [lng, setLng] = useState(value.lng);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [mapType, setMapType] = useState<MapType>('google');
   const inputRef = useRef<HTMLInputElement>(null);
   const center = { lat: parseFloat(lat) || 35.6892, lng: parseFloat(lng) || 51.389 };
 
@@ -74,13 +77,7 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
     setOpen(false);
   };
 
-  if (!isLoaded)
-    return (
-      <Button variant="outline" className="w-full gap-2" disabled>
-        <MapPin className="h-4 w-4 animate-bounce" />
-        در حال بارگذاری...
-      </Button>
-    );
+  const baladUrl = `https://balad.ir/#15/${lat}/${lng}`;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -90,11 +87,33 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
           انتخاب از روی نقشه
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>انتخاب موقعیت</DialogTitle>
         </DialogHeader>
+
         <div className="space-y-4">
+          {/* Map type toggle */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant={mapType === 'google' ? 'default' : 'outline'}
+              onClick={() => setMapType('google')}
+              className="rounded-lg text-xs"
+            >
+              گوگل مپ
+            </Button>
+            <Button
+              size="sm"
+              variant={mapType === 'balad' ? 'default' : 'outline'}
+              onClick={() => setMapType('balad')}
+              className="rounded-lg text-xs"
+            >
+              نقشه بلد
+            </Button>
+          </div>
+
+          {/* Search */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
@@ -129,26 +148,57 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
               جستجو
             </Button>
           </div>
-          <div className="h-80 overflow-hidden rounded-xl border-2">
-            <GoogleMap
-              center={center}
-              zoom={15}
-              mapContainerStyle={{ height: '100%', width: '100%' }}
-              onClick={handleMapClick}
-              options={{
-                streetViewControl: false,
-                mapTypeControl: false,
-                fullscreenControl: false,
-              }}
-            >
-              <Marker
-                position={center}
-                draggable
-                onDragEnd={handleMarkerDrag}
-                animation={google.maps.Animation.DROP}
-              />
-            </GoogleMap>
+
+          {/* Map */}
+          <div className="relative h-80 overflow-hidden rounded-xl border-2 sm:h-96">
+            {mapType === 'google' ? (
+              isLoaded ? (
+                <GoogleMap
+                  center={center}
+                  zoom={15}
+                  mapContainerStyle={{ height: '100%', width: '100%' }}
+                  onClick={handleMapClick}
+                  options={{
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                  }}
+                >
+                  <Marker
+                    position={center}
+                    draggable
+                    onDragEnd={handleMarkerDrag}
+                    animation={google.maps.Animation.DROP}
+                  />
+                </GoogleMap>
+              ) : (
+                <div className="bg-muted/20 text-muted-foreground flex h-full items-center justify-center text-sm">
+                  <span className="border-primary mr-2 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" />
+                  در حال بارگذاری...
+                </div>
+              )
+            ) : (
+              <>
+                <iframe
+                  key={`balad-${lat}-${lng}`}
+                  src={baladUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  title="نقشه بلد"
+                />
+                <div className="pointer-events-none absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-full">
+                  <MapPin className="h-10 w-10 text-red-500 drop-shadow-lg" fill="currentColor" />
+                </div>
+                <div className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-lg bg-black/60 px-3 py-1.5 text-[10px] text-white backdrop-blur-sm">
+                  مختصات را با جستجو یا ورود دستی تغییر دهید
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Coordinates */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">عرض جغرافیایی</Label>
@@ -169,9 +219,10 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
               />
             </div>
           </div>
+
           <Button className="w-full rounded-xl" onClick={handleConfirm}>
             <MapPin className="ml-2 h-4 w-4" />
-            تایید
+            تایید موقعیت
           </Button>
         </div>
       </DialogContent>
