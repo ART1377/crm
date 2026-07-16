@@ -11,6 +11,7 @@ export type LeadStatus =
   | 'INVALID';
 
 export type LeadSource =
+  | 'BALAD'
   | 'IRAN_SITE'
   | 'NIAZ_ROOZ'
   | 'KETAB_AVAL'

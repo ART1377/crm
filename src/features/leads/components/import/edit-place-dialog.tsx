@@ -16,20 +16,17 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { BaladPlace } from './types';
 
 interface EditPlaceDialogProps {
-  place: {
-    businessName: string;
-    phoneNumber: string;
-    address: string;
-    [key: string]: unknown;
-  };
-  index: number;
-  onSave: (index: number, updatedPlace: Record<string, unknown>) => void;
+  place: BaladPlace;
+
+  onSave: (id: string, updatedPlace: BaladPlace) => void;
+
   isExisting?: boolean;
 }
 
-export function EditPlaceDialog({ place, index, onSave, isExisting }: EditPlaceDialogProps) {
+export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     businessName: place.businessName || '',
@@ -45,15 +42,17 @@ export function EditPlaceDialog({ place, index, onSave, isExisting }: EditPlaceD
     });
   }, [place]);
 
-  const handleSave = () => {
-    onSave(index, {
+  function handleSave() {
+    const updatedPlace: BaladPlace = {
       ...place,
       businessName: form.businessName,
       phoneNumber: form.phoneNumber,
       address: form.address,
-    });
+    };
+
+    onSave(place.id, updatedPlace);
     setOpen(false);
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

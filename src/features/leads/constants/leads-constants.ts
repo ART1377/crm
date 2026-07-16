@@ -1,4 +1,5 @@
 export const LEAD_SOURCES = [
+  { value: 'BALAD', label: 'بلد' },
   { value: 'IRAN_SITE', label: 'ایران سایت' },
   { value: 'NIAZ_ROOZ', label: 'نیاز روز' },
   { value: 'KETAB_AVAL', label: 'کتاب اول' },

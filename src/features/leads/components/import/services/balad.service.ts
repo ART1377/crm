@@ -1,9 +1,7 @@
-// src/app/api/leads/search-balad/route.ts
-import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+// src/features/leads/components/import/services/balad.service.ts
 
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+import { generateSearchKeywords } from '../keywords/generator';
+import type { BaladPlace } from '../types';
 
 const SEARCH_API = 'https://search.raah.ir/v4/submit/';
 const DETAIL_API = 'https://poi.raah.ir/web/v4';
@@ -37,6 +35,7 @@ function generateGridPoints(centerLat: number, centerLng: number, radiusKm: numb
   const latStep = stepKm / 111.32;
   const lngStep = stepKm / (111.32 * Math.cos((centerLat * Math.PI) / 180));
   const gridSize = Math.ceil(radiusKm / stepKm) + 1;
+
   for (let i = -gridSize; i <= gridSize; i++) {
     for (let j = -gridSize; j <= gridSize; j++) {
       const pointLat = centerLat + latStep * i;
@@ -66,7 +65,7 @@ async function searchTokens(keyword: string, lat: number, lng: number): Promise<
   return data['poi-tokens'] ?? [];
 }
 
-async function getPlace(token: string) {
+async function getPlace(token: string): Promise<BaladPlace | null> {
   const res = await fetch(`${DETAIL_API}/${token}`, { headers: headers() });
   if (!res.ok) return null;
   const place = await res.json();
@@ -93,70 +92,48 @@ async function getPlace(token: string) {
   };
 }
 
-export async function GET(req: NextRequest) {
-  try {
-    const keywordParam = (req.nextUrl.searchParams.get('keyword') || 'آهن')
-      .replace(/\u200C/g, ' ')
-      .trim();
-    const lat = parseFloat(req.nextUrl.searchParams.get('lat') || '35.6607');
-    const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3156');
-    const radiusKm = parseFloat(req.nextUrl.searchParams.get('radius') || '2');
+export async function searchBalad(
+  keyword: string,
+  lat: number,
+  lng: number,
+  radiusKm: number
+): Promise<BaladPlace[]> {
+  // Generate all keywords from aliases
+  const keywords = generateSearchKeywords({ keyword: keyword.replace(/\u200C/g, ' ').trim() });
+  console.log(`Keywords: ${keywords.length} - ${keywords.slice(0, 5).join(', ')}...`);
 
-    // Split comma-separated keywords and search each one
-    const keywords = keywordParam
-      .split(',')
-      .map((k) => k.trim())
-      .filter(Boolean);
-    console.log(`Searching ${keywords.length} keywords: ${keywords.slice(0, 5).join(', ')}...`);
+  const gridPoints = generateGridPoints(lat, lng, radiusKm);
+  console.log(`Grid: ${gridPoints.length} points`);
 
-    const gridPoints = generateGridPoints(lat, lng, radiusKm);
-    console.log(`Grid: ${gridPoints.length} points`);
+  const allTokens = new Set<string>();
 
-    const allTokens = new Set<string>();
-
-    for (const kw of keywords) {
-      for (const point of gridPoints) {
-        let tokens: string[] = [];
-        for (let r = 0; r < 2; r++) {
-          tokens = await searchTokens(kw, point.lat, point.lng);
-          if (tokens.length > 0) break;
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-        tokens.forEach((t) => allTokens.add(t));
+  for (const kw of keywords) {
+    for (const point of gridPoints) {
+      let tokens: string[] = [];
+      for (let r = 0; r < 2; r++) {
+        tokens = await searchTokens(kw, point.lat, point.lng);
+        if (tokens.length > 0) break;
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
+      tokens.forEach((t) => allTokens.add(t));
     }
-
-    console.log(`Tokens: ${allTokens.size}`);
-
-    const results = [];
-    const seenPhones = new Set<string>();
-    for (const token of allTokens) {
-      try {
-        const place = await getPlace(token);
-        if (place && !seenPhones.has(place.phoneNumber)) {
-          seenPhones.add(place.phoneNumber);
-          results.push(place);
-        }
-      } catch {}
-    }
-
-    console.log(`Results: ${results.length}`);
-
-    const phones = results.map((p) => p.phoneNumber);
-    const existing = phones.length
-      ? await prisma.lead.findMany({
-          where: { phoneNumber: { in: phones } },
-          select: { phoneNumber: true },
-        })
-      : [];
-    const existingSet = new Set(existing.map((l) => l.phoneNumber));
-
-    return NextResponse.json({
-      places: results.map((p) => ({ ...p, isExisting: existingSet.has(p.phoneNumber) })),
-      total: results.length,
-    });
-  } catch (error) {
-    console.error('Balad:', error);
-    return NextResponse.json({ error: 'خطا', places: [] });
   }
+
+  console.log(`Total tokens: ${allTokens.size}`);
+
+  const results: BaladPlace[] = [];
+  const seenPhones = new Set<string>();
+
+  for (const token of allTokens) {
+    try {
+      const place = await getPlace(token);
+      if (place && !seenPhones.has(place.phoneNumber)) {
+        seenPhones.add(place.phoneNumber);
+        results.push(place);
+      }
+    } catch {}
+  }
+
+  console.log(`Results: ${results.length}`);
+  return results;
 }

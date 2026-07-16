@@ -1,135 +1,62 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { leads: incomingLeads } = body;
+    const { leads } = await req.json();
+    if (!leads?.length) return NextResponse.json({ imported: 0, skipped: 0 });
 
-    const results = {
-      imported: 0,
-      skipped: 0,
-      errors: 0,
-      details: [] as { name: string; status: string; reason?: string }[],
-    };
+    const phones = leads.map((l: any) => l.phoneNumber).filter(Boolean);
+    const names = leads.map((l: any) => l.businessName).filter(Boolean);
 
-    // یکبار همه موجودی‌ها رو بگیریم
-    const allPhones = incomingLeads
-      .map((l: { phoneNumber: string }) => l.phoneNumber)
-      .filter(Boolean);
-    const allNames = incomingLeads
-      .map((l: { businessName: string }) => l.businessName)
-      .filter(Boolean);
-
-    const existingLeads = await prisma.lead.findMany({
-      where: {
-        OR: [{ phoneNumber: { in: allPhones } }, { businessName: { in: allNames } }],
-      },
+    const existing = await prisma.lead.findMany({
+      where: { OR: [{ phoneNumber: { in: phones } }, { businessName: { in: names } }] },
       select: { phoneNumber: true, businessName: true },
     });
 
-    const existingPhones = new Set(existingLeads.map((l) => l.phoneNumber));
-    const existingNames = new Set(existingLeads.map((l) => l.businessName));
-
-    // چک تکراری داخل خود لیست import
+    const existingPhones = new Set(existing.map((l) => l.phoneNumber));
+    const existingNames = new Set(existing.map((l) => l.businessName));
     const seenPhones = new Set<string>();
-    const seenNames = new Set<string>();
+    const data: any[] = [];
+    let skipped = 0;
 
-    for (const lead of incomingLeads) {
-      try {
-        // اعتبارسنجی اولیه
-        if (!lead.businessName || !lead.phoneNumber) {
-          results.skipped++;
-          results.details.push({
-            name: lead.businessName || 'بدون نام',
-            status: 'skipped',
-            reason: 'نام یا شماره تماس خالی است',
-          });
-          continue;
-        }
-
-        // چک تکراری داخل خود لیست
-        if (seenPhones.has(lead.phoneNumber)) {
-          results.skipped++;
-          results.details.push({
-            name: lead.businessName,
-            status: 'skipped',
-            reason: 'تکراری - در همین لیست',
-          });
-          continue;
-        }
-
-        if (seenNames.has(lead.businessName)) {
-          results.skipped++;
-          results.details.push({
-            name: lead.businessName,
-            status: 'skipped',
-            reason: 'تکراری - در همین لیست',
-          });
-          continue;
-        }
-
-        // چک تکراری در دیتابیس
-        if (existingPhones.has(lead.phoneNumber)) {
-          results.skipped++;
-          results.details.push({
-            name: lead.businessName,
-            status: 'skipped',
-            reason: `تکراری - شماره ${lead.phoneNumber} قبلاً ثبت شده`,
-          });
-          seenPhones.add(lead.phoneNumber);
-          seenNames.add(lead.businessName);
-          continue;
-        }
-
-        if (existingNames.has(lead.businessName)) {
-          results.skipped++;
-          results.details.push({
-            name: lead.businessName,
-            status: 'skipped',
-            reason: 'تکراری - این نام قبلاً ثبت شده',
-          });
-          seenPhones.add(lead.phoneNumber);
-          seenNames.add(lead.businessName);
-          continue;
-        }
-
-        // ذخیره در دیتابیس
-        await prisma.lead.create({
-          data: {
-            businessName: lead.businessName,
-            phoneNumber: lead.phoneNumber,
-            industry: lead.industry || '',
-            source: lead.source || 'نامشخص',
-            notes: lead.address
-              ? `${lead.address}${lead.rating ? ` | ⭐ ${lead.rating}` : ''}`
-              : lead.notes || '',
-            status: 'NEW',
-          },
-        });
-
-        seenPhones.add(lead.phoneNumber);
-        seenNames.add(lead.businessName);
-
-        results.imported++;
-        results.details.push({
-          name: lead.businessName,
-          status: 'imported',
-        });
-      } catch (error) {
-        console.error('Import error for lead:', lead.businessName, error);
-        results.errors++;
-        results.details.push({
-          name: lead.businessName || 'نامشخص',
-          status: 'error',
-          reason: 'خطا در ذخیره‌سازی',
-        });
+    for (const lead of leads) {
+      if (!lead.phoneNumber || !lead.businessName) {
+        skipped++;
+        continue;
       }
+      if (existingPhones.has(lead.phoneNumber) || existingNames.has(lead.businessName)) {
+        skipped++;
+        continue;
+      }
+      if (seenPhones.has(lead.phoneNumber)) {
+        skipped++;
+        continue;
+      }
+      seenPhones.add(lead.phoneNumber);
+
+      data.push({
+        businessName: lead.businessName,
+        phoneNumber: lead.phoneNumber,
+        industry: lead.industry || lead.category || '',
+        source: lead.source || 'بلد',
+        status: 'NEW',
+        notes: [
+          lead.address,
+          lead.category,
+          lead.website,
+          lead.rating ? `⭐ ${lead.rating}` : undefined,
+        ]
+          .filter(Boolean)
+          .join(' | '),
+      });
     }
 
-    return NextResponse.json(results);
-  } catch (error) {
-    console.error('Bulk import error:', error);
-    return NextResponse.json({ error: 'خطا در وارد کردن سرنخ‌ها' }, { status: 400 });
+    if (data.length) await prisma.lead.createMany({ data, skipDuplicates: true });
+
+    return NextResponse.json({ imported: data.length, skipped });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'خطا' }, { status: 500 });
   }
 }
