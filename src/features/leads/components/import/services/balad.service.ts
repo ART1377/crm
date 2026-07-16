@@ -1,6 +1,5 @@
 // src/features/leads/components/import/services/balad.service.ts
 
-import { generateSearchKeywords } from '../keywords/generator';
 import type { BaladPlace } from '../types';
 
 const SEARCH_API = 'https://search.raah.ir/v4/submit/';
@@ -35,7 +34,6 @@ function generateGridPoints(centerLat: number, centerLng: number, radiusKm: numb
   const latStep = stepKm / 111.32;
   const lngStep = stepKm / (111.32 * Math.cos((centerLat * Math.PI) / 180));
   const gridSize = Math.ceil(radiusKm / stepKm) + 1;
-
   for (let i = -gridSize; i <= gridSize; i++) {
     for (let j = -gridSize; j <= gridSize; j++) {
       const pointLat = centerLat + latStep * i;
@@ -98,13 +96,11 @@ export async function searchBalad(
   lng: number,
   radiusKm: number
 ): Promise<BaladPlace[]> {
-  // Generate all keywords from aliases
-  const keywords = generateSearchKeywords({ keyword: keyword.replace(/\u200C/g, ' ').trim() });
-  console.log(`Keywords: ${keywords.length} - ${keywords.slice(0, 5).join(', ')}...`);
-
+  const keywords = keyword
+    .split(',')
+    .map((k) => k.trim())
+    .filter(Boolean);
   const gridPoints = generateGridPoints(lat, lng, radiusKm);
-  console.log(`Grid: ${gridPoints.length} points`);
-
   const allTokens = new Set<string>();
 
   for (const kw of keywords) {
@@ -113,13 +109,11 @@ export async function searchBalad(
       for (let r = 0; r < 2; r++) {
         tokens = await searchTokens(kw, point.lat, point.lng);
         if (tokens.length > 0) break;
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 300));
       }
       tokens.forEach((t) => allTokens.add(t));
     }
   }
-
-  console.log(`Total tokens: ${allTokens.size}`);
 
   const results: BaladPlace[] = [];
   const seenPhones = new Set<string>();
@@ -134,6 +128,5 @@ export async function searchBalad(
     } catch {}
   }
 
-  console.log(`Results: ${results.length}`);
   return results;
 }

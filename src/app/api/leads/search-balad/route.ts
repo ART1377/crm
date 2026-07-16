@@ -1,148 +1,24 @@
 // src/app/api/leads/search-balad/route.ts
+
+import { searchBalad } from '@/features/leads/components/import/services/balad.service';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const SEARCH_API = 'https://search.raah.ir/v4/submit/';
-const DETAIL_API = 'https://poi.raah.ir/web/v4';
-
-function headers() {
-  return {
-    accept: 'application/json',
-    origin: 'https://balad.ir',
-    referer: 'https://balad.ir/',
-    platform: 'web',
-    'device-id': '0ad90fcd-ed5f-455c-88c8-722fea0bed0c',
-    'app-session': crypto.randomUUID(),
-    'user-agent':
-      'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/150.0.0.0 Mobile Safari/537.36',
-  };
-}
-
-function polygonFromCenter(lat: number, lng: number, radiusKm: number): string {
-  const dLat = radiusKm / 111.32;
-  const dLng = radiusKm / (111.32 * Math.cos((lat * Math.PI) / 180));
-  const nw = `${(lng - dLng).toFixed(6)},${(lat + dLat).toFixed(6)}`;
-  const ne = `${(lng + dLng).toFixed(6)},${(lat + dLat).toFixed(6)}`;
-  const se = `${(lng + dLng).toFixed(6)},${(lat - dLat).toFixed(6)}`;
-  const sw = `${(lng - dLng).toFixed(6)},${(lat - dLat).toFixed(6)}`;
-  return `${nw}|${ne}|${se}|${sw}|${nw}`;
-}
-
-function generateGridPoints(centerLat: number, centerLng: number, radiusKm: number) {
-  const points: Array<{ lat: number; lng: number }> = [];
-  const stepKm = 0.5;
-  const latStep = stepKm / 111.32;
-  const lngStep = stepKm / (111.32 * Math.cos((centerLat * Math.PI) / 180));
-  const gridSize = Math.ceil(radiusKm / stepKm) + 1;
-  for (let i = -gridSize; i <= gridSize; i++) {
-    for (let j = -gridSize; j <= gridSize; j++) {
-      const pointLat = centerLat + latStep * i;
-      const pointLng = centerLng + lngStep * j;
-      const distLat = (pointLat - centerLat) * 111.32;
-      const distLng = (pointLng - centerLng) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
-      if (Math.sqrt(distLat ** 2 + distLng ** 2) <= radiusKm) {
-        points.push({ lat: +pointLat.toFixed(6), lng: +pointLng.toFixed(6) });
-      }
-    }
-  }
-  return points;
-}
-
-async function searchTokens(keyword: string, lat: number, lng: number): Promise<string[]> {
-  const polygon = polygonFromCenter(lat, lng, 0.5);
-  const params = new URLSearchParams({
-    text: keyword,
-    query: keyword,
-    polygon,
-    camera: `${lng},${lat}`,
-    zoom: '20',
-  });
-  const res = await fetch(`${SEARCH_API}?${params}`, { headers: headers() });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data['poi-tokens'] ?? [];
-}
-
-async function getPlace(token: string) {
-  const res = await fetch(`${DETAIL_API}/${token}`, { headers: headers() });
-  if (!res.ok) return null;
-  const place = await res.json();
-  let phone = '',
-    address = '',
-    website = '';
-  for (const field of place.fields ?? []) {
-    if (field.type === 'link' && field.value?.startsWith('tel://'))
-      phone = field.value.replace('tel://', '').replace(/[^0-9]/g, '');
-    if (field.type === 'link' && field.value?.startsWith('http')) website = field.value;
-    if (field.type === 'text' && !address) address = field.value ?? '';
-  }
-  if (!phone || phone.length < 7) return null;
-  return {
-    id: crypto.randomUUID(),
-    businessName: place.name || '',
-    phoneNumber: phone,
-    address,
-    category: place.category || '',
-    website,
-    rating: place.rating?.score ?? null,
-    ratingCount: place.rating?.count ?? null,
-    isExisting: false,
-  };
-}
-
 export async function GET(req: NextRequest) {
   try {
-    const keywordParam = (req.nextUrl.searchParams.get('keyword') || 'آهن')
+    const keyword = (req.nextUrl.searchParams.get('keyword') || 'آهن')
       .replace(/\u200C/g, ' ')
       .trim();
     const lat = parseFloat(req.nextUrl.searchParams.get('lat') || '35.6607');
     const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3156');
     const radiusKm = parseFloat(req.nextUrl.searchParams.get('radius') || '2');
 
-    // Split comma-separated keywords and search each one
-    const keywords = keywordParam
-      .split(',')
-      .map((k) => k.trim())
-      .filter(Boolean);
-    console.log(`Searching ${keywords.length} keywords: ${keywords.slice(0, 5).join(', ')}...`);
+    const places = await searchBalad(keyword, lat, lng, radiusKm);
 
-    const gridPoints = generateGridPoints(lat, lng, radiusKm);
-    console.log(`Grid: ${gridPoints.length} points`);
-
-    const allTokens = new Set<string>();
-
-    for (const kw of keywords) {
-      for (const point of gridPoints) {
-        let tokens: string[] = [];
-        for (let r = 0; r < 2; r++) {
-          tokens = await searchTokens(kw, point.lat, point.lng);
-          if (tokens.length > 0) break;
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-        tokens.forEach((t) => allTokens.add(t));
-      }
-    }
-
-    console.log(`Tokens: ${allTokens.size}`);
-
-    const results = [];
-    const seenPhones = new Set<string>();
-    for (const token of allTokens) {
-      try {
-        const place = await getPlace(token);
-        if (place && !seenPhones.has(place.phoneNumber)) {
-          seenPhones.add(place.phoneNumber);
-          results.push(place);
-        }
-      } catch {}
-    }
-
-    console.log(`Results: ${results.length}`);
-
-    const phones = results.map((p) => p.phoneNumber);
+    const phones = places.map((p) => p.phoneNumber);
     const existing = phones.length
       ? await prisma.lead.findMany({
           where: { phoneNumber: { in: phones } },
@@ -152,8 +28,8 @@ export async function GET(req: NextRequest) {
     const existingSet = new Set(existing.map((l) => l.phoneNumber));
 
     return NextResponse.json({
-      places: results.map((p) => ({ ...p, isExisting: existingSet.has(p.phoneNumber) })),
-      total: results.length,
+      places: places.map((p) => ({ ...p, isExisting: existingSet.has(p.phoneNumber) })),
+      total: places.length,
     });
   } catch (error) {
     console.error('Balad:', error);

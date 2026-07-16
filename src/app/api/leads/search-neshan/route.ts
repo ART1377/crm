@@ -1,3 +1,5 @@
+// src/app/api/leads/search-neshan/route.ts
+
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { chromium } from 'playwright';
@@ -6,26 +8,6 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-function generateGridPoints(centerLat: number, centerLng: number, radiusKm: number) {
-  const points: Array<{ lat: number; lng: number }> = [];
-  const stepKm = 0.5;
-  const latStep = stepKm / 111.32;
-  const lngStep = stepKm / (111.32 * Math.cos((centerLat * Math.PI) / 180));
-  const gridSize = Math.ceil(radiusKm / stepKm) + 1;
-  for (let i = -gridSize; i <= gridSize; i++) {
-    for (let j = -gridSize; j <= gridSize; j++) {
-      const pointLat = centerLat + latStep * i;
-      const pointLng = centerLng + lngStep * j;
-      const distLat = (pointLat - centerLat) * 111.32;
-      const distLng = (pointLng - centerLng) * 111.32 * Math.cos((centerLat * Math.PI) / 180);
-      if (Math.sqrt(distLat ** 2 + distLng ** 2) <= radiusKm) {
-        points.push({ lat: +pointLat.toFixed(6), lng: +pointLng.toFixed(6) });
-      }
-    }
-  }
-  return points;
-}
 
 export async function GET(req: NextRequest) {
   const keywordParam = (req.nextUrl.searchParams.get('keyword') || 'آهن')
@@ -44,20 +26,14 @@ export async function GET(req: NextRequest) {
       .split(',')
       .map((k) => k.trim())
       .filter(Boolean);
-    const gridPoints = generateGridPoints(lat, lng, radiusKm);
-
-    console.log(`Neshan: ${keywords.length} keywords × ${gridPoints.length} grid points`);
-
     const allPlaceUrls = new Set<string>();
 
     for (const kw of keywords.slice(0, 3)) {
-      // Limit to 3 keywords to avoid timeout
-      for (const point of gridPoints.slice(0, 5)) {
-        // Limit grid points
+      for (let i = 0; i < 5; i++) {
         try {
-          // نشان search URL با مختصات
-          const searchUrl = `https://neshan.org/maps/@${point.lat},${point.lng},19z,0p/search/${encodeURIComponent(kw)}`;
-
+          const offsetLat = lat + ((i % 3) - 1) * 0.005;
+          const offsetLng = lng + (Math.floor(i / 3) - 1) * 0.005;
+          const searchUrl = `https://neshan.org/maps/@${offsetLat.toFixed(6)},${offsetLng.toFixed(6)},19z,0p/search/${encodeURIComponent(kw)}`;
           await page.goto(searchUrl, { waitUntil: 'networkidle', timeout: 20000 });
           await wait(2000);
 
@@ -69,13 +45,10 @@ export async function GET(req: NextRequest) {
             });
             return urls;
           });
-
           urls.forEach((u) => allPlaceUrls.add(u));
         } catch {}
       }
     }
-
-    console.log(`Neshan unique URLs: ${allPlaceUrls.size}`);
 
     const results: any[] = [];
     const seenPhones = new Set<string>();

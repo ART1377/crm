@@ -1,3 +1,5 @@
+// src/app/api/leads/bulk-import/route.ts
+
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
         businessName: lead.businessName,
         phoneNumber: lead.phoneNumber,
         industry: lead.industry || lead.category || '',
-        source: lead.source || 'بلد',
+        source: lead.source || 'نامشخص',
         status: 'NEW',
         notes: [
           lead.address,
