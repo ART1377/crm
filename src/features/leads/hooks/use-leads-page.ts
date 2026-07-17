@@ -18,6 +18,7 @@ export function useLeadsPage() {
       dateFrom: parseAsString.withDefault(''),
       dateTo: parseAsString.withDefault(''),
       industry: parseAsString.withDefault(''),
+      source: parseAsString.withDefault(''),
       sortBy: parseAsString.withDefault('createdAt'),
       sortOrder: parseAsString.withDefault('desc'),
     },
@@ -36,6 +37,7 @@ export function useLeadsPage() {
       dateFrom: params.dateFrom || undefined,
       dateTo: params.dateTo || undefined,
       industry: params.industry || undefined,
+      source: params.source || undefined,
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
     }),
@@ -45,6 +47,7 @@ export function useLeadsPage() {
       params.dateFrom,
       params.dateTo,
       params.industry,
+      params.source,
       params.sortBy,
       params.sortOrder,
     ]
@@ -99,6 +102,7 @@ export function useLeadsPage() {
       dateFrom: '',
       dateTo: '',
       industry: '',
+      source: '',
       sortBy: 'createdAt',
       sortOrder: 'desc',
     });
@@ -108,13 +112,15 @@ export function useLeadsPage() {
     Boolean(params.search) ||
     Boolean(params.status) ||
     Boolean(params.dateFrom || params.dateTo) ||
-    Boolean(params.industry);
+    Boolean(params.industry) ||
+    Boolean(params.source);
 
   const filters = {
     status: params.status,
     search: params.search,
     dateFrom: params.dateFrom,
     dateTo: params.dateTo,
+    source: params.source,
     industry: params.industry,
   };
 

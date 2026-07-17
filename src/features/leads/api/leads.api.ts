@@ -21,6 +21,7 @@ export const leadsService = {
     if (filters?.status) params.append('status', filters.status);
     if (filters?.search) params.append('search', filters.search);
     if (filters?.industry) params.append('industry', filters.industry);
+    if (filters?.source) params.append('source', filters.source);
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
@@ -75,6 +76,7 @@ export const leadsService = {
     return apiClient.get(`${LEADS_ENDPOINT}/analytics`) as Promise<{
       industryStats: { industry: string; status: string; _count: { id: number } }[];
       dailyActivity: { date: string; count: number }[];
+      sourceByIndustry: { source: string; industry: string; _count: { id: number } }[];
     }>;
   },
 

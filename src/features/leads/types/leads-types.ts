@@ -12,6 +12,7 @@ export type LeadStatus =
 
 export type LeadSource =
   | 'BALAD'
+  | 'NESHAN'
   | 'IRAN_SITE'
   | 'NIAZ_ROOZ'
   | 'KETAB_AVAL'
@@ -52,6 +53,7 @@ export interface LeadFilters {
   status?: string;
   search?: string;
   industry?: string;
+  source?: string;
   dateFrom?: string;
   dateTo?: string;
 }

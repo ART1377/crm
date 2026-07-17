@@ -1,11 +1,12 @@
 export const LEAD_SOURCES = [
-  { value: 'BALAD', label: 'بلد' },
-  { value: 'IRAN_SITE', label: 'ایران سایت' },
-  { value: 'NIAZ_ROOZ', label: 'نیاز روز' },
-  { value: 'KETAB_AVAL', label: 'کتاب اول' },
-  { value: 'INSTAGRAM', label: 'اینستاگرام' },
-  { value: 'OTHER_DIRECTORY', label: 'سایر دایرکتوری‌ها' },
-  { value: 'DIRECT', label: 'مستقیم' },
+  { value: 'بلد', label: 'بلد' },
+  { value: 'نشان', label: 'نشان' },
+  { value: 'ایران سایت', label: 'ایران سایت' },
+  { value: 'نیاز روز', label: 'نیاز روز' },
+  { value: 'کتاب اول', label: 'کتاب اول' },
+  { value: 'اینستاگرام', label: 'اینستاگرام' },
+  { value: 'سایر دایرکتوری‌ها', label: 'سایر دایرکتوری‌ها' },
+  { value: 'مستقیم', label: 'مستقیم' },
 ] as const;
 
 export const LEAD_STATUSES = [

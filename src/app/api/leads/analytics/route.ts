@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+// src/app/api/leads/analytics/route.ts
 
 import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -9,6 +10,12 @@ export async function GET() {
       by: ['industry', 'status'],
       _count: { id: true },
       orderBy: { industry: 'asc' },
+    });
+
+    const sourceByIndustry = await prisma.lead.groupBy({
+      by: ['source', 'industry'],
+      _count: { id: true },
+      orderBy: [{ source: 'asc' }, { _count: { id: 'desc' } }],
     });
 
     // Weekly activity
@@ -21,7 +28,6 @@ export async function GET() {
       orderBy: { createdAt: 'asc' },
     });
 
-    // Daily activity count for last 7 days
     const dailyActivity: Record<string, number> = {};
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
@@ -39,6 +45,7 @@ export async function GET() {
 
     return NextResponse.json({
       industryStats,
+      sourceByIndustry,
       dailyActivity: Object.entries(dailyActivity).map(([date, count]) => ({ date, count })),
     });
   } catch {

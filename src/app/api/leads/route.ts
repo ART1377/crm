@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const search = searchParams.get('search');
     const industry = searchParams.get('industry');
+    const source = searchParams.get('source');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '15');
     const skip = (page - 1) * limit;
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'all') where.status = status;
     if (industry) where.industry = industry;
+    if (source) where.source = source;
     if (search) {
       where.OR = [
         { businessName: { contains: search } },

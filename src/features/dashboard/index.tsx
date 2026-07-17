@@ -17,9 +17,9 @@ import { IndustryTable } from './components/industry-table';
 import { DashboardSkeleton } from './components/skeleton';
 import { StatusCards } from './components/status-cards';
 import { TasksProgressCard } from './components/tasks-progress-card';
-import { TodayTasks } from './components/today-tasks';
 import { WeeklyCalendar } from './components/weekly-chart';
 import { useDashboardData } from './hooks/use-dashboard-data';
+import { SourceIndustryTable } from './components/source-industry-table';
 
 export function DashboardPage() {
   const {
@@ -36,6 +36,7 @@ export function DashboardPage() {
     industrySortBy,
     setIndustrySortBy,
     industrySortDirection,
+    sourceByIndustry,
   } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
@@ -105,7 +106,7 @@ export function DashboardPage() {
         <IndustryChart data={industryPieData} />
       </div>
 
-      <TodayTasks />
+      <SourceIndustryTable data={sourceByIndustry} />
     </PageWrapper>
   );
 }

@@ -1,9 +1,8 @@
-'use client';
-
-import { useMemo, useState } from 'react';
+// src/features/dashboard/hooks/use-dashboard.ts
 
 import { useLeadsAnalytics, useLeadsStats } from '@/features/dashboard/hooks/use-dashboard';
 import { useTodayTasks } from '@/features/tasks/hooks/use-tasks';
+import { useMemo, useState } from 'react';
 
 export function useDashboardData() {
   const { data: stats, isLoading: statsLoading } = useLeadsStats();
@@ -18,6 +17,8 @@ export function useDashboardData() {
   const newLeads = stats?.newLeads ?? 0;
   const activeLeads = (stats?.called ?? 0) + (stats?.followedUp ?? 0) + (stats?.messaged ?? 0);
   const customers = stats?.customers ?? 0;
+
+  const sourceByIndustry = analytics?.sourceByIndustry ?? [];
 
   const conversionRate = total > 0 ? Math.round((customers / total) * 100) : 0;
 
@@ -37,7 +38,7 @@ export function useDashboardData() {
     value: Object.values(statuses).reduce((a, b) => a + b, 0),
   }));
 
-  // محاسبه تعداد هر استاتوس از industryStats
+
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const item of analytics?.industryStats ?? []) {
@@ -50,20 +51,16 @@ export function useDashboardData() {
     return Object.entries(industryMap).sort(([, a], [, b]) => {
       const aTotal = Object.values(a).reduce((sum, v) => sum + v, 0);
       const bTotal = Object.values(b).reduce((sum, v) => sum + v, 0);
-
       const aValue = industrySortBy === 'total' ? aTotal : (a[industrySortBy] ?? 0);
       const bValue = industrySortBy === 'total' ? bTotal : (b[industrySortBy] ?? 0);
-
       return industrySortDirection === 'desc' ? bValue - aValue : aValue - bValue;
     });
   }, [industryMap, industrySortBy, industrySortDirection]);
 
   const handleIndustrySort = (column: string) => {
     if (industrySortBy === column) {
-      // اگه روی همون ستون کلیک کرد، جهت رو برعکس کن
       setIndustrySortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'));
     } else {
-      // اگه ستون جدید انتخاب کرد، پیش‌فرض نزولی
       setIndustrySortBy(column);
       setIndustrySortDirection('desc');
     }
@@ -85,5 +82,6 @@ export function useDashboardData() {
     industrySortBy,
     setIndustrySortBy: handleIndustrySort,
     industrySortDirection,
+    sourceByIndustry,
   };
 }

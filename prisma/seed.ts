@@ -218,7 +218,7 @@ async function main() {
         phoneNumber: lead.phoneNumber,
         secondaryPhone: lead.secondaryPhone || null,
         industry: 'آهن آلات',
-        source: 'INSTAGRAM',
+        source: 'اینستاگرام',
         status: lead.status,
       },
     });

@@ -1,6 +1,8 @@
+// src/features/leads/components/table/filters.tsx
+
 'use client';
 
-import { ArrowUpDown, Filter, Search, Tag, Trash2, X } from 'lucide-react';
+import { ArrowUpDown, Search, Tag, Trash2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,11 +23,18 @@ import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { LEAD_STATUSES } from '../../constants/leads-constants';
 
 interface LeadsFiltersProps {
-  filters: { status: string; search: string; dateFrom: string; dateTo: string; industry: string };
+  filters: {
+    status: string;
+    search: string;
+    dateFrom: string;
+    dateTo: string;
+    industry: string;
+    source: string;
+  };
   sortBy: string;
   sortOrder: string;
   onFilterChange: (
-    field: 'status' | 'search' | 'dateFrom' | 'dateTo' | 'industry',
+    field: 'status' | 'search' | 'dateFrom' | 'dateTo' | 'industry' | 'source',
     value: string
   ) => void;
   onSortByChange: (value: string) => void;
@@ -45,6 +54,7 @@ const hasActiveFilters = (
   filters.dateFrom ||
   filters.dateTo ||
   filters.industry ||
+  filters.source ||
   sortBy !== 'createdAt' ||
   sortOrder !== 'desc';
 
@@ -58,6 +68,7 @@ export function LeadsFilters({
   onClearFilters,
 }: LeadsFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
+  const { data: sourceOptions = [] } = useListOptions('SOURCE');
   const industries = industryOptions.map((o) => o.value);
   const showClear = hasActiveFilters(filters, sortBy, sortOrder);
 
@@ -65,7 +76,7 @@ export function LeadsFilters({
     <Card className="overflow-visible">
       <CardContent className="p-4">
         <div className="space-y-3">
-          {/* Row 1: Search + Status + Industry */}
+          {/* Row 1: Search + Status */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
@@ -86,11 +97,10 @@ export function LeadsFilters({
               )}
             </div>
             <Select value={filters.status} onValueChange={(v) => onFilterChange('status', v)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <Filter className="ml-2 h-4 w-4 shrink-0" />
+              <SelectTrigger className="w-full sm:w-44">
                 <SelectValue placeholder="وضعیت" />
               </SelectTrigger>
-              <SelectContent className="w-fit">
+              <SelectContent>
                 {STATUS_FILTERS.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
                     {s.label}
@@ -98,7 +108,24 @@ export function LeadsFilters({
                 ))}
               </SelectContent>
             </Select>
-            <div className="w-full sm:w-44">
+          </div>
+
+          {/* Row 2: Source + Industry */}
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Select value={filters.source} onValueChange={(v) => onFilterChange('source', v)}>
+              <SelectTrigger className="w-full sm:flex-1">
+                <SelectValue placeholder="منبع" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">همه</SelectItem>
+                {sourceOptions.map((s) => (
+                  <SelectItem key={s.id} value={s.value}>
+                    {s.value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="w-full sm:flex-1">
               <ComboboxInput
                 value={filters.industry}
                 onChange={(value) => onFilterChange('industry', value)}
@@ -110,11 +137,11 @@ export function LeadsFilters({
             </div>
           </div>
 
-          {/* Row 2: Sort + Date */}
+          {/* Row 3: Sort + Date */}
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            <div className="flex w-full gap-2 sm:w-auto sm:flex-1">
+            <div className="flex w-full gap-2 sm:w-auto">
               <Select value={sortBy} onValueChange={onSortByChange}>
-                <SelectTrigger className="w-full sm:w-36 sm:flex-1">
+                <SelectTrigger className="w-full sm:w-36">
                   <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
                   <SelectValue placeholder="مرتب‌سازی" />
                 </SelectTrigger>
@@ -126,7 +153,7 @@ export function LeadsFilters({
                 </SelectContent>
               </Select>
               <Select value={sortOrder} onValueChange={onSortOrderChange}>
-                <SelectTrigger className="w-full sm:w-28 sm:flex-1">
+                <SelectTrigger className="w-full sm:w-28">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,6 +179,7 @@ export function LeadsFilters({
               />
             </div>
           </div>
+
           {showClear && (
             <Button
               variant="destructive"
