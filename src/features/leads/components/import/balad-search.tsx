@@ -131,11 +131,13 @@ export function BaladSearch() {
           </CardHeader>
           <CardContent>
             <div className="max-h-120 space-y-2 overflow-y-auto">
-              {places.map((place) => (
+              {places.map((place, index) => (
                 <ResultCard
                   key={place.id}
                   place={place}
                   checked={selected.has(place.id)}
+                  index={index}
+                  total={places.length}
                   importing={importingOne === place.id}
                   onCheckedChange={() => toggle(place.id)}
                   onSave={(id, updated) =>
