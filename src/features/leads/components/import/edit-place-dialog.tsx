@@ -20,9 +20,7 @@ import { BaladPlace } from './types';
 
 interface EditPlaceDialogProps {
   place: BaladPlace;
-
   onSave: (id: string, updatedPlace: BaladPlace) => void;
-
   isExisting?: boolean;
 }
 
@@ -43,14 +41,12 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
   }, [place]);
 
   function handleSave() {
-    const updatedPlace: BaladPlace = {
+    onSave(place.id, {
       ...place,
       businessName: form.businessName,
       phoneNumber: form.phoneNumber,
       address: form.address,
-    };
-
-    onSave(place.id, updatedPlace);
+    });
     setOpen(false);
   }
 
@@ -60,10 +56,10 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 shrink-0 opacity-50 hover:opacity-100"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground h-8 w-8 rounded-lg"
           onClick={(e) => e.stopPropagation()}
         >
-          <Pencil className="h-3 w-3" />
+          <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -96,7 +92,7 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
           </div>
           {isExisting && (
             <Badge variant="secondary" className="w-fit text-[10px]">
-              این مورد قبلاً در سیستم ثبت شده است
+              این مورد قبلاً ثبت شده
             </Badge>
           )}
         </div>

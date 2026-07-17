@@ -95,7 +95,7 @@ export function SearchConfig({
           صنعت
         </Label>
         <Select value={selectedIndustry?.value ?? ''} onValueChange={handleIndustryChange}>
-          <SelectTrigger className="border-muted bg-muted/20 h-11 w-full rounded-xl border-2 text-sm transition-all focus:border-amber-200 focus:bg-white">
+          <SelectTrigger className="border-muted bg-muted/20 h-11! w-full rounded-xl border-2 text-sm transition-all focus:border-amber-200 focus:bg-white">
             <SelectValue placeholder="یک صنعت انتخاب کنید" />
           </SelectTrigger>
           <SelectContent>
@@ -193,7 +193,7 @@ export function SearchConfig({
               شعاع جستجو
             </Label>
             <Select value={radius} onValueChange={onRadiusChange}>
-              <SelectTrigger className="border-muted h-11 w-full rounded-xl border-2 bg-white text-sm transition-all focus:border-green-200">
+              <SelectTrigger className="border-muted h-11! w-full rounded-xl border-2 bg-white text-sm transition-all focus:border-green-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
