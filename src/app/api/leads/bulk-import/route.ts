@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     const seenPhones = new Set<string>();
     const data: any[] = [];
     let skipped = 0;
+    const sanitize = (str: string) => (str || '').replace(/\u200C/g, ' ').trim();
 
     for (const lead of leads) {
       if (!lead.phoneNumber || !lead.businessName) {
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       data.push({
         businessName: lead.businessName,
         phoneNumber: lead.phoneNumber,
-        industry: lead.industry || lead.category || '',
+        industry: sanitize(lead.industry || lead.category || ''),
         source: lead.source || 'نامشخص',
         status: 'NEW',
         notes: [

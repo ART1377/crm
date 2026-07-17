@@ -19,7 +19,7 @@ async function main() {
     { type: 'SOURCE', value: 'نمایشگاه' },
     { type: 'SOURCE', value: 'تبلیغات پیامکی' },
     // Industries
-    { type: 'INDUSTRY', value: 'آهن‌آلات' },
+    { type: 'INDUSTRY', value: 'آهن آلات' },
     { type: 'INDUSTRY', value: 'فولاد' },
     { type: 'INDUSTRY', value: 'پلیمر' },
     { type: 'INDUSTRY', value: 'پتروشیمی' },
@@ -217,7 +217,7 @@ async function main() {
         businessName: lead.businessName,
         phoneNumber: lead.phoneNumber,
         secondaryPhone: lead.secondaryPhone || null,
-        industry: 'آهن‌آلات',
+        industry: 'آهن آلات',
         source: 'INSTAGRAM',
         status: lead.status,
       },

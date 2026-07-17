@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+    const sanitize = (str: string) => (str || '').replace(/\u200C/g, ' ').trim();
 
     const lead = await prisma.lead.create({
       data: {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
         contactPerson: body.contactPerson || null,
         phoneNumber: body.phoneNumber,
         secondaryPhone: body.secondaryPhone || null,
-        industry: body.industry,
+        industry: sanitize(body.industry),
         source: body.source || null,
         notes: body.notes || null,
         status: 'NEW',
