@@ -1,6 +1,8 @@
+// src/features/leads/utils/export-utils.ts
+
 import { formatDate } from '@/lib/utils';
 
-import { LEAD_SOURCES, LEAD_STATUSES } from '../constants/leads-constants';
+import { LEAD_STATUSES } from '../constants/leads-constants';
 import { Lead } from '../types/leads-types';
 
 export const ALL_COLUMNS = [
@@ -44,7 +46,7 @@ function getCellValue(lead: Lead, key: ColumnKey): string {
     case 'industry':
       return lead.industry;
     case 'source':
-      return LEAD_SOURCES.find((s) => s.value === lead.source)?.label || lead.source || '';
+      return lead.source || '';
     case 'status':
       return LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status;
     case 'createdAt':
@@ -54,9 +56,12 @@ function getCellValue(lead: Lead, key: ColumnKey): string {
   }
 }
 
-export function exportToText(leads: Lead[], columns: ColumnKey[]) {
-  const lines = leads.map((lead) => {
-    const items = columns
+export function exportToText(leads: Lead[], columns: ColumnKey[], fileName?: string) {
+  // Filter out businessName from columns since it's already in the header
+  const dataColumns = columns; // keep all, businessName is in the title line
+
+  const lines = leads.map((lead, index) => {
+    const items = dataColumns
       .map((key) => {
         const value = getCellValue(lead, key);
         if (!value) return null;
@@ -64,20 +69,22 @@ export function exportToText(leads: Lead[], columns: ColumnKey[]) {
         return `  ${label}: ${value}`;
       })
       .filter(Boolean);
-    return [`📋 ${lead.businessName}`, ...items, ''].join('\n');
+    return [`${index + 1}. 📋 ${lead.businessName}`, ...items, ''].join('\n');
   });
 
-  const content = `گزارش سرنخ‌ها - ${formatDate(new Date())}\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
+  const content = `گزارش سرنخ‌ها - ${new Date().toLocaleDateString('fa-IR')}\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
   const blob = new Blob(['\uFEFF' + content], { type: 'text/plain;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `leads-${formatDate(new Date()).replace(/\//g, '-')}.txt`;
+  a.download = fileName
+    ? `${fileName}.txt`
+    : `leads-${new Date().toLocaleDateString('fa-IR').replace(/\//g, '-')}.txt`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-export function exportToCsv(leads: Lead[], columns: ColumnKey[]) {
+export function exportToCsv(leads: Lead[], columns: ColumnKey[], fileName?: string) {
   const headers = columns.map((key) => ALL_COLUMNS.find((c) => c.key === key)!.label);
   const rows = leads.map((lead) =>
     columns.map((key) => {
@@ -96,7 +103,9 @@ export function exportToCsv(leads: Lead[], columns: ColumnKey[]) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `leads-${formatDate(new Date()).replace(/\//g, '-')}.csv`;
+  a.download = fileName
+    ? `${fileName}.csv`
+    : `leads-${formatDate(new Date()).replace(/\//g, '-')}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }

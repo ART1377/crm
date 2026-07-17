@@ -10,15 +10,17 @@ export type LeadStatus =
   | 'NOT_INTERESTED'
   | 'INVALID';
 
-export type LeadSource =
-  | 'BALAD'
-  | 'NESHAN'
-  | 'IRAN_SITE'
-  | 'NIAZ_ROOZ'
-  | 'KETAB_AVAL'
-  | 'INSTAGRAM'
-  | 'OTHER_DIRECTORY'
-  | 'DIRECT';
+// export type LeadSource =
+//   | 'BALAD'
+//   | 'NESHAN'
+//   | 'IRAN_SITE'
+//   | 'NIAZ_ROOZ'
+//   | 'KETAB_AVAL'
+//   | 'INSTAGRAM'
+//   | 'OTHER_DIRECTORY'
+//   | 'DIRECT';
+
+export type LeadSource = string;
 
 export interface Lead {
   id: string;
