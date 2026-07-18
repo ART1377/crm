@@ -95,7 +95,7 @@ export function ExportDialog({
           خروجی ({totalCount})
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[90dvh] max-w-md flex-col overflow-hidden">
+      <DialogContent className="flex max-h-[90dvh] max-w-md! flex-col overflow-hidden">
         <DialogHeader className="shrink-0">
           <DialogTitle className="text-lg font-bold">تنظیمات خروجی</DialogTitle>
         </DialogHeader>
