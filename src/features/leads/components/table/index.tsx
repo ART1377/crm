@@ -78,8 +78,8 @@ export function LeadsPage() {
           title="سرنخ‌ها"
           description="مدیریت و پیگیری سرنخ‌های فروش"
           actions={
-            <Link href="/leads/new">
-              <Button size="lg">
+            <Link href="/leads/new" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto">
                 <Plus className="ml-2 h-5 w-5" />
                 افزودن سرنخ جدید
               </Button>
@@ -98,7 +98,7 @@ export function LeadsPage() {
         onClearFilters={handleClearFilters}
       />
 
-      <Card className="flex-1 overflow-y-auto">
+      <Card className="min-h-100 flex-1 overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{totalCount} سرنخ پیدا شد</CardTitle>
           <ExportDialog totalCount={totalCount} onExportAll={exportAllLeads} />

@@ -150,34 +150,28 @@ export function LeadsTable({
               <TableCell className="whitespace-nowrap">
                 {formatDate(new Date(lead.createdAt))}
               </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      copy(lead.phoneNumber, 'شماره کپی شد');
-                      downloadVCard(lead);
-                    }}
-                    title="کپی شماره و ذخیره مخاطب"
-                  >
-                    <Contact className="h-4 w-4 text-blue-500" />
-                  </Button>
-                  <Link href={ROUTES.leads.detail(lead.id)}>
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <EditLeadDialog lead={lead} key={`${lead.id}-${lead.status}-${lead.updatedAt}`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </EditLeadDialog>
-                  <Button variant="ghost" size="icon" onClick={() => onDelete(lead.id)}>
-                    <Trash2 className="text-destructive h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+             <TableCell>
+  <div className="flex items-center gap-0.5">
+    <Button variant="ghost" size="icon" className="h-8 w-8"
+      onClick={() => { copy(lead.phoneNumber, 'شماره کپی شد'); downloadVCard(lead); }}
+      title="کپی شماره و ذخیره مخاطب">
+      <Contact className="h-4 w-4 text-blue-500" />
+    </Button>
+    <Link href={ROUTES.leads.detail(lead.id)}>
+      <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Eye className="h-4 w-4" />
+      </Button>
+    </Link>
+    <EditLeadDialog lead={lead}>
+      <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Pencil className="h-4 w-4" />
+      </Button>
+    </EditLeadDialog>
+    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onDelete(lead.id)}>
+      <Trash2 className="h-4 w-4 text-destructive" />
+    </Button>
+  </div>
+</TableCell>
             </TableRow>
           ))}
         </TableBody>

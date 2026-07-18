@@ -140,11 +140,6 @@ export function ResultCard({
               {place.category}
             </Badge>
           )}
-          {place.website && (
-            <Badge variant="outline" className="text-muted-foreground text-[11px]">
-              وبسایت
-            </Badge>
-          )}
         </div>
 
         {place.address && (

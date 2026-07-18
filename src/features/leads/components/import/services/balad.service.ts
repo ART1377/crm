@@ -1,4 +1,5 @@
 // src/features/leads/components/import/services/balad.service.ts
+// اضافه کردن generator function برای streaming
 
 import type { BaladPlace } from '../types';
 
@@ -28,7 +29,7 @@ function polygonFromCenter(lat: number, lng: number, radiusKm: number): string {
   return `${nw}|${ne}|${se}|${sw}|${nw}`;
 }
 
-function generateGridPoints(centerLat: number, centerLng: number, radiusKm: number) {
+export function generateGridPoints(centerLat: number, centerLng: number, radiusKm: number) {
   const points: Array<{ lat: number; lng: number }> = [];
   const stepKm = 0.5;
   const latStep = stepKm / 111.32;
@@ -90,43 +91,62 @@ async function getPlace(token: string): Promise<BaladPlace | null> {
   };
 }
 
-export async function searchBalad(
+export async function* searchBaladStream(
   keyword: string,
   lat: number,
   lng: number,
   radiusKm: number
-): Promise<BaladPlace[]> {
+): AsyncGenerator<
+  | {
+      type: 'progress';
+      message: string;
+      current: number;
+      total: number;
+      point?: { lat: number; lng: number };
+    }
+  | { type: 'place'; place: BaladPlace }
+  | { type: 'done'; total: number }
+> {
   const keywords = keyword
     .split(',')
     .map((k) => k.trim())
     .filter(Boolean);
   const gridPoints = generateGridPoints(lat, lng, radiusKm);
-  const allTokens = new Set<string>();
+  const totalSearches = keywords.length * gridPoints.length;
+
+  yield { type: 'progress', message: 'در حال جستجو...', current: 0, total: totalSearches };
+
+  const seenPhones = new Set<string>();
+  let searchCount = 0;
 
   for (const kw of keywords) {
     for (const point of gridPoints) {
-      let tokens: string[] = [];
-      for (let r = 0; r < 2; r++) {
-        tokens = await searchTokens(kw, point.lat, point.lng);
-        if (tokens.length > 0) break;
-        await new Promise((resolve) => setTimeout(resolve, 300));
+      try {
+        const tokens = await searchTokens(kw, point.lat, point.lng);
+        searchCount++;
+
+        for (const token of tokens) {
+          try {
+            const place = await getPlace(token);
+            if (place && !seenPhones.has(place.phoneNumber) && place.phoneNumber.length >= 7) {
+              seenPhones.add(place.phoneNumber);
+              yield { type: 'place', place };
+            }
+          } catch {}
+        }
+      } catch {}
+
+      if (searchCount % 5 === 0 || searchCount === totalSearches) {
+        yield {
+          type: 'progress',
+          message: `جستجو: ${searchCount}/${totalSearches} - ${seenPhones.size} سرنخ`,
+          current: searchCount,
+          total: totalSearches,
+          point: { lat: point.lat, lng: point.lng }, 
+        };
       }
-      tokens.forEach((t) => allTokens.add(t));
     }
   }
 
-  const results: BaladPlace[] = [];
-  const seenPhones = new Set<string>();
-
-  for (const token of allTokens) {
-    try {
-      const place = await getPlace(token);
-      if (place && !seenPhones.has(place.phoneNumber)) {
-        seenPhones.add(place.phoneNumber);
-        results.push(place);
-      }
-    } catch {}
-  }
-
-  return results;
+  yield { type: 'done', total: seenPhones.size };
 }

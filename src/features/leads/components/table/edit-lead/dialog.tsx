@@ -1,3 +1,5 @@
+// src/features/leads/components/table/edit-lead/dialog.tsx
+
 'use client';
 
 import { useState } from 'react';
@@ -42,22 +44,20 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
   return (
     <Dialog key={lead.id} open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>ویرایش سرنخ</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="min-w-0 space-y-4 py-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldWithIcon icon={Building2} label="نام کسب‌وکار *">
               <Input
-                className="pr-10"
                 value={form.businessName}
                 onChange={(e) => updateField('businessName', e.target.value)}
               />
             </FieldWithIcon>
             <FieldWithIcon icon={User} label="شخص تماس">
               <Input
-                className="pr-10"
                 value={form.contactPerson}
                 onChange={(e) => updateField('contactPerson', e.target.value)}
               />
@@ -67,7 +67,6 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldWithIcon icon={Phone} label="شماره اصلی *">
               <Input
-                className="pr-10"
                 dir="ltr"
                 value={form.phoneNumber}
                 onChange={(e) => updateField('phoneNumber', e.target.value)}
@@ -75,7 +74,6 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
             </FieldWithIcon>
             <FieldWithIcon icon={Phone} label="شماره دوم">
               <Input
-                className="pr-10"
                 dir="ltr"
                 value={form.secondaryPhone}
                 onChange={(e) => updateField('secondaryPhone', e.target.value)}
@@ -124,7 +122,7 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
 
           <FieldWithIcon icon={StickyNote} label="یادداشت">
             <Textarea
-              className="min-h-24 pr-10"
+              className="min-h-24"
               value={form.notes}
               onChange={(e) => updateField('notes', e.target.value)}
             />

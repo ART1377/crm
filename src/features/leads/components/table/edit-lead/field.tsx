@@ -1,3 +1,5 @@
+// src/features/leads/components/table/edit-lead/field.tsx
+
 import { Label } from '@/components/ui/label';
 
 export default function FieldWithIcon({
@@ -11,11 +13,11 @@ export default function FieldWithIcon({
 }) {
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="relative">
-        <Icon className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
-        {children}
-      </div>
+      <Label className="flex items-center gap-1.5">
+        <Icon className="text-muted-foreground h-4 w-4" />
+        {label}
+      </Label>
+      {children}
     </div>
   );
 }

@@ -27,18 +27,23 @@ export function ImportToolbar({
   const allSelected = available.length > 0 && selected.size === available.length;
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <CardTitle className="text-sm font-medium">نتایج جستجو ({places.length})</CardTitle>
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-sm font-medium">نتایج جستجو ({places.length})</CardTitle>
         <label className="flex cursor-pointer items-center gap-2 text-xs">
           <Checkbox checked={allSelected} onCheckedChange={onToggleAll} />
           انتخاب همه
         </label>
-        <Button size="sm" disabled={selected.size === 0 || importing} onClick={onImport}>
-          <Plus className="ml-2 h-4 w-4" />
-          {importing ? 'در حال وارد کردن...' : `وارد کردن (${selected.size})`}
-        </Button>
       </div>
+      <Button
+        size="sm"
+        className="w-full"
+        disabled={selected.size === 0 || importing}
+        onClick={onImport}
+      >
+        <Plus className="ml-2 h-4 w-4" />
+        {importing ? 'در حال وارد کردن...' : `وارد کردن (${selected.size})`}
+      </Button>
     </div>
   );
 }

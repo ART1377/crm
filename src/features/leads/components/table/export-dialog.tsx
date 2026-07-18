@@ -95,12 +95,12 @@ export function ExportDialog({
           خروجی ({totalCount})
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90dvh] max-w-md flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="text-lg font-bold">تنظیمات خروجی</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5">
+        <div className="flex-1 space-y-5 overflow-y-auto px-1">
           {/* Format toggle */}
           <div className="space-y-2">
             <Label className="text-muted-foreground text-xs font-medium">فرمت خروجی</Label>
@@ -202,19 +202,18 @@ export function ExportDialog({
                   تنظیم مجدد
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 {generatedParts.map((part) => (
                   <Button
                     key={part.name}
                     onClick={() => handleDownloadPart(part)}
-                    size={'lg'}
-                    className="group border-muted hover:border-primary/30 hover:bg-primary/5 flex cursor-pointer items-center gap-1.5 rounded-xl border-2 bg-white px-3 py-2 text-xs font-medium shadow-sm transition-all hover:shadow-md"
+                    className="group border-muted hover:border-primary/30 hover:bg-primary/5 flex w-full cursor-pointer items-center gap-1.5 rounded-xl border-2 bg-white px-3 py-2 text-xs font-medium shadow-sm transition-all hover:shadow-md"
                   >
-                    <Download className="text-primary h-3.5 w-3.5 transition-transform group-hover:translate-y-0.5" />
-                    <span className="text-muted-foreground group-hover:text-foreground">
+                    <Download className="text-primary h-3.5 w-3.5 shrink-0" />
+                    <span className="text-muted-foreground group-hover:text-foreground truncate">
                       {part.name}
                     </span>
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="secondary" className="shrink-0 text-[10px]">
                       {part.leads.length}
                     </Badge>
                   </Button>
@@ -223,7 +222,7 @@ export function ExportDialog({
             </div>
           ) : (
             <Button
-              className="shadow-primary/20 hover:shadow-primary/30 h-11 w-full rounded-xl text-sm font-semibold shadow-lg transition-all hover:shadow-xl"
+              className="shadow-primary/20 hover:shadow-primary/30 h-11 w-full shrink-0 rounded-xl text-sm font-semibold shadow-lg transition-all hover:shadow-xl"
               onClick={handleGenerate}
               disabled={columns.length === 0 || loading}
             >
