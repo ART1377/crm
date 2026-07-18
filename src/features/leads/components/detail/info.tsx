@@ -49,7 +49,7 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
           >
             <Contact className="h-4 w-4" />
           </Button>
-          <EditLeadDialog lead={lead}>
+          <EditLeadDialog lead={lead} key={`info-${lead.id}-${lead.status}-${lead.updatedAt}`}>
             <Button
               variant="ghost"
               size="icon"
