@@ -56,6 +56,7 @@ export interface LeadFilters {
   search?: string;
   industry?: string;
   source?: string;
+  ids?: string;
   dateFrom?: string;
   dateTo?: string;
 }

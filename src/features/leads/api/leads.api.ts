@@ -22,6 +22,7 @@ export const leadsService = {
     if (filters?.search) params.append('search', filters.search);
     if (filters?.industry) params.append('industry', filters.industry);
     if (filters?.source) params.append('source', filters.source);
+    if (filters?.ids) params.append('ids', filters.ids);
     if (filters?.page) params.append('page', String(filters.page));
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
