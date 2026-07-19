@@ -56,12 +56,12 @@ export function ExportDialog({
       const parts: { name: string; leads: Lead[] }[] = [];
 
       if (splitNumber <= 1 || allLeads.length <= leadsPerFile) {
-        parts.push({ name: `leads-${dateStr}`, leads: allLeads });
+        parts.push({ name: `${dateStr}-قسمت-1`, leads: allLeads });
       } else {
         for (let i = 0; i < splitNumber; i++) {
           const chunk = allLeads.slice(i * leadsPerFile, (i + 1) * leadsPerFile);
           if (!chunk.length) break;
-          parts.push({ name: `leads-part${i + 1}-${dateStr}`, leads: chunk });
+          parts.push({ name: `${dateStr}-قسمت-${i + 1}`, leads: chunk });
         }
       }
 

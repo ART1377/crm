@@ -13,14 +13,22 @@ export async function GET(request: NextRequest) {
     const industry = searchParams.get('industry');
     const source = searchParams.get('source');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '15');
-    const skip = (page - 1) * limit;
+    const ids = searchParams.get('ids');
+    let limit = parseInt(searchParams.get('limit') || '15');
+    let skip = (page - 1) * limit;
     const sortBy = (searchParams.get('sortBy') as string) || 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') as string) || 'desc';
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
 
     const where: Prisma.LeadWhereInput = {};
+
+    if (ids) {
+      const idList = ids.split(',').filter(Boolean);
+      where.id = { in: idList };
+      limit = idList.length;
+      skip = 0;
+    }
 
     if (status && status !== 'all') where.status = status;
     if (industry) where.industry = industry;

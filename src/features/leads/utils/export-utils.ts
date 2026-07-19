@@ -1,9 +1,10 @@
 // src/features/leads/utils/export-utils.ts
 
 import { formatDate } from '@/lib/utils';
-
 import { LEAD_STATUSES } from '../constants/leads-constants';
 import { Lead } from '../types/leads-types';
+
+const BASE_URL = 'https://crm-tan-nine.vercel.app';
 
 export const ALL_COLUMNS = [
   { key: 'businessName', label: 'نام کسب‌وکار' },
@@ -14,6 +15,8 @@ export const ALL_COLUMNS = [
   { key: 'source', label: 'منبع' },
   { key: 'status', label: 'وضعیت' },
   { key: 'createdAt', label: 'تاریخ ثبت' },
+  { key: 'individualLink', label: 'لینک فردی' },
+  { key: 'batchLink', label: 'لینک گروهی' },
 ] as const;
 
 export type ColumnKey = (typeof ALL_COLUMNS)[number]['key'];
@@ -51,14 +54,20 @@ function getCellValue(lead: Lead, key: ColumnKey): string {
       return LEAD_STATUSES.find((s) => s.value === lead.status)?.label || lead.status;
     case 'createdAt':
       return formatDate(new Date(lead.createdAt));
+    case 'individualLink':
+      return `${BASE_URL}/leads/${lead.id}`;
+    case 'batchLink':
+      return '';
     default:
       return '';
   }
 }
 
 export function exportToText(leads: Lead[], columns: ColumnKey[], fileName?: string) {
-  // Filter out businessName from columns since it's already in the header
-  const dataColumns = columns; // keep all, businessName is in the title line
+  const ids = leads.map((l) => l.id).join(',');
+  const batchLink = `${BASE_URL}/leads?ids=${ids}`;
+  const hasBatchLink = columns.includes('batchLink');
+  const dataColumns = columns.filter((c) => c !== 'batchLink');
 
   const lines = leads.map((lead, index) => {
     const items = dataColumns
@@ -72,7 +81,14 @@ export function exportToText(leads: Lead[], columns: ColumnKey[], fileName?: str
     return [`${index + 1}. 📋 ${lead.businessName}`, ...items, ''].join('\n');
   });
 
-  const content = `گزارش سرنخ‌ها - ${new Date().toLocaleDateString('fa-IR')}\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
+  const headerParts = [`گزارش سرنخ‌ها - ${new Date().toLocaleDateString('fa-IR')}`, '='.repeat(40)];
+
+  if (hasBatchLink) {
+    headerParts.push('', `🔗 لینک اختصاصی این فایل:`, batchLink, '', '='.repeat(40));
+  }
+
+  const content = [...headerParts, '', ...lines].join('\n');
+
   const blob = new Blob(['\uFEFF' + content], { type: 'text/plain;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -85,9 +101,12 @@ export function exportToText(leads: Lead[], columns: ColumnKey[], fileName?: str
 }
 
 export function exportToCsv(leads: Lead[], columns: ColumnKey[], fileName?: string) {
-  const headers = columns.map((key) => ALL_COLUMNS.find((c) => c.key === key)!.label);
+  const hasBatchLink = columns.includes('batchLink');
+  const dataColumns = columns.filter((c) => c !== 'batchLink');
+  const headers = dataColumns.map((key) => ALL_COLUMNS.find((c) => c.key === key)!.label);
+
   const rows = leads.map((lead) =>
-    columns.map((key) => {
+    dataColumns.map((key) => {
       const value = getCellValue(lead, key);
       if (key === 'phoneNumber' || key === 'secondaryPhone') {
         return value ? `=""${value}""` : '';
@@ -95,10 +114,22 @@ export function exportToCsv(leads: Lead[], columns: ColumnKey[], fileName?: stri
       return value;
     })
   );
-  const csvContent = [
+
+  let csvLines: string[] = [];
+
+  if (hasBatchLink) {
+    const ids = leads.map((l) => l.id).join(',');
+    const batchLink = `${BASE_URL}/leads?ids=${ids}`;
+    csvLines.push(`"🔗 لینک اختصاصی: ${batchLink}"`);
+  }
+
+  csvLines = [
     headers.map((h) => `"${h}"`).join(','),
+    ...csvLines,
     ...rows.map((row) => row.map((cell) => String(cell)).join(',')),
-  ].join('\n');
+  ];
+
+  const csvContent = csvLines.join('\n');
   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
