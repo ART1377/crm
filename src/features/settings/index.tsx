@@ -1,6 +1,6 @@
 'use client';
 
-import { List, MessageSquare, Settings2 } from 'lucide-react';
+import { GitMerge, List, MessageSquare, Settings2 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,12 +13,14 @@ import { ListOptionsManager } from './components/list-options-manager';
 import { MessengersTable } from './components/messengers-table';
 import { SettingsPageSkeleton } from './components/skeleton';
 import { useSettingsPage } from './hooks/use-settings-page';
+import { DeduplicateManager } from './components/deduplicate-manager';
 
 const TABS = [
   { value: 'general', label: 'فرستنده', icon: Settings2 },
   { value: 'messengers', label: 'پیام‌رسان‌ها', icon: MessageSquare },
   { value: 'sources', label: 'منابع', icon: List },
   { value: 'industries', label: 'حوزه‌ها', icon: List },
+  { value: 'deduplicate', label: 'تکراری‌ها', icon: GitMerge },
 ] as const;
 
 export function SettingsPage() {
@@ -45,7 +47,6 @@ export function SettingsPage() {
             </TabsTrigger>
           ))}
         </TabsList>
-
         <TabsContent value="general">
           <SenderInfoForm
             register={register}
@@ -53,22 +54,24 @@ export function SettingsPage() {
             isPending={isPending}
           />
         </TabsContent>
-
         <TabsContent value="messengers">
           <Card>
             <MessengersTable />
           </Card>
         </TabsContent>
-
         <TabsContent value="sources">
           <Card>
             <ListOptionsManager type="SOURCE" title="منابع سرنخ" />
           </Card>
         </TabsContent>
-
         <TabsContent value="industries">
           <Card>
             <ListOptionsManager type="INDUSTRY" title="حوزه‌های فعالیت" />
+          </Card>
+        </TabsContent>
+        <TabsContent value="deduplicate">
+          <Card>
+            <DeduplicateManager />
           </Card>
         </TabsContent>
       </Tabs>
