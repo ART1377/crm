@@ -1,6 +1,10 @@
+// src/features/templates/components/create-dialog.tsx
+
 'use client';
 
-import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,40 +15,60 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-import { useCreateTemplate } from '@/features/templates/hooks/use-templates';
+import { useCreateTemplate, useUpdateTemplate } from '@/features/templates/hooks/use-templates';
 
-import { MESSENGER_TYPES, TEMPLATE_PURPOSES } from '../constants/templates-constants';
-import { MessengerType } from '../types/templates-types';
+import { TemplateFormData, templateSchema } from '../schemas/templates-schemas';
+import { MessageTemplate } from '../types/templates-types';
 
 interface CreateTemplateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  template?: MessageTemplate;
 }
 
-export function CreateTemplateDialog({ open, onOpenChange, children }: CreateTemplateDialogProps) {
+export function CreateTemplateDialog({
+  open,
+  onOpenChange,
+  children,
+  template,
+}: CreateTemplateDialogProps) {
   const createTemplate = useCreateTemplate();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [purpose, setPurpose] = useState('CUSTOM');
-  const [type, setType] = useState<MessengerType>('WHATSAPP');
+  const updateTemplate = useUpdateTemplate();
+  const isEditing = !!template;
 
-  const handleCreate = async () => {
-    await createTemplate.mutateAsync({ title, content, type, purpose });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TemplateFormData>({
+    resolver: zodResolver(templateSchema),
+    defaultValues: {
+      title: template?.title || '',
+      content: template?.content || '',
+    },
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        title: template?.title || '',
+        content: template?.content || '',
+      });
+    }
+  }, [open, template, reset]);
+
+  const onSubmit = async (data: TemplateFormData) => {
+    if (isEditing) {
+      await updateTemplate.mutateAsync({ id: template!.id, data });
+    } else {
+      await createTemplate.mutateAsync(data);
+    }
     onOpenChange(false);
-    setTitle('');
-    setContent('');
-    setPurpose('CUSTOM');
-    setType('WHATSAPP');
   };
 
   return (
@@ -52,56 +76,37 @@ export function CreateTemplateDialog({ open, onOpenChange, children }: CreateTem
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>ایجاد قالب پیام جدید</DialogTitle>
+          <DialogTitle>{isEditing ? 'ویرایش قالب پیام' : 'ایجاد قالب پیام جدید'}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <Input
-            placeholder="عنوان قالب"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>عنوان قالب *</Label>
+            <Input placeholder="عنوان قالب" {...register('title')} />
+            {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
+          </div>
 
-          <Select value={purpose} onValueChange={setPurpose}>
-            <SelectTrigger>
-              <SelectValue placeholder="نوع قالب" />
-            </SelectTrigger>
-            <SelectContent>
-              {TEMPLATE_PURPOSES.map((p) => (
-                <SelectItem key={p.value} value={p.value}>
-                  {p.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label>متن پیام *</Label>
+            <Textarea placeholder="متن پیام" className="min-h-32" {...register('content')} />
+            {errors.content && <p className="text-destructive text-sm">{errors.content.message}</p>}
+            <p className="text-muted-foreground text-xs">
+              متغیرهای قابل استفاده: {'{senderName}'} {'{senderPhone}'} {'{senderCompany}'}{' '}
+              {'{companyName}'} {'{contactPerson}'}
+            </p>
+          </div>
 
-          <Textarea
-            placeholder="متن پیام"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-25"
-          />
-          <p className="text-muted-foreground -mt-2 text-xs">
-            متغیرهای قابل استفاده: {'{senderName}'} {'{senderPhone}'} {'{senderCompany}'}{' '}
-            {'{companyName}'} {'{contactPerson}'}
-          </p>
-
-          <Select value={type} onValueChange={(value) => setType(value as MessengerType)}>
-            <SelectTrigger>
-              <SelectValue placeholder="پلتفرم پیش‌فرض" />
-            </SelectTrigger>
-            <SelectContent>
-              {MESSENGER_TYPES.map((m) => (
-                <SelectItem key={m.value} value={m.value}>
-                  {m.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Button className="w-full" onClick={handleCreate} disabled={!title || !content}>
-            ذخیره قالب
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={createTemplate.isPending || updateTemplate.isPending}
+          >
+            {createTemplate.isPending || updateTemplate.isPending
+              ? 'در حال ذخیره...'
+              : isEditing
+                ? 'بروزرسانی قالب'
+                : 'ذخیره قالب'}
           </Button>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

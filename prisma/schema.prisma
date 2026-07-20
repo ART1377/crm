@@ -59,8 +59,6 @@ model MessageTemplate {
   id        String   @id @default(cuid())
   title     String
   content   String
-  type      String
-  purpose   String   @default("INITIAL")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -1,5 +1,6 @@
-import apiClient from '@/config/axios';
+// src/features/templates/api/templates.api.ts
 
+import apiClient from '@/config/axios';
 import { MessageTemplate } from '../types/templates-types';
 
 export const templatesService = {
@@ -7,7 +8,7 @@ export const templatesService = {
     return apiClient.get('/templates') as Promise<MessageTemplate[]>;
   },
 
-  async create(data: { title: string; content: string; type: string; purpose: string }) {
+  async create(data: { title: string; content: string }) {
     return apiClient.post('/templates', data) as Promise<MessageTemplate>;
   },
 

@@ -1,6 +1,7 @@
 // src/features/leads/components/import/services/balad.service.ts
 // اضافه کردن generator function برای streaming
 
+import { sanitizePhone } from '@/lib/sanitize';
 import type { BaladPlace } from '../types';
 
 const SEARCH_API = 'https://search.raah.ir/v4/submit/';
@@ -73,7 +74,7 @@ async function getPlace(token: string): Promise<BaladPlace | null> {
     website = '';
   for (const field of place.fields ?? []) {
     if (field.type === 'link' && field.value?.startsWith('tel://'))
-      phone = field.value.replace('tel://', '').replace(/[^0-9]/g, '');
+      phone = sanitizePhone(field.value.replace('tel://', ''));
     if (field.type === 'link' && field.value?.startsWith('http')) website = field.value;
     if (field.type === 'text' && !address) address = field.value ?? '';
   }
@@ -142,7 +143,7 @@ export async function* searchBaladStream(
           message: `جستجو: ${searchCount}/${totalSearches} - ${seenPhones.size} سرنخ`,
           current: searchCount,
           total: totalSearches,
-          point: { lat: point.lat, lng: point.lng }, 
+          point: { lat: point.lat, lng: point.lng },
         };
       }
     }

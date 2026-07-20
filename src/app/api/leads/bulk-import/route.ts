@@ -1,6 +1,7 @@
 // src/app/api/leads/bulk-import/route.ts
 
 import { prisma } from '@/lib/prisma';
+import { sanitizePhone, sanitizeText } from '@/lib/sanitize';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -8,7 +9,7 @@ export async function POST(req: NextRequest) {
     const { leads } = await req.json();
     if (!leads?.length) return NextResponse.json({ imported: 0, skipped: 0 });
 
-    const phones = leads.map((l: any) => l.phoneNumber).filter(Boolean);
+    const phones = leads.map((l: any) => sanitizePhone(l.phoneNumber)).filter(Boolean);
     const names = leads.map((l: any) => l.businessName).filter(Boolean);
 
     const existing = await prisma.lead.findMany({
@@ -21,27 +22,27 @@ export async function POST(req: NextRequest) {
     const seenPhones = new Set<string>();
     const data: any[] = [];
     let skipped = 0;
-    const sanitize = (str: string) => (str || '').replace(/\u200C/g, ' ').trim();
 
     for (const lead of leads) {
-      if (!lead.phoneNumber || !lead.businessName) {
+      const phone = sanitizePhone(lead.phoneNumber);
+      if (!phone || !lead.businessName) {
         skipped++;
         continue;
       }
-      if (existingPhones.has(lead.phoneNumber) || existingNames.has(lead.businessName)) {
+      if (existingPhones.has(phone) || existingNames.has(lead.businessName)) {
         skipped++;
         continue;
       }
-      if (seenPhones.has(lead.phoneNumber)) {
+      if (seenPhones.has(phone)) {
         skipped++;
         continue;
       }
-      seenPhones.add(lead.phoneNumber);
+      seenPhones.add(phone);
 
       data.push({
         businessName: lead.businessName,
-        phoneNumber: lead.phoneNumber,
-        industry: sanitize(lead.industry || lead.category || ''),
+        phoneNumber: phone,
+        industry: sanitizeText(lead.industry || lead.category || ''),
         source: lead.source || 'نامشخص',
         status: 'NEW',
         notes: [

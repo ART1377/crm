@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/prisma';
+import { sanitizePhone } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -39,8 +40,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (body.businessName !== undefined) updateData.businessName = body.businessName;
     if (body.contactPerson !== undefined) updateData.contactPerson = body.contactPerson;
-    if (body.phoneNumber !== undefined) updateData.phoneNumber = body.phoneNumber;
-    if (body.secondaryPhone !== undefined) updateData.secondaryPhone = body.secondaryPhone;
+    if (body.phoneNumber !== undefined) updateData.phoneNumber = sanitizePhone(body.phoneNumber);
+    if (body.secondaryPhone !== undefined)
+      updateData.secondaryPhone = body.secondaryPhone ? sanitizePhone(body.secondaryPhone) : null;
     if (body.industry !== undefined) updateData.industry = body.industry;
     if (body.source !== undefined) updateData.source = body.source;
     if (body.status !== undefined) updateData.status = body.status;

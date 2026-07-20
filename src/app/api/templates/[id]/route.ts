@@ -1,7 +1,7 @@
 // src/app/api/templates/[id]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,7 +18,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       data: {
         title: body.title,
         content: body.content,
-        type: body.type,
       },
     });
     return NextResponse.json(updated);

@@ -105,62 +105,85 @@ export function countOverdueTasks(tasks?: { isCompleted: boolean; dueDate: strin
   }).length;
 }
 
+
 export function generateVCard(
-  name: string,
+  businessName: string,
   phoneNumber: string,
   options?: {
+    contactPerson?: string | null;
+    secondaryPhone?: string | null;
     organization?: string;
-    secondaryPhone?: string;
-    address?: string;
-    notes?: string;
+    notes?: string | null;
   }
 ): string {
-  const lines: string[] = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `FN:${name}`,
-    `TEL;TYPE=CELL:${phoneNumber.replace(/[^0-9+]/g, '')}`,
-  ];
+  const lines: string[] = ['BEGIN:VCARD', 'VERSION:3.0'];
 
-  if (options?.secondaryPhone) {
-    lines.push(`TEL;TYPE=CELL:${options.secondaryPhone.replace(/[^0-9+]/g, '')}`);
+  // اسم: اگر شخص تماس هست → "شخص تماس_نام شرکت"، وگرنه فقط نام شرکت
+  if (options?.contactPerson) {
+    lines.push(`FN:${options.contactPerson}_${businessName}`);
+  } else {
+    lines.push(`FN:${businessName}`);
   }
 
+  // شماره اصلی - تشخیص موبایل یا ثابت
+  const primaryClean = phoneNumber.replace(/[^0-9]/g, '');
+  if (primaryClean.startsWith('09') && primaryClean.length >= 10) {
+    lines.push(`TEL;TYPE=CELL:${primaryClean}`); // موبایل
+  } else if (primaryClean.startsWith('09')) {
+    lines.push(`TEL;TYPE=CELL:${primaryClean}`);
+  } else {
+    lines.push(`TEL;TYPE=WORK:${primaryClean}`); // ثابت
+  }
+
+  // شماره دوم (اگه باشه)
+  if (options?.secondaryPhone) {
+    const secondaryClean = options.secondaryPhone.replace(/[^0-9]/g, '');
+    if (secondaryClean.startsWith('09') && secondaryClean.length >= 10) {
+      lines.push(`TEL;TYPE=CELL:${secondaryClean}`);
+    } else {
+      lines.push(`TEL;TYPE=WORK:${secondaryClean}`);
+    }
+  }
+
+  // سازمان
   if (options?.organization) {
     lines.push(`ORG:${options.organization}`);
   }
 
-  if (options?.address) {
-    lines.push(`ADR;TYPE=WORK:;;${options.address};;;`);
-  }
-
+  // یادداشت
   if (options?.notes) {
     lines.push(`NOTE:${options.notes}`);
   }
 
   lines.push('END:VCARD');
-
   return lines.join('\n');
 }
 
 export function downloadVCard(lead: {
   businessName: string;
   phoneNumber: string;
+  contactPerson?: string | null;
   secondaryPhone?: string | null;
   industry?: string;
   notes?: string | null;
 }) {
   const vCardData = generateVCard(lead.businessName, lead.phoneNumber, {
+    contactPerson: lead.contactPerson,
+    secondaryPhone: lead.secondaryPhone,
     organization: lead.industry || '',
-    secondaryPhone: lead.secondaryPhone || undefined,
     notes: lead.notes || undefined,
   });
+
+  // اسم فایل: اگه شخص تماس هست → "شخص تماس_نام شرکت"
+  const fileName = lead.contactPerson
+    ? `${lead.contactPerson}_${lead.businessName}`
+    : lead.businessName;
 
   const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${lead.businessName.replace(/\s+/g, '_')}.vcf`;
+  a.download = `${fileName.replace(/\s+/g, '_')}.vcf`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

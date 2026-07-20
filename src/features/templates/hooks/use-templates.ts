@@ -1,14 +1,11 @@
-// src/hooks/use-templates.ts
+// src/features/templates/hooks/use-templates.ts
+
 'use client';
 
-import toast from 'react-hot-toast';
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
 import { templatesService } from '@/features/templates/api/templates.api';
-
 import { TEMPLATES_QUERY_KEY } from '@/lib/query-keys';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { MessageTemplate } from '../types/templates-types';
 
 export function useTemplates() {
@@ -22,15 +19,12 @@ export function useCreateTemplate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { title: string; content: string; type: string; purpose: string }) =>
-      templatesService.create(data),
+    mutationFn: (data: { title: string; content: string }) => templatesService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TEMPLATES_QUERY_KEY] });
       toast.success('قالب پیام ایجاد شد');
     },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
+    onError: (error: Error) => toast.error(error.message),
   });
 }
 
@@ -44,9 +38,7 @@ export function useUpdateTemplate() {
       queryClient.invalidateQueries({ queryKey: [TEMPLATES_QUERY_KEY] });
       toast.success('قالب پیام بروزرسانی شد');
     },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
+    onError: (error: Error) => toast.error(error.message),
   });
 }
 
@@ -59,8 +51,6 @@ export function useDeleteTemplate() {
       queryClient.invalidateQueries({ queryKey: [TEMPLATES_QUERY_KEY] });
       toast.success('قالب پیام حذف شد');
     },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
+    onError: (error: Error) => toast.error(error.message),
   });
 }

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/prisma';
+import { sanitizePhone, sanitizeText } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
   try {
@@ -101,15 +102,14 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
-    const sanitize = (str: string) => (str || '').replace(/\u200C/g, ' ').trim();
-
+    
     const lead = await prisma.lead.create({
       data: {
         businessName: body.businessName,
         contactPerson: body.contactPerson || null,
-        phoneNumber: body.phoneNumber,
-        secondaryPhone: body.secondaryPhone || null,
-        industry: sanitize(body.industry),
+        phoneNumber: sanitizePhone(body.phoneNumber),
+        secondaryPhone: body.secondaryPhone ? sanitizePhone(body.secondaryPhone) : null,
+        industry: sanitizeText(body.industry),
         source: body.source || null,
         notes: body.notes || null,
         status: 'NEW',
