@@ -31,9 +31,33 @@ export async function GET(request: NextRequest) {
       skip = 0;
     }
 
-    if (status && status !== 'all') where.status = status;
-    if (industry) where.industry = industry;
-    if (source) where.source = source;
+    if (status && status !== 'all') {
+      const statusList = status.split(',').filter(Boolean);
+      if (statusList.length === 1) {
+        where.status = statusList[0];
+      } else {
+        where.status = { in: statusList };
+      }
+    }
+
+    if (industry) {
+      const industryList = industry.split(',').filter(Boolean);
+      if (industryList.length === 1) {
+        where.industry = industryList[0];
+      } else {
+        where.industry = { in: industryList };
+      }
+    }
+
+    if (source) {
+      const sourceList = source.split(',').filter(Boolean);
+      if (sourceList.length === 1) {
+        where.source = sourceList[0];
+      } else {
+        where.source = { in: sourceList };
+      }
+    }
+
     if (search) {
       where.OR = [
         { businessName: { contains: search } },
@@ -102,7 +126,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
-    
+
     const lead = await prisma.lead.create({
       data: {
         businessName: body.businessName,

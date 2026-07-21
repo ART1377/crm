@@ -2,7 +2,7 @@
 
 'use client';
 
-import { ArrowUpDown, Search, Tag, Trash2, X } from 'lucide-react';
+import { ArrowUpDown, Search, Trash2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,12 +15,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { ComboboxInput } from '@/components/shared/combobox-input';
+import { MultiSelect } from '@/components/shared/multi-select';
 import { PersianDatePicker } from '@/components/shared/persian-date-picker';
 
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
 import { LEAD_STATUSES } from '../../constants/leads-constants';
+
+const hasActiveFilters = (
+  filters: LeadsFiltersProps['filters'],
+  sortBy: string,
+  sortOrder: string
+) =>
+  filters.search ||
+  filters.status ||
+  filters.dateFrom ||
+  filters.dateTo ||
+  filters.industry ||
+  filters.source ||
+  sortBy !== 'createdAt' ||
+  sortOrder !== 'desc';
 
 interface LeadsFiltersProps {
   filters: {
@@ -42,22 +56,6 @@ interface LeadsFiltersProps {
   onClearFilters: () => void;
 }
 
-const STATUS_FILTERS = [{ value: '', label: 'همه' }, ...LEAD_STATUSES] as const;
-
-const hasActiveFilters = (
-  filters: LeadsFiltersProps['filters'],
-  sortBy: string,
-  sortOrder: string
-) =>
-  filters.search ||
-  filters.status ||
-  filters.dateFrom ||
-  filters.dateTo ||
-  filters.industry ||
-  filters.source ||
-  sortBy !== 'createdAt' ||
-  sortOrder !== 'desc';
-
 export function LeadsFilters({
   filters,
   sortBy,
@@ -69,8 +67,11 @@ export function LeadsFilters({
 }: LeadsFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
-  const industries = industryOptions.map((o) => o.value);
   const showClear = hasActiveFilters(filters, sortBy, sortOrder);
+
+  const selectedStatuses = filters.status ? filters.status.split(',').filter(Boolean) : [];
+  const selectedSources = filters.source ? filters.source.split(',').filter(Boolean) : [];
+  const selectedIndustries = filters.industry ? filters.industry.split(',').filter(Boolean) : [];
 
   return (
     <Card className="overflow-visible">
@@ -96,45 +97,33 @@ export function LeadsFilters({
                 </button>
               )}
             </div>
-            <Select value={filters.status} onValueChange={(v) => onFilterChange('status', v)}>
-              <SelectTrigger className="w-full sm:w-44">
-                <SelectValue placeholder="وضعیت" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_FILTERS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+            <MultiSelect
+              label="وضعیت"
+              options={LEAD_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+              selectedValues={selectedStatuses}
+              onChange={(v) => onFilterChange('status', v)}
+              className='sm:w-48'
+            />
           </div>
 
           {/* Row 2: Source + Industry */}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Select value={filters.source} onValueChange={(v) => onFilterChange('source', v)}>
-              <SelectTrigger className="w-full sm:flex-1">
-                <SelectValue placeholder="منبع" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">همه</SelectItem>
-                {sourceOptions.map((s) => (
-                  <SelectItem key={s.id} value={s.value}>
-                    {s.value}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="w-full sm:flex-1">
-              <ComboboxInput
-                value={filters.industry}
-                onChange={(value) => onFilterChange('industry', value)}
-                options={industries}
-                placeholder="صنعت"
-                className="cursor-pointer"
-                icon={<Tag className="h-4 w-4" />}
-              />
-            </div>
+            <MultiSelect
+              label="منبع"
+              options={sourceOptions.map((s) => ({ value: s.value, label: s.value }))}
+              selectedValues={selectedSources}
+              onChange={(v) => onFilterChange('source', v)}
+              className='flex-1'
+            />
+
+            <MultiSelect
+              label="صنعت"
+              options={industryOptions.map((s) => ({ value: s.value, label: s.value }))}
+              selectedValues={selectedIndustries}
+              onChange={(v) => onFilterChange('industry', v)}
+              className='flex-1'
+            />
           </div>
 
           {/* Row 3: Sort + Date */}
