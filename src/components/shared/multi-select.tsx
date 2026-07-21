@@ -1,10 +1,12 @@
+// src/components/shared/multi-select.tsx
 'use client';
 
-import { Tag, X } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Tag, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface MultiSelectProps {
@@ -14,6 +16,7 @@ interface MultiSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  searchable?: boolean;
 }
 
 export function MultiSelect({
@@ -23,8 +26,15 @@ export function MultiSelect({
   onChange,
   placeholder,
   className,
+  searchable = false,
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const filteredOptions = useMemo(() => {
+    if (!search) return options;
+    return options.filter((option) => option.label.toLowerCase().includes(search.toLowerCase()));
+  }, [options, search]);
 
   const toggleOption = (value: string) => {
     const next = selectedValues.includes(value)
@@ -36,6 +46,7 @@ export function MultiSelect({
   const clearAll = () => {
     onChange('');
     setOpen(false);
+    setSearch('');
   };
 
   const getSelectedLabel = () => {
@@ -81,6 +92,19 @@ export function MultiSelect({
       </PopoverTrigger>
       <PopoverContent className="w-fit min-w-44 p-2" align="start">
         <div className="space-y-2">
+          {/* Search input */}
+          {searchable && (
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 right-2 h-3 w-3 -translate-y-1/2" />
+              <Input
+                placeholder="جستجو..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-8 pr-7 text-sm"
+              />
+            </div>
+          )}
+
           {/* Header with Clear All button */}
           {selectedValues.length > 0 && (
             <div className="flex items-center justify-between border-b pb-2">
@@ -101,18 +125,28 @@ export function MultiSelect({
 
           {/* Options list */}
           <div className="max-h-48 space-y-1 overflow-y-auto">
-            {options.map((option) => (
-              <label
-                key={option.value}
-                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm"
-              >
-                <Checkbox
-                  checked={selectedValues.includes(option.value)}
-                  onCheckedChange={() => toggleOption(option.value)}
-                />
-                {option.label}
-              </label>
-            ))}
+            {filteredOptions.length === 0 ? (
+              <div className="text-muted-foreground py-2 text-center text-sm">موردی یافت نشد</div>
+            ) : (
+              filteredOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+                >
+                  <Checkbox
+                    checked={selectedValues.includes(option.value)}
+                    onCheckedChange={() => toggleOption(option.value)}
+                  />
+                  <span className="flex-1">{option.label}</span>
+                  {option.color && (
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: option.color }}
+                    />
+                  )}
+                </label>
+              ))
+            )}
           </div>
         </div>
       </PopoverContent>

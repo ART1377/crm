@@ -1,8 +1,7 @@
 // src/features/leads/components/table/filters.tsx
-
 'use client';
 
-import { ArrowUpDown, Search, Trash2, X } from 'lucide-react';
+import { ArrowUpDown, RotateCcw, Search, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -73,6 +72,10 @@ export function LeadsFilters({
   const selectedSources = filters.source ? filters.source.split(',').filter(Boolean) : [];
   const selectedIndustries = filters.industry ? filters.industry.split(',').filter(Boolean) : [];
 
+  const clearField = (field: keyof typeof filters) => {
+    onFilterChange(field, '');
+  };
+
   return (
     <Card className="overflow-visible">
       <CardContent className="p-4">
@@ -90,7 +93,7 @@ export function LeadsFilters({
               {filters.search && (
                 <button
                   type="button"
-                  onClick={() => onFilterChange('search', '')}
+                  onClick={() => clearField('search')}
                   className="text-muted-foreground hover:text-foreground absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer"
                 >
                   <X className="h-4 w-4" />
@@ -103,7 +106,8 @@ export function LeadsFilters({
               options={LEAD_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
               selectedValues={selectedStatuses}
               onChange={(v) => onFilterChange('status', v)}
-              className='sm:w-48'
+              className="sm:w-48"
+              searchable
             />
           </div>
 
@@ -114,7 +118,8 @@ export function LeadsFilters({
               options={sourceOptions.map((s) => ({ value: s.value, label: s.value }))}
               selectedValues={selectedSources}
               onChange={(v) => onFilterChange('source', v)}
-              className='flex-1'
+              className="flex-1"
+              searchable
             />
 
             <MultiSelect
@@ -122,7 +127,8 @@ export function LeadsFilters({
               options={industryOptions.map((s) => ({ value: s.value, label: s.value }))}
               selectedValues={selectedIndustries}
               onChange={(v) => onFilterChange('industry', v)}
-              className='flex-1'
+              className="flex-1"
+              searchable
             />
           </div>
 
@@ -153,19 +159,41 @@ export function LeadsFilters({
             </div>
 
             <div className="flex w-full items-center gap-1.5 sm:flex-1">
-              <PersianDatePicker
-                value={filters.dateFrom}
-                onChange={(date) => onFilterChange('dateFrom', date)}
-                placeholder="از تاریخ"
-                className="flex-1"
-              />
+              <div className="relative flex-1">
+                <PersianDatePicker
+                  value={filters.dateFrom}
+                  onChange={(date) => onFilterChange('dateFrom', date)}
+                  placeholder="از تاریخ"
+                  className="w-full"
+                />
+                {filters.dateFrom && (
+                  <button
+                    type="button"
+                    onClick={() => clearField('dateFrom')}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 left-1 -translate-y-1/2 cursor-pointer"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
               <span className="text-muted-foreground shrink-0 text-xs">تا</span>
-              <PersianDatePicker
-                value={filters.dateTo}
-                onChange={(date) => onFilterChange('dateTo', date)}
-                placeholder="تا تاریخ"
-                className="flex-1"
-              />
+              <div className="relative flex-1">
+                <PersianDatePicker
+                  value={filters.dateTo}
+                  onChange={(date) => onFilterChange('dateTo', date)}
+                  placeholder="تا تاریخ"
+                  className="w-full"
+                />
+                {filters.dateTo && (
+                  <button
+                    type="button"
+                    onClick={() => clearField('dateTo')}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 left-1 -translate-y-1/2 cursor-pointer"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -176,8 +204,8 @@ export function LeadsFilters({
               onClick={onClearFilters}
               className="w-full gap-1.5"
             >
-              <Trash2 className="h-4 w-4" />
-              حذف فیلترها
+              <RotateCcw className="h-4 w-4" />
+              بازنشانی همه فیلترها
             </Button>
           )}
         </div>
