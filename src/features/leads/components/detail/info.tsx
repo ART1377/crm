@@ -1,8 +1,12 @@
+// src/features/leads/components/detail/info.tsx
+
 import {
+  ArrowUpDown,
   Building2,
   Check,
   Contact,
   Copy,
+  Loader2,
   Pencil,
   Phone,
   PhoneCall,
@@ -15,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
+import { useUpdateLead } from '@/features/leads/hooks/use-leads';
 import { useCopyToClipboard } from '@/hooks/use-copy';
 
 import { downloadVCard } from '@/lib/utils';
@@ -25,6 +30,17 @@ import { EditLeadDialog } from '../table/edit-lead/dialog';
 export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void }) {
   const { copy, copied: primaryCopied } = useCopyToClipboard();
   const { copy: copySecondary, copied: secondaryCopied } = useCopyToClipboard();
+  const updateLead = useUpdateLead();
+
+  const handleSwapPhones = async () => {
+    await updateLead.mutateAsync({
+      id: lead.id,
+      data: {
+        phoneNumber: lead.secondaryPhone || '',
+        secondaryPhone: lead.phoneNumber,
+      },
+    });
+  };
 
   return (
     <Card className="border-muted/60 overflow-hidden border-2 shadow-sm">
@@ -71,7 +87,7 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
 
       <CardContent className="space-y-0 p-0">
         {/* Phone numbers - main section */}
-        <div className="divide-y">
+        <div>
           {/* Primary phone */}
           <div className="hover:bg-muted/20 flex items-center justify-between px-5 py-4 transition-colors">
             <div className="flex items-center gap-3">
@@ -110,6 +126,25 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
               </a>
             </div>
           </div>
+
+          {/* Swap button between numbers */}
+          {lead.secondaryPhone && (
+            <div className="bg-muted relative flex h-0.5 w-full items-center justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground relative z-10 size-8 gap-1 rounded-full bg-white px-3 text-[10px] shadow-sm"
+                onClick={handleSwapPhones}
+                disabled={updateLead.isPending}
+              >
+                {updateLead.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <ArrowUpDown className="h-3 w-3" />
+                )}
+              </Button>
+            </div>
+          )}
 
           {/* Secondary phone */}
           {lead.secondaryPhone && (
