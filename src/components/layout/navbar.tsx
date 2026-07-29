@@ -26,8 +26,8 @@ const navigation = [
   { name: 'سرنخ‌ها', href: '/leads', icon: Users, exact: true },
   { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare, exact: true },
   { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare, exact: true },
-  { name: 'تنظیمات', href: '/settings', icon: Settings, exact: true },
   { name: 'جستجوی Maps', href: '/leads/import', icon: MapPin, exact: false },
+  { name: 'تنظیمات', href: '/settings', icon: Settings, exact: true },
 ];
 
 export function Navbar() {

@@ -106,4 +106,12 @@ export const leadsService = {
       details: Array<{ name: string; status: string; reason?: string }>;
     }>;
   },
+
+  async bulkDelete(ids: string[]) {
+    return apiClient.delete('/leads/bulk-delete', { data: { ids } }) as Promise<{
+      success: boolean;
+      deletedCount: number;
+      message: string;
+    }>;
+  },
 };

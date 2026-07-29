@@ -119,3 +119,18 @@ export function useUpdateChannels() {
     },
   });
 }
+
+export function useBulkDeleteLeads() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ids: string[]) => leadsService.bulkDelete(ids),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      toast.success(data.message || 'سرنخ‌ها با موفقیت حذف شدند');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'خطا در حذف گروهی');
+    },
+  });
+}

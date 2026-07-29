@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { parseAsString, useQueryStates } from 'nuqs';
 
 import { leadsService } from '@/features/leads/api/leads.api';
-import { useDeleteLead, useLeads } from '@/features/leads/hooks/use-leads';
+import { useBulkDeleteLeads, useDeleteLead, useLeads } from '@/features/leads/hooks/use-leads';
 
 import { useDebounce } from '@/hooks/use-debounce';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
@@ -28,8 +28,12 @@ export function useLeadsPage() {
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const debouncedSearch = useDebounce(params.search, 300);
+
+  const deleteLead = useDeleteLead();
+  const bulkDeleteLeads = useBulkDeleteLeads();
 
   const queryFilters = useMemo(
     () => ({
@@ -60,9 +64,24 @@ export function useLeadsPage() {
     return result.leads;
   }, [queryFilters]);
 
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+    await bulkDeleteLeads.mutateAsync(selectedIds);
+    setSelectedIds([]);
+    setIsBulkDeleteDialogOpen(false);
+  }, [selectedIds, bulkDeleteLeads]);
+
+  const openBulkDeleteDialog = useCallback(() => {
+    if (selectedIds.length === 0) return;
+    setIsBulkDeleteDialogOpen(true);
+  }, [selectedIds]);
+
+  const closeBulkDeleteDialog = useCallback(() => {
+    setIsBulkDeleteDialogOpen(false);
+  }, []);
+
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useLeads(queryFilters);
-  const deleteLead = useDeleteLead();
 
   const leads = useMemo(() => data?.pages.flatMap((page) => page.leads) ?? [], [data?.pages]);
   const totalCount = data?.pages[0]?.total ?? 0;
@@ -150,5 +169,10 @@ export function useLeadsPage() {
     handleSelectAll,
     handleSelectOne,
     handleClearSelection,
+    isBulkDeleteDialogOpen,
+    isBulkDeleting: bulkDeleteLeads.isPending,
+    handleBulkDelete,
+    openBulkDeleteDialog,
+    closeBulkDeleteDialog,
   };
 }

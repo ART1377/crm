@@ -1,3 +1,5 @@
+// src/features/leads/components/table/index.tsx
+
 'use client';
 
 import { useCallback } from 'react';
@@ -16,6 +18,7 @@ import { useChangeLeadStatus } from '@/features/leads/hooks/use-leads';
 
 import { useLeadsPage } from '../../hooks/use-leads-page';
 import { BulkActionsBar } from './bulk-actions-bar';
+import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { DeleteLeadDialog } from './delete-dialog';
 import { LeadsEmptyState } from './empty';
 import { ExportDialog } from './export-dialog';
@@ -36,6 +39,8 @@ export function LeadsPage() {
     deleteIsPending,
     isFetchingNextPage,
     loaderRef,
+    isBulkDeleteDialogOpen,
+    isBulkDeleting,
     handleFilterChange,
     setSortBy,
     setSortOrder,
@@ -48,6 +53,9 @@ export function LeadsPage() {
     handleSelectOne,
     handleClearSelection,
     handleClearFilters,
+    handleBulkDelete,
+    openBulkDeleteDialog,
+    closeBulkDeleteDialog,
   } = useLeadsPage();
 
   const changeStatus = useChangeLeadStatus();
@@ -112,7 +120,9 @@ export function LeadsPage() {
                 <BulkActionsBar
                   selectedCount={selectedIds.length}
                   onBulkStatusChange={handleBulkStatusChange}
+                  onBulkDelete={openBulkDeleteDialog}
                   onClearSelection={handleClearSelection}
+                  isDeleting={isBulkDeleting}
                 />
               )}
               <LeadsTable
@@ -133,11 +143,21 @@ export function LeadsPage() {
         </CardContent>
       </Card>
 
+      {/* دیالوگ حذف تکی */}
       <DeleteLeadDialog
         open={Boolean(deleteId)}
         onClose={closeDeleteDialog}
         onConfirm={handleDelete}
         isPending={deleteIsPending}
+      />
+
+      {/* دیالوگ حذف گروهی */}
+      <BulkDeleteDialog
+        open={isBulkDeleteDialogOpen}
+        onClose={closeBulkDeleteDialog}
+        onConfirm={handleBulkDelete}
+        isPending={isBulkDeleting}
+        count={selectedIds.length}
       />
     </PageWrapper>
   );
