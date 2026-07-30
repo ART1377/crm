@@ -1,5 +1,4 @@
 // src/features/leads/components/import/services/balad.service.ts
-// اضافه کردن generator function برای streaming
 
 import { sanitizePhone } from '@/lib/sanitize';
 import type { BaladPlace } from '../types';
@@ -30,12 +29,17 @@ function polygonFromCenter(lat: number, lng: number, radiusKm: number): string {
   return `${nw}|${ne}|${se}|${sw}|${nw}`;
 }
 
-export function generateGridPoints(centerLat: number, centerLng: number, radiusKm: number) {
+export function generateGridPoints(
+  centerLat: number,
+  centerLng: number,
+  radiusKm: number,
+  stepKm: number = 0.2
+): Array<{ lat: number; lng: number }> {
   const points: Array<{ lat: number; lng: number }> = [];
-  const stepKm = 0.5;
   const latStep = stepKm / 111.32;
   const lngStep = stepKm / (111.32 * Math.cos((centerLat * Math.PI) / 180));
   const gridSize = Math.ceil(radiusKm / stepKm) + 1;
+
   for (let i = -gridSize; i <= gridSize; i++) {
     for (let j = -gridSize; j <= gridSize; j++) {
       const pointLat = centerLat + latStep * i;
@@ -96,7 +100,8 @@ export async function* searchBaladStream(
   keyword: string,
   lat: number,
   lng: number,
-  radiusKm: number
+  radiusKm: number,
+  stepKm: number = 0.2
 ): AsyncGenerator<
   | {
       type: 'progress';
@@ -112,7 +117,7 @@ export async function* searchBaladStream(
     .split(',')
     .map((k) => k.trim())
     .filter(Boolean);
-  const gridPoints = generateGridPoints(lat, lng, radiusKm);
+  const gridPoints = generateGridPoints(lat, lng, radiusKm, stepKm);
   const totalSearches = keywords.length * gridPoints.length;
 
   yield { type: 'progress', message: 'در حال جستجو...', current: 0, total: totalSearches };

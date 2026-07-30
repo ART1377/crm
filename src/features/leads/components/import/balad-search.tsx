@@ -23,6 +23,8 @@ export function BaladSearch() {
   const [latitude, setLatitude] = useState('35.6607');
   const [longitude, setLongitude] = useState('51.3156');
   const [radius, setRadius] = useState('2');
+  const [zoom, setZoom] = useState('19');
+  const [step, setStep] = useState('0.2');
   const [loading, setLoading] = useState(false);
   const [paused, setPaused] = useState(false);
   const [places, setPlaces] = useState<BaladPlace[]>([]);
@@ -49,16 +51,18 @@ export function BaladSearch() {
     }
   }, [industries, keyword]);
 
+  // Re-generate grid points when radius or step changes
   useEffect(() => {
     try {
       const points = generateGridPoints(
         parseFloat(latitude),
         parseFloat(longitude),
-        parseFloat(radius)
+        parseFloat(radius),
+        parseFloat(step)
       );
       setGridPoints(points.map((p) => ({ ...p, searched: false })));
     } catch {}
-  }, [latitude, longitude, radius]);
+  }, [latitude, longitude, radius, step]);
 
   async function handleSearch() {
     setLoading(true);
@@ -68,11 +72,13 @@ export function BaladSearch() {
     setSelected(new Set());
     setProgress('در حال شروع...');
     setProgressPercent(0);
+
     try {
       const points = generateGridPoints(
         parseFloat(latitude),
         parseFloat(longitude),
-        parseFloat(radius)
+        parseFloat(radius),
+        parseFloat(step)
       );
       setGridPoints(points.map((p) => ({ ...p, searched: false })));
     } catch {}
@@ -81,7 +87,14 @@ export function BaladSearch() {
     abortControllerRef.current = controller;
 
     try {
-      const params = new URLSearchParams({ keyword, lat: latitude, lng: longitude, radius });
+      const params = new URLSearchParams({
+        keyword,
+        lat: latitude,
+        lng: longitude,
+        radius,
+        step,
+      });
+
       const res = await fetch(`/api/leads/search-balad?${params}`, { signal: controller.signal });
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -211,10 +224,14 @@ export function BaladSearch() {
             latitude={latitude}
             longitude={longitude}
             radius={radius}
+            zoom={zoom}
+            step={step}
             onKeywordChange={setKeyword}
             onLatitudeChange={setLatitude}
             onLongitudeChange={setLongitude}
             onRadiusChange={setRadius}
+            onZoomChange={setZoom}
+            onStepChange={setStep}
           />
 
           {loading && (
@@ -283,16 +300,15 @@ export function BaladSearch() {
       {/* Main content area with map */}
       {showMap && loading && gridPoints.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Mobile: Map first, Desktop: Map right (order-2 lg:order-2) */}
           <div className="order-1 h-80 lg:sticky lg:top-4 lg:order-2 lg:h-[calc(100vh-12rem)]">
             <SearchMap
               center={{ lat: parseFloat(latitude), lng: parseFloat(longitude) }}
               gridPoints={gridPoints}
               currentPoint={currentPoint}
+              zoom={parseInt(zoom)}
             />
           </div>
 
-          {/* Mobile: Results second, Desktop: Results left (order-2 lg:order-1) */}
           <div className="order-2 lg:order-1">
             {places.length === 0 ? (
               <Card className="h-full">
@@ -341,7 +357,6 @@ export function BaladSearch() {
         </div>
       ) : (
         <>
-          {/* No map: just show results or loading */}
           {loading && places.length === 0 && (
             <Card>
               <CardContent className="py-8">

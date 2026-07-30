@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const lat = parseFloat(req.nextUrl.searchParams.get('lat') || '35.6607');
   const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3156');
   const radiusKm = parseFloat(req.nextUrl.searchParams.get('radius') || '2');
+  const stepKm = parseFloat(req.nextUrl.searchParams.get('step') || '0.2');
 
   const encoder = new TextEncoder();
   let aborted = false;
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const event of searchBaladStream(keyword, lat, lng, radiusKm)) {
+        for await (const event of searchBaladStream(keyword, lat, lng, radiusKm, stepKm)) {
           if (aborted) break;
 
           if (event.type === 'place') {
@@ -36,8 +37,14 @@ export async function GET(req: NextRequest) {
           controller.enqueue(encoder.encode(JSON.stringify(event) + '\n'));
         }
       } catch (error) {
+        console.error('Stream error:', error);
         controller.enqueue(
-          encoder.encode(JSON.stringify({ type: 'error', message: 'خطا در جستجو' }) + '\n')
+          encoder.encode(
+            JSON.stringify({
+              type: 'error',
+              message: 'خطا در جستجو',
+            }) + '\n'
+          )
         );
       }
       controller.close();

@@ -1,3 +1,5 @@
+// src/features/leads/components/import/search-config.tsx
+
 'use client';
 
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +15,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
-import { Layers, MapPin, Plus, Search, Tag, X } from 'lucide-react';
+import { Layers, MapPin, Plus, Search, StepForward, Tag, Target, X, ZoomIn } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
 import { generateSearchKeywords } from './keywords/generator';
+import { PresetConfig } from './preset-config';
 
 const MapPicker = dynamic(() => import('./map-picker').then((m) => m.MapPicker), { ssr: false });
 
@@ -25,10 +28,14 @@ interface Props {
   latitude: string;
   longitude: string;
   radius: string;
+  zoom?: string;
+  step?: string;
   onKeywordChange: (v: string) => void;
   onLatitudeChange: (v: string) => void;
   onLongitudeChange: (v: string) => void;
   onRadiusChange: (v: string) => void;
+  onZoomChange?: (v: string) => void;
+  onStepChange?: (v: string) => void;
 }
 
 export function SearchConfig({
@@ -36,10 +43,14 @@ export function SearchConfig({
   latitude,
   longitude,
   radius,
+  zoom = '19',
+  step = '0.2',
   onKeywordChange,
   onLatitudeChange,
   onLongitudeChange,
   onRadiusChange,
+  onZoomChange,
+  onStepChange,
 }: Props) {
   const { data: industries = [] } = useListOptions('INDUSTRY');
   const [newKeyword, setNewKeyword] = useState('');
@@ -49,13 +60,11 @@ export function SearchConfig({
     .map((k) => k.trim())
     .filter(Boolean);
 
-  // Default keywords for current industry (always available to add)
   const defaultKeywords = useMemo(() => {
     const first = keywords[0] ?? '';
     return generateSearchKeywords({ keyword: first });
   }, [keywords[0]]);
 
-  // Default keywords that are NOT currently selected
   const availableDefaults = defaultKeywords.filter((k) => !keywords.includes(k));
 
   const selectedIndustry = industries.find((item) => {
@@ -84,8 +93,41 @@ export function SearchConfig({
     onKeywordChange([...keywords, kw].join(', '));
   }
 
+  // محاسبه تعداد نقاط جستجو
+  const calculateGridPoints = () => {
+    const radiusNum = parseFloat(radius);
+    const stepNum = parseFloat(step);
+    if (!radiusNum || !stepNum) return 0;
+    const gridSize = Math.ceil(radiusNum / stepNum) + 1;
+    return Math.pow(gridSize * 2 - 1, 2);
+  };
+
+  const totalPoints = calculateGridPoints();
+
   return (
     <div className="space-y-5">
+      {/* Preset Config */}
+      {onZoomChange && onStepChange && (
+        <div className="space-y-2">
+          <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-50">
+              <Target className="h-3.5 w-3.5 text-gray-600" />
+            </div>
+            تنظیمات سریع
+          </Label>
+          <PresetConfig
+            onApply={({ radius: r, step: s, zoom: z }) => {
+              onRadiusChange(r);
+              onStepChange?.(s);
+              onZoomChange?.(z);
+            }}
+            currentRadius={radius}
+            currentStep={step}
+            currentZoom={zoom}
+          />
+        </div>
+      )}
+
       {/* Industry Select */}
       <div className="space-y-2">
         <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
@@ -122,13 +164,12 @@ export function SearchConfig({
           </span>
         </Label>
 
-        {/* Active keywords */}
         <div className="flex flex-wrap gap-1.5">
           {keywords.map((kw, i) => (
             <Badge
               key={`${kw}-${i}`}
               variant="outline"
-              className="gap-1.5 py-1.5 pr-1.5 pl-3 text-xs font-normal bg-primary/10 text-primary transition-all"
+              className="bg-primary/10 text-primary gap-1.5 py-1.5 pr-1.5 pl-3 text-xs font-normal transition-all"
             >
               {kw}
               <button
@@ -141,7 +182,6 @@ export function SearchConfig({
           ))}
         </div>
 
-        {/* Available defaults */}
         {availableDefaults.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-muted-foreground text-[10px]">کلیدواژه‌های پیشنهادی:</p>
@@ -161,7 +201,6 @@ export function SearchConfig({
           </div>
         )}
 
-        {/* Add custom */}
         <div className="flex gap-2">
           <Input
             value={newKeyword}
@@ -182,28 +221,64 @@ export function SearchConfig({
         </div>
       </div>
 
-      {/* Radius & Coordinates */}
+      {/* Radius & Step & Coordinates & Zoom */}
       <div className="border-muted bg-muted/10 rounded-xl border-2 p-4">
         <div className="grid gap-4 sm:grid-cols-2">
+          {/* Radius */}
           <div className="space-y-2">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-green-50">
                 <Layers className="h-3.5 w-3.5 text-green-600" />
               </div>
-              شعاع جستجو
+              شعاع جستجو (کیلومتر)
             </Label>
             <Select value={radius} onValueChange={onRadiusChange}>
               <SelectTrigger className="border-muted h-11! w-full rounded-xl border-2 bg-white text-sm transition-all focus:border-green-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="0.5">۵۰۰ متر</SelectItem>
                 <SelectItem value="1">۱ کیلومتر</SelectItem>
+                <SelectItem value="1.5">۱.۵ کیلومتر</SelectItem>
                 <SelectItem value="2">۲ کیلومتر</SelectItem>
+                <SelectItem value="3">۳ کیلومتر</SelectItem>
                 <SelectItem value="5">۵ کیلومتر</SelectItem>
                 <SelectItem value="10">۱۰ کیلومتر</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Step */}
+          {onStepChange && (
+            <div className="space-y-2">
+              <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50">
+                  <StepForward className="h-3.5 w-3.5 text-indigo-600" />
+                </div>
+                گام جستجو (کیلومتر)
+              </Label>
+              <Select value={step} onValueChange={onStepChange}>
+                <SelectTrigger className="border-muted h-11! w-full rounded-xl border-2 bg-white text-sm transition-all focus:border-indigo-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0.1">۱۰۰ متر (بیشترین دقت)</SelectItem>
+                  <SelectItem value="0.15">۱۵۰ متر (دقت بالا)</SelectItem>
+                  <SelectItem value="0.2">۲۰۰ متر (پیشنهادی)</SelectItem>
+                  <SelectItem value="0.25">۲۵۰ متر</SelectItem>
+                  <SelectItem value="0.3">۳۰۰ متر</SelectItem>
+                  <SelectItem value="0.4">۴۰۰ متر</SelectItem>
+                  <SelectItem value="0.5">۵۰۰ متر</SelectItem>
+                  <SelectItem value="0.7">۷۰۰ متر</SelectItem>
+                  <SelectItem value="1">۱ کیلومتر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {/* Coordinates */}
           <div className="space-y-2">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-red-50">
@@ -228,6 +303,45 @@ export function SearchConfig({
               />
             </div>
           </div>
+
+          {/* Zoom */}
+          {onZoomChange && (
+            <div className="space-y-2">
+              <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-purple-50">
+                  <ZoomIn className="h-3.5 w-3.5 text-purple-600" />
+                </div>
+                زوم نقشه
+              </Label>
+              <Select value={zoom} onValueChange={onZoomChange}>
+                <SelectTrigger className="border-muted h-11! w-full rounded-xl border-2 bg-white text-sm transition-all focus:border-purple-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">۱۰ (شهر)</SelectItem>
+                  <SelectItem value="12">۱۲ (منطقه)</SelectItem>
+                  <SelectItem value="14">۱۴ (محله)</SelectItem>
+                  <SelectItem value="16">۱۶ (خیابان)</SelectItem>
+                  <SelectItem value="17">۱۷ (نزدیک)</SelectItem>
+                  <SelectItem value="18">۱۸ (خیلی نزدیک)</SelectItem>
+                  <SelectItem value="19">۱۹ (بسیار دقیق) - پیش‌فرض</SelectItem>
+                  <SelectItem value="20">۲۰ (فوق دقیق)</SelectItem>
+                  <SelectItem value="21">۲۱ (حداکثر جزئیات)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+
+        {/* Info: Total grid points */}
+        <div className="mt-4 flex items-center justify-between rounded-lg bg-white/50 px-4 py-2 text-xs">
+          <span className="text-muted-foreground">تعداد نقاط جستجو:</span>
+          <Badge variant="secondary" className="font-mono">
+            ~{totalPoints} نقطه
+          </Badge>
+          <span className="text-muted-foreground">
+            (شعاع {radius} کیلومتر × گام {step} کیلومتر)
+          </span>
         </div>
       </div>
 
