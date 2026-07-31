@@ -1,3 +1,5 @@
+// src/features/leads/schemas/leads-schemas.ts
+
 import { z } from 'zod';
 
 export const leadSchema = z.object({
@@ -11,7 +13,7 @@ export const leadSchema = z.object({
   notes: z.string().optional(),
   address: z.string().optional(),
   website: z.string().optional(),
-  rating: z.number().min(0).max(5).optional().nullable(),
+  rating: z.number().min(0).max(5).optional(), // حذف .nullable()
   category: z.string().optional(),
 });
 

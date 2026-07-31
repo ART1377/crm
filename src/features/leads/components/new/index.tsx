@@ -30,6 +30,10 @@ export function NewLeadPage() {
       industry: '',
       source: '',
       notes: '',
+      address: '',
+      website: '',
+      rating: undefined, // اضافه شد
+      category: '',
     },
   });
 

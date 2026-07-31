@@ -32,10 +32,10 @@ export interface Lead {
   status: LeadStatus;
   source: LeadSource;
   notes?: string | null;
-  address?: string | null; 
-  website?: string | null; 
-  rating?: number | null; 
-  category?: string | null; 
+  address?: string | null;
+  website?: string | null;
+  rating?: number | null;
+  category?: string | null;
   activities?: Activity[];
   tasks?: Task[];
   _count?: { activities: number; tasks: number };
@@ -52,10 +52,10 @@ export interface CreateLeadData {
   industry: string;
   source?: string;
   notes?: string;
-  address?: string; 
-  website?: string; 
-  rating?: number; 
-  category?: string; 
+  address?: string;
+  website?: string;
+  rating?: number;
+  category?: string;
 }
 
 export interface UpdateLeadData extends Partial<CreateLeadData> {
