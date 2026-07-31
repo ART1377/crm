@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { Loader2, MapPin, Pause, Play, Search, Square } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ImportToolbar } from './import-toolbar';
 import { generateSearchKeywords } from './keywords/generator';
@@ -34,6 +34,8 @@ export function BaladSearch() {
   const [progress, setProgress] = useState('');
   const [progressPercent, setProgressPercent] = useState(0);
   const [showMap, setShowMap] = useState(false);
+  const [showDuplicates, setShowDuplicates] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [gridPoints, setGridPoints] = useState<
     Array<{ lat: number; lng: number; searched: boolean }>
   >([]);
@@ -43,6 +45,28 @@ export function BaladSearch() {
   const pauseRef = useRef(false);
   const resumeRef = useRef<() => void>(() => {});
 
+  // فیلتر کردن نتایج
+  const filteredPlaces = useMemo(() => {
+    let result = places;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.trim().toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.businessName.toLowerCase().includes(query) ||
+          p.phoneNumber.includes(query) ||
+          p.address?.toLowerCase().includes(query) ||
+          p.category?.toLowerCase().includes(query)
+      );
+    }
+
+    if (!showDuplicates) {
+      result = result.filter((p) => !p.isExisting);
+    }
+
+    return result;
+  }, [places, searchQuery, showDuplicates]);
+
   useEffect(() => {
     if (!keyword && industries.length > 0) {
       const first = industries[0].value.replace(/\u200C/g, ' ').trim();
@@ -51,7 +75,6 @@ export function BaladSearch() {
     }
   }, [industries, keyword]);
 
-  // Re-generate grid points when radius or step changes
   useEffect(() => {
     try {
       const points = generateGridPoints(
@@ -182,7 +205,7 @@ export function BaladSearch() {
     });
   }
   function toggleAll() {
-    const av = places.filter((p) => !p.isExisting);
+    const av = filteredPlaces.filter((p) => !p.isExisting);
     setSelected(selected.size === av.length ? new Set() : new Set(av.map((p) => p.id)));
   }
 
@@ -324,31 +347,41 @@ export function BaladSearch() {
               <Card>
                 <CardHeader>
                   <ImportToolbar
-                    places={places}
+                    places={filteredPlaces}
                     selected={selected}
                     importing={importing}
                     onToggleAll={toggleAll}
                     onImport={handleImport}
                     onImportOne={handleImportOne}
+                    onSearchChange={setSearchQuery}
+                    onToggleDuplicates={setShowDuplicates}
+                    showDuplicates={showDuplicates}
+                    searchQuery={searchQuery}
                   />
                 </CardHeader>
                 <CardContent>
                   <div className="max-h-140 space-y-2 overflow-y-auto">
-                    {places.map((place, index) => (
-                      <ResultCard
-                        key={place.id}
-                        place={place}
-                        checked={selected.has(place.id)}
-                        index={index}
-                        total={places.length}
-                        importing={importingOne === place.id}
-                        onCheckedChange={() => toggle(place.id)}
-                        onSave={(id, updated) =>
-                          setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
-                        }
-                        onImportOne={handleImportOne}
-                      />
-                    ))}
+                    {filteredPlaces.length === 0 ? (
+                      <div className="text-muted-foreground py-8 text-center text-sm">
+                        {searchQuery ? 'نتیجه‌ای با این عبارت پیدا نشد' : 'هیچ نتیجه‌ای وجود ندارد'}
+                      </div>
+                    ) : (
+                      filteredPlaces.map((place, index) => (
+                        <ResultCard
+                          key={place.id}
+                          place={place}
+                          checked={selected.has(place.id)}
+                          index={index}
+                          total={filteredPlaces.length}
+                          importing={importingOne === place.id}
+                          onCheckedChange={() => toggle(place.id)}
+                          onSave={(id, updated) =>
+                            setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
+                          }
+                          onImportOne={handleImportOne}
+                        />
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -373,31 +406,41 @@ export function BaladSearch() {
             <Card>
               <CardHeader>
                 <ImportToolbar
-                  places={places}
+                  places={filteredPlaces}
                   selected={selected}
                   importing={importing}
                   onToggleAll={toggleAll}
                   onImport={handleImport}
                   onImportOne={handleImportOne}
+                  onSearchChange={setSearchQuery}
+                  onToggleDuplicates={setShowDuplicates}
+                  showDuplicates={showDuplicates}
+                  searchQuery={searchQuery}
                 />
               </CardHeader>
               <CardContent>
                 <div className="max-h-120 space-y-2 overflow-y-auto">
-                  {places.map((place, index) => (
-                    <ResultCard
-                      key={place.id}
-                      place={place}
-                      checked={selected.has(place.id)}
-                      index={index}
-                      total={places.length}
-                      importing={importingOne === place.id}
-                      onCheckedChange={() => toggle(place.id)}
-                      onSave={(id, updated) =>
-                        setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
-                      }
-                      onImportOne={handleImportOne}
-                    />
-                  ))}
+                  {filteredPlaces.length === 0 ? (
+                    <div className="text-muted-foreground py-8 text-center text-sm">
+                      {searchQuery ? 'نتیجه‌ای با این عبارت پیدا نشد' : 'هیچ نتیجه‌ای وجود ندارد'}
+                    </div>
+                  ) : (
+                    filteredPlaces.map((place, index) => (
+                      <ResultCard
+                        key={place.id}
+                        place={place}
+                        checked={selected.has(place.id)}
+                        index={index}
+                        total={filteredPlaces.length}
+                        importing={importingOne === place.id}
+                        onCheckedChange={() => toggle(place.id)}
+                        onSave={(id, updated) =>
+                          setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
+                        }
+                        onImportOne={handleImportOne}
+                      />
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

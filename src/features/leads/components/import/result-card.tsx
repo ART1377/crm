@@ -68,8 +68,11 @@ export function ResultCard({
                 {place.businessName}
               </h4>
               {place.isExisting && (
-                <Badge variant="secondary" className="text-[10px]">
-                  ثبت شده
+                <Badge
+                  variant="secondary"
+                  className="border-amber-200 bg-amber-100 text-[10px] text-amber-800"
+                >
+                  ⚠️ تکراری
                 </Badge>
               )}
               <Button
@@ -131,7 +134,7 @@ export function ResultCard({
           </div>
         </div>
 
-        {/* Address - with copy button */}
+        {/* Address */}
         {place.address && (
           <div className="mt-2 flex items-start gap-1.5">
             <MapPin className="text-muted-foreground mt-0.5 h-3 w-3 shrink-0" />
