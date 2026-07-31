@@ -1,3 +1,5 @@
+// src/features/leads/components/import/neshan-search.tsx
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -18,6 +20,8 @@ export function NeshanSearch() {
   const [latitude, setLatitude] = useState('35.6607');
   const [longitude, setLongitude] = useState('51.3156');
   const [radius, setRadius] = useState('2');
+  const [zoom, setZoom] = useState('19');
+  const [step, setStep] = useState('0.2');
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<BaladPlace[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -35,7 +39,12 @@ export function NeshanSearch() {
   async function handleSearch() {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ keyword, lat: latitude, lng: longitude, radius });
+      const params = new URLSearchParams({
+        keyword,
+        lat: latitude,
+        lng: longitude,
+        radius,
+      });
       const res = await fetch(`/api/leads/search-neshan?${params}`);
       const data = await res.json();
       setPlaces(data.places ?? []);
@@ -99,10 +108,14 @@ export function NeshanSearch() {
             latitude={latitude}
             longitude={longitude}
             radius={radius}
+            zoom={zoom}
+            step={step}
             onKeywordChange={setKeyword}
             onLatitudeChange={setLatitude}
             onLongitudeChange={setLongitude}
             onRadiusChange={setRadius}
+            onZoomChange={setZoom}
+            onStepChange={setStep}
           />
           <Button className="w-full gap-2" onClick={handleSearch} disabled={loading}>
             {loading ? (

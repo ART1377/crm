@@ -105,7 +105,6 @@ export function countOverdueTasks(tasks?: { isCompleted: boolean; dueDate: strin
   }).length;
 }
 
-
 export function generateVCard(
   businessName: string,
   phoneNumber: string,
@@ -188,4 +187,22 @@ export function downloadVCard(lead: {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// src/lib/utils.ts (اضافه کردن تابع)
+
+export function getDisplayUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    // حذف www و نمایش فقط دامنه اصلی
+    let hostname = parsed.hostname.replace(/^www\./, '');
+    // اگر طول زیاد بود، کوتاه کن
+    if (hostname.length > 30) {
+      return hostname.slice(0, 30) + '...';
+    }
+    return hostname;
+  } catch {
+    // اگر URL معتبر نبود، خودش رو برگردون
+    return url.length > 30 ? url.slice(0, 30) + '...' : url;
+  }
 }

@@ -9,6 +9,10 @@ export const leadSchema = z.object({
   source: z.string().default('DIRECT'),
   status: z.string().default('NEW'),
   notes: z.string().optional(),
+  address: z.string().optional(),
+  website: z.string().optional(),
+  rating: z.number().min(0).max(5).optional().nullable(),
+  category: z.string().optional(),
 });
 
 export const activitySchema = z.object({

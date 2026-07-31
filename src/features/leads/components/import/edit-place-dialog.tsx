@@ -1,3 +1,5 @@
+// src/features/leads/components/import/edit-place-dialog.tsx
+
 'use client';
 
 import { Pencil } from 'lucide-react';
@@ -30,6 +32,9 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
     businessName: place.businessName || '',
     phoneNumber: place.phoneNumber || '',
     address: place.address || '',
+    website: place.website || '',
+    category: place.category || '',
+    rating: place.rating?.toString() || '',
   });
 
   useEffect(() => {
@@ -37,6 +42,9 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
       businessName: place.businessName || '',
       phoneNumber: place.phoneNumber || '',
       address: place.address || '',
+      website: place.website || '',
+      category: place.category || '',
+      rating: place.rating?.toString() || '',
     });
   }, [place]);
 
@@ -46,6 +54,9 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
       businessName: form.businessName,
       phoneNumber: form.phoneNumber,
       address: form.address,
+      website: form.website,
+      category: form.category,
+      rating: form.rating ? parseFloat(form.rating) : undefined,
     });
     setOpen(false);
   }
@@ -62,21 +73,21 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>ویرایش اطلاعات</DialogTitle>
           <DialogDescription>می‌توانید اطلاعات را قبل از وارد کردن ویرایش کنید</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>نام کسب‌وکار</Label>
+            <Label>نام کسب‌وکار *</Label>
             <Input
               value={form.businessName}
               onChange={(e) => setForm((prev) => ({ ...prev, businessName: e.target.value }))}
             />
           </div>
           <div className="space-y-2">
-            <Label>شماره تماس</Label>
+            <Label>شماره تماس *</Label>
             <Input
               value={form.phoneNumber}
               onChange={(e) => setForm((prev) => ({ ...prev, phoneNumber: e.target.value }))}
@@ -89,6 +100,37 @@ export function EditPlaceDialog({ place, onSave, isExisting }: EditPlaceDialogPr
               value={form.address}
               onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>وبسایت</Label>
+            <Input
+              value={form.website}
+              onChange={(e) => setForm((prev) => ({ ...prev, website: e.target.value }))}
+              dir="ltr"
+              placeholder="example.com"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>دسته‌بندی</Label>
+              <Input
+                value={form.category}
+                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>امتیاز</Label>
+              <Input
+                value={form.rating}
+                onChange={(e) => setForm((prev) => ({ ...prev, rating: e.target.value }))}
+                dir="ltr"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                placeholder="0-5"
+              />
+            </div>
           </div>
           {isExisting && (
             <Badge variant="secondary" className="w-fit text-[10px]">

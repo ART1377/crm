@@ -1,3 +1,5 @@
+// src/features/leads/components/import/google-search.tsx
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -17,7 +19,9 @@ export function GoogleSearch() {
   const [keyword, setKeyword] = useState('');
   const [latitude, setLatitude] = useState('35.6892');
   const [longitude, setLongitude] = useState('51.3890');
-  const [radius, setRadius] = useState('5000');
+  const [radius, setRadius] = useState('5000'); // Google uses meters
+  const [zoom, setZoom] = useState('19');
+  const [step, setStep] = useState('0.2');
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<BaladPlace[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -35,7 +39,14 @@ export function GoogleSearch() {
   async function handleSearch() {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ keyword, lat: latitude, lng: longitude, radius });
+      // تبدیل شعاع از کیلومتر به متر برای API گوگل
+      const radiusMeters = parseFloat(radius) * 1000;
+      const params = new URLSearchParams({
+        keyword,
+        lat: latitude,
+        lng: longitude,
+        radius: radiusMeters.toString(), // حالا به متر
+      });
       const res = await fetch(`/api/leads/search-google?${params}`);
       const data = await res.json();
       setPlaces(data.places ?? []);
@@ -99,10 +110,14 @@ export function GoogleSearch() {
             latitude={latitude}
             longitude={longitude}
             radius={radius}
+            zoom={zoom}
+            step={step}
             onKeywordChange={setKeyword}
             onLatitudeChange={setLatitude}
             onLongitudeChange={setLongitude}
             onRadiusChange={setRadius}
+            onZoomChange={setZoom}
+            onStepChange={setStep}
           />
           <Button className="w-full gap-2" onClick={handleSearch} disabled={loading}>
             {loading ? (

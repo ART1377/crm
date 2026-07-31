@@ -6,10 +6,13 @@ import {
   Check,
   Contact,
   Copy,
+  Globe,
   Loader2,
+  MapPin,
   Pencil,
   Phone,
   PhoneCall,
+  Star,
   Tag,
   Trash2,
   User,
@@ -22,7 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { useUpdateLead } from '@/features/leads/hooks/use-leads';
 import { useCopyToClipboard } from '@/hooks/use-copy';
 
-import { downloadVCard } from '@/lib/utils';
+import { downloadVCard, getDisplayUrl } from '@/lib/utils';
 
 import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from '../table/edit-lead/dialog';
@@ -214,6 +217,64 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
             <div className="bg-muted/10 px-5 py-3">
               <p className="text-muted-foreground mb-1 text-[10px] font-medium">یادداشت</p>
               <p className="text-muted-foreground text-[13px] leading-relaxed">{lead.notes}</p>
+            </div>
+          </>
+        )}
+
+        {(lead.address || lead.website || lead.category || lead.rating) && (
+          <>
+            <Separator />
+            <div className="grid grid-cols-2 divide-x">
+              {lead.address && (
+                <div className="flex items-center gap-2.5 px-5 py-3">
+                  <MapPin className="text-muted-foreground h-4 w-4 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-muted-foreground text-[10px]">آدرس</p>
+                    <p className="truncate text-sm font-medium">{lead.address}</p>
+                  </div>
+                </div>
+              )}
+              {lead.website && (
+                <div className="flex items-center gap-2.5 px-5 py-3">
+                  <Globe className="text-muted-foreground h-4 w-4 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-muted-foreground text-[10px]">وبسایت</p>
+                    <a
+                      href={
+                        lead.website.startsWith('http') ? lead.website : `https://${lead.website}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block truncate text-sm font-medium text-blue-600 hover:underline"
+                      title={lead.website}
+                    >
+                      {getDisplayUrl(lead.website)}
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-2 divide-x">
+              {lead.category && (
+                <div className="flex items-center gap-2.5 px-5 py-3">
+                  <Tag className="text-muted-foreground h-4 w-4 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-muted-foreground text-[10px]">دسته‌بندی</p>
+                    <p className="truncate text-sm font-medium">{lead.category}</p>
+                  </div>
+                </div>
+              )}
+              {lead.rating && (
+                <div className="flex items-center gap-2.5 px-5 py-3">
+                  <Star className="text-muted-foreground h-4 w-4 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-muted-foreground text-[10px]">امتیاز</p>
+                    <p className="truncate text-sm font-medium">
+                      <span className="text-amber-500">⭐</span> {lead.rating}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}

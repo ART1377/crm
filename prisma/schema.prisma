@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model Lead {
   id             String     @id @default(cuid())
   
@@ -19,10 +18,14 @@ model Lead {
   source         String     @default("DIRECT")
   status         String     @default("NEW")
   notes          String?
+  address        String?    // فیلد جدید برای آدرس
+  website        String?    // فیلد جدید برای وبسایت
+  rating         Float?     // فیلد جدید برای امتیاز
+  category       String?    // فیلد جدید برای دسته‌بندی
   
   activities     Activity[]
   tasks          Task[]
-  channels String @default("") // comma-separated: "WHATSAPP,SMS,CALL"
+  channels       String    @default("") // comma-separated: "WHATSAPP,SMS,CALL"
 
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt

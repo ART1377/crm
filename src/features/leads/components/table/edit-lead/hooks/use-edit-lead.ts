@@ -1,3 +1,5 @@
+// src/features/leads/components/table/edit-lead/hooks/use-edit-lead.ts
+
 'use client';
 
 import { useState } from 'react';
@@ -26,6 +28,10 @@ export function useEditLead({ lead, onClose }: { lead: Lead; onClose: () => void
     source: lead.source as string,
     status: lead.status as string,
     notes: lead.notes || '',
+    address: lead.address || '',
+    website: lead.website || '',
+    category: lead.category || '',
+    rating: lead.rating?.toString() || '', // ذخیره به عنوان string
   });
 
   const updateField = (field: string, value: string) => {
@@ -38,7 +44,26 @@ export function useEditLead({ lead, onClose }: { lead: Lead; onClose: () => void
       return;
     }
 
-    await updateLead.mutateAsync({ id: lead.id, data: form });
+    // تبدیل rating به number یا undefined
+    const ratingValue = form.rating ? parseFloat(form.rating) : undefined;
+    const finalRating = ratingValue && !isNaN(ratingValue) ? ratingValue : undefined;
+
+    const data = {
+      businessName: form.businessName,
+      contactPerson: form.contactPerson || undefined,
+      phoneNumber: form.phoneNumber,
+      secondaryPhone: form.secondaryPhone || undefined,
+      industry: form.industry,
+      source: form.source,
+      status: form.status,
+      notes: form.notes || undefined,
+      address: form.address || undefined,
+      website: form.website || undefined,
+      category: form.category || undefined,
+      rating: finalRating, // فقط اگر valid باشه
+    };
+
+    await updateLead.mutateAsync({ id: lead.id, data });
 
     if (form.status !== lead.status) {
       await changeStatus.mutateAsync({

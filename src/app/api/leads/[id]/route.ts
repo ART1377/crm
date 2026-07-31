@@ -48,6 +48,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (body.status !== undefined) updateData.status = body.status;
     if (body.notes !== undefined) updateData.notes = body.notes;
     if (body.channels !== undefined) updateData.channels = body.channels;
+    if (body.address !== undefined) updateData.address = body.address;
+    if (body.website !== undefined) updateData.website = body.website;
+    if (body.rating !== undefined) {
+      updateData.rating = body.rating ? parseFloat(body.rating) : null;
+    }
+    if (body.category !== undefined) updateData.category = body.category;
 
     const lead = await prisma.lead.update({
       where: { id },

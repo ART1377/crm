@@ -1,10 +1,12 @@
+// src/features/leads/components/import/result-card.tsx
+
 'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { Copy, Phone, Plus, Star } from 'lucide-react';
+import { Copy, Globe, MapPin, Phone, Plus, Star } from 'lucide-react';
 import { EditPlaceDialog } from './edit-place-dialog';
 import type { BaladPlace } from './types';
 
@@ -31,6 +33,9 @@ export function ResultCard({
 }: Props) {
   const { copy: copyName } = useCopyToClipboard();
   const { copy: copyPhone } = useCopyToClipboard();
+  const { copy: copyAddress } = useCopyToClipboard();
+
+  const hasExtraInfo = place.website || place.rating || place.category;
 
   return (
     <div
@@ -80,6 +85,7 @@ export function ResultCard({
               </Button>
             </div>
 
+            {/* Phone */}
             {place.phoneNumber && (
               <div className="mt-1.5 flex items-center gap-2">
                 <a
@@ -125,27 +131,62 @@ export function ResultCard({
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          {place.rating && (
-            <Badge
-              variant="outline"
-              className="gap-1 border-amber-200 bg-amber-50 text-[11px] text-amber-700"
-            >
-              <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-              {place.rating}
-            </Badge>
-          )}
-          {place.category && (
-            <Badge variant="outline" className="text-muted-foreground text-[11px]">
-              {place.category}
-            </Badge>
-          )}
-        </div>
-
+        {/* Address - with copy button */}
         {place.address && (
-          <p className="text-muted-foreground mt-2 line-clamp-1 text-[11px] leading-relaxed">
-            {place.address}
-          </p>
+          <div className="mt-2 flex items-start gap-1.5">
+            <MapPin className="text-muted-foreground mt-0.5 h-3 w-3 shrink-0" />
+            <p className="text-muted-foreground line-clamp-2 text-[11px] leading-relaxed">
+              {place.address}
+            </p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                copyAddress(place.address!, 'آدرس کپی شد');
+              }}
+            >
+              <Copy className="h-2.5 w-2.5" />
+            </Button>
+          </div>
+        )}
+
+        {/* Extra info: Website, Category, Rating */}
+        {hasExtraInfo && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {place.rating && (
+              <Badge
+                variant="outline"
+                className="gap-1 border-amber-200 bg-amber-50 text-[11px] text-amber-700"
+              >
+                <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                {place.rating}
+                {place.ratingCount && <span className="text-[10px]">({place.ratingCount})</span>}
+              </Badge>
+            )}
+            {place.category && (
+              <Badge variant="outline" className="text-muted-foreground text-[11px]">
+                {place.category}
+              </Badge>
+            )}
+            {place.website && (
+              <Badge variant="outline" className="text-muted-foreground gap-1 text-[11px]">
+                <Globe className="h-3 w-3" />
+                <a
+                  href={
+                    place.website.startsWith('http') ? place.website : `https://${place.website}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="hover:text-primary transition-colors"
+                >
+                  وبسایت
+                </a>
+              </Badge>
+            )}
+          </div>
         )}
       </div>
     </div>

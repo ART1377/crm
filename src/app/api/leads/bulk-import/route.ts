@@ -39,20 +39,26 @@ export async function POST(req: NextRequest) {
       }
       seenPhones.add(phone);
 
+      // ساخت یادداشت از اطلاعات اضافی که فیلد جدا ندارند
+      const noteParts = [];
+      if (lead.category && lead.category !== lead.industry)
+        noteParts.push(`دسته: ${lead.category}`);
+      if (lead.rating) noteParts.push(`⭐ ${lead.rating}`);
+      if (lead.ratingCount) noteParts.push(`(${lead.ratingCount} نظر)`);
+      if (lead.website && !lead.website?.includes('http'))
+        noteParts.push(`وبسایت: ${lead.website}`);
+
       data.push({
         businessName: lead.businessName,
         phoneNumber: phone,
         industry: sanitizeText(lead.industry || lead.category || ''),
         source: lead.source || 'نامشخص',
         status: 'NEW',
-        notes: [
-          lead.address,
-          lead.category,
-          lead.website,
-          lead.rating ? `⭐ ${lead.rating}` : undefined,
-        ]
-          .filter(Boolean)
-          .join(' | '),
+        address: lead.address || null,
+        website: lead.website || null,
+        rating: lead.rating ? parseFloat(lead.rating) : null, 
+        category: lead.category || null,
+        notes: noteParts.filter(Boolean).join(' | ') || null,
       });
     }
 

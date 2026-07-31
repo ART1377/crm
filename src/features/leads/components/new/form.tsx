@@ -1,8 +1,10 @@
+// src/features/leads/components/new/form.tsx
+
 'use client';
 
 import type { UseFormReturn } from 'react-hook-form';
 
-import { Building2, Hash, Phone, StickyNote, Tag, User } from 'lucide-react';
+import { Building2, Globe, Hash, MapPin, Phone, Star, StickyNote, Tag, User } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -103,6 +105,72 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
             placeholder="انتخاب منبع"
             icon={<Hash className="h-4 w-4" />}
           />
+        </FormField>
+      </div>
+
+      {/* فیلدهای جدید: Address + Website */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FormField label="آدرس" error={errors.address?.message}>
+          <div className="relative">
+            <MapPin className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              id="address"
+              placeholder="آدرس کامل"
+              className="pr-10"
+              {...register('address')}
+            />
+          </div>
+        </FormField>
+
+        <FormField label="وبسایت" error={errors.website?.message}>
+          <div className="relative">
+            <Globe className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              id="website"
+              placeholder="example.com"
+              dir="ltr"
+              className="pr-10"
+              {...register('website')}
+            />
+          </div>
+        </FormField>
+      </div>
+
+      {/* Category + Rating */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FormField label="دسته‌بندی" error={errors.category?.message}>
+          <div className="relative">
+            <Tag className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              id="category"
+              placeholder="دسته‌بندی کسب‌وکار"
+              className="pr-10"
+              {...register('category')}
+            />
+          </div>
+        </FormField>
+
+        <FormField label="امتیاز" error={errors.rating?.message}>
+          <div className="relative">
+            <Star className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              id="rating"
+              placeholder="0 تا 5"
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              dir="ltr"
+              className="pr-10"
+              {...register('rating', {
+                setValueAs: (v) => {
+                  if (v === '' || v === null || v === undefined) return undefined;
+                  const num = parseFloat(v);
+                  return isNaN(num) ? undefined : num;
+                },
+              })}
+            />
+          </div>
         </FormField>
       </div>
 

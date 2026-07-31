@@ -32,12 +32,34 @@ export interface Lead {
   status: LeadStatus;
   source: LeadSource;
   notes?: string | null;
+  address?: string | null; 
+  website?: string | null; 
+  rating?: number | null; 
+  category?: string | null; 
   activities?: Activity[];
   tasks?: Task[];
   _count?: { activities: number; tasks: number };
   channels?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateLeadData {
+  businessName: string;
+  contactPerson?: string;
+  phoneNumber: string;
+  secondaryPhone?: string;
+  industry: string;
+  source?: string;
+  notes?: string;
+  address?: string; 
+  website?: string; 
+  rating?: number; 
+  category?: string; 
+}
+
+export interface UpdateLeadData extends Partial<CreateLeadData> {
+  status?: string;
 }
 
 export type ActivityType = 'CALL' | 'MESSAGE' | 'NOTE' | 'STATUS_CHANGE';
@@ -59,20 +81,6 @@ export interface LeadFilters {
   ids?: string;
   dateFrom?: string;
   dateTo?: string;
-}
-
-export interface CreateLeadData {
-  businessName: string;
-  contactPerson?: string;
-  phoneNumber: string;
-  secondaryPhone?: string;
-  industry: string;
-  source?: string;
-  notes?: string;
-}
-
-export interface UpdateLeadData extends Partial<CreateLeadData> {
-  status?: string;
 }
 
 export interface CreateActivityData {

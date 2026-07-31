@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 
-import { Building2, Hash, Phone, StickyNote, Tag, User } from 'lucide-react';
+import { Building2, Globe, Hash, MapPin, Phone, Star, StickyNote, Tag, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -102,6 +102,44 @@ export function EditLeadDialog({ lead, children }: { lead: Lead; children: React
                 icon={<Hash className="h-4 w-4" />}
               />
             </div>
+          </div>
+
+          {/* فیلدهای جدید */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FieldWithIcon icon={MapPin} label="آدرس">
+              <Input
+                value={form.address || ''}
+                onChange={(e) => updateField('address', e.target.value)}
+              />
+            </FieldWithIcon>
+            <FieldWithIcon icon={Globe} label="وبسایت">
+              <Input
+                dir="ltr"
+                value={form.website || ''}
+                onChange={(e) => updateField('website', e.target.value)}
+              />
+            </FieldWithIcon>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FieldWithIcon icon={Tag} label="دسته‌بندی">
+              <Input
+                value={form.category || ''}
+                onChange={(e) => updateField('category', e.target.value)}
+              />
+            </FieldWithIcon>
+            <FieldWithIcon icon={Star} label="امتیاز">
+              <Input
+                dir="ltr"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                value={form.rating}
+                onChange={(e) => updateField('rating', e.target.value)}
+                placeholder="اختیاری"
+              />
+            </FieldWithIcon>
           </div>
 
           <div className="space-y-2">

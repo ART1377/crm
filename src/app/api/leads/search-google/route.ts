@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
       .trim();
     const lat = parseFloat(req.nextUrl.searchParams.get('lat') || '35.6892');
     const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3890');
+    // radius الان به متر میاد (چون در فرانت تبدیل کردیم)
     const radiusMeters = parseFloat(req.nextUrl.searchParams.get('radius') || '5000');
 
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
