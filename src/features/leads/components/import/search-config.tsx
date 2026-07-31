@@ -36,6 +36,9 @@ interface Props {
   onRadiusChange: (v: string) => void;
   onZoomChange?: (v: string) => void;
   onStepChange?: (v: string) => void;
+  onSearch?: () => void;
+  isSearching?: boolean;
+  selectedSourcesCount?: number;
 }
 
 export function SearchConfig({
@@ -51,6 +54,9 @@ export function SearchConfig({
   onRadiusChange,
   onZoomChange,
   onStepChange,
+  onSearch,
+  isSearching = false,
+  selectedSourcesCount = 0,
 }: Props) {
   const { data: industries = [] } = useListOptions('INDUSTRY');
   const [newKeyword, setNewKeyword] = useState('');
@@ -357,6 +363,33 @@ export function SearchConfig({
           />
         </CardContent>
       </Card>
+
+      {/* دکمه جستجوی یکپارچه */}
+      {onSearch && (
+        <Button
+          className="w-full gap-2"
+          onClick={onSearch}
+          disabled={isSearching || selectedSourcesCount === 0}
+          size="lg"
+        >
+          {isSearching ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              در حال جستجو در {selectedSourcesCount} منبع...
+            </>
+          ) : (
+            <>
+              <Search className="h-4 w-4" />
+              جستجو در همه منابع
+              {selectedSourcesCount > 0 && (
+                <Badge variant="secondary" className="ml-2 text-[10px]">
+                  {selectedSourcesCount} منبع
+                </Badge>
+              )}
+            </>
+          )}
+        </Button>
+      )}
     </div>
   );
 }

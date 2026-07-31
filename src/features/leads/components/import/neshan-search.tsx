@@ -4,142 +4,53 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { Loader2, Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useImportSearch } from './hooks/use-import-search';
 import { ImportToolbar } from './import-toolbar';
-import { generateSearchKeywords } from './keywords/generator';
 import { ResultCard } from './result-card';
-import { SearchConfig } from './search-config';
-import type { BaladPlace } from './types';
 
-export function NeshanSearch() {
-  const { data: industries = [] } = useListOptions('INDUSTRY');
-  const [keyword, setKeyword] = useState('');
-  const [latitude, setLatitude] = useState('35.6607');
-  const [longitude, setLongitude] = useState('51.3156');
-  const [radius, setRadius] = useState('2');
-  const [zoom, setZoom] = useState('19');
-  const [step, setStep] = useState('0.2');
-  const [loading, setLoading] = useState(false);
-  const [places, setPlaces] = useState<BaladPlace[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [importing, setImporting] = useState(false);
-  const [importingOne, setImportingOne] = useState<string | null>(null);
-  const [showDuplicates, setShowDuplicates] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
-  const [showHidden, setShowHidden] = useState(false);
-
-  const filteredPlaces = useMemo(() => {
-    let result = places;
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.trim().toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.businessName.toLowerCase().includes(query) ||
-          p.phoneNumber.includes(query) ||
-          p.address?.toLowerCase().includes(query) ||
-          p.category?.toLowerCase().includes(query)
-      );
-    }
-
-    if (!showDuplicates) {
-      result = result.filter((p) => !p.isExisting);
-    }
-
-    if (!showHidden) {
-      result = result.filter((p) => !hiddenIds.has(p.id));
-    }
-
-    return result;
-  }, [places, searchQuery, showDuplicates, hiddenIds, showHidden]);
-
-  useEffect(() => {
-    if (!keyword && industries.length > 0) {
-      const first = industries[0].value.replace(/\u200C/g, ' ').trim();
-      const aliases = generateSearchKeywords({ keyword: first });
-      setKeyword(aliases.join(', '));
-    }
-  }, [industries, keyword]);
-
-  const handleHide = (id: string) => {
-    setHiddenIds((prev) => new Set([...prev, id]));
-    if (selected.has(id)) {
-      setSelected((prev) => {
-        const n = new Set(prev);
-        n.delete(id);
-        return n;
-      });
-    }
+interface NeshanSearchProps {
+  sharedParams: {
+    keyword: string;
+    latitude: string;
+    longitude: string;
+    radius: string;
+    zoom: string;
+    step: string;
   };
+}
 
-  const handleShowAllHidden = () => {
-    setHiddenIds(new Set());
-    setShowHidden(false);
-  };
-
-  async function handleSearch() {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        keyword,
-        lat: latitude,
-        lng: longitude,
-        radius,
-      });
+export function NeshanSearch({ sharedParams }: NeshanSearchProps) {
+  const {
+    loading,
+    places,
+    filteredPlaces,
+    selected,
+    importing,
+    importingOne,
+    showDuplicates,
+    setShowDuplicates,
+    searchQuery,
+    setSearchQuery,
+    hiddenIds,
+    showHidden,
+    handleSearch,
+    toggle,
+    toggleAll,
+    handleHide,
+    handleShowAllHidden,
+    handleImport,
+    handleImportOne,
+    updatePlace,
+  } = useImportSearch({
+    searchFn: async ({ keyword, lat, lng, radius }) => {
+      const params = new URLSearchParams({ keyword, lat, lng, radius });
       const res = await fetch(`/api/leads/search-neshan?${params}`);
-      const data = await res.json();
-      setPlaces(data.places ?? []);
-      setSelected(new Set());
-      if (data.error) toast.error(data.error);
-    } catch {
-      toast.error('خطا');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function toggle(id: string) {
-    setSelected((prev) => {
-      const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  }
-
-  function toggleAll() {
-    const av = filteredPlaces.filter((p) => !p.isExisting);
-    setSelected(selected.size === av.length ? new Set() : new Set(av.map((p) => p.id)));
-  }
-
-  async function importPlaces(ids: string[]) {
-    const leads = places
-      .filter((p) => ids.includes(p.id))
-      .map((p) => ({ ...p, industry: keyword.split(',')[0], source: 'نشان' }));
-    const res = await fetch('/api/leads/bulk-import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leads }),
-    });
-    const r = await res.json();
-    toast.success(`${r.imported} وارد شد`);
-    setPlaces((prev) => prev.map((p) => (ids.includes(p.id) ? { ...p, isExisting: true } : p)));
-    setSelected(new Set());
-  }
-
-  async function handleImport() {
-    setImporting(true);
-    await importPlaces(Array.from(selected));
-    setImporting(false);
-  }
-  async function handleImportOne(place: BaladPlace) {
-    setImportingOne(place.id);
-    await importPlaces([place.id]);
-    setImportingOne(null);
-  }
+      return res.json();
+    },
+    sharedParams,
+    sourceName: 'نشان',
+  });
 
   return (
     <div className="space-y-5">
@@ -147,21 +58,7 @@ export function NeshanSearch() {
         <CardHeader>
           <CardTitle>جستجو در نشان</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
-          <SearchConfig
-            keyword={keyword}
-            latitude={latitude}
-            longitude={longitude}
-            radius={radius}
-            zoom={zoom}
-            step={step}
-            onKeywordChange={setKeyword}
-            onLatitudeChange={setLatitude}
-            onLongitudeChange={setLongitude}
-            onRadiusChange={setRadius}
-            onZoomChange={setZoom}
-            onStepChange={setStep}
-          />
+        <CardContent>
           <Button className="w-full gap-2" onClick={handleSearch} disabled={loading}>
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -172,6 +69,7 @@ export function NeshanSearch() {
           </Button>
         </CardContent>
       </Card>
+
       {places.length > 0 && (
         <Card>
           <CardHeader>
@@ -207,14 +105,23 @@ export function NeshanSearch() {
                     importing={importingOne === place.id}
                     isHidden={hiddenIds.has(place.id)}
                     onCheckedChange={() => toggle(place.id)}
-                    onSave={(id, updated) =>
-                      setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
-                    }
+                    onSave={updatePlace}
                     onImportOne={handleImportOne}
                     onHide={handleHide}
                   />
                 ))
               )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {loading && places.length === 0 && (
+        <Card>
+          <CardContent className="py-8">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="text-primary h-8 w-8 animate-spin" />
+              <p className="text-muted-foreground text-sm">در حال جستجو...</p>
             </div>
           </CardContent>
         </Card>

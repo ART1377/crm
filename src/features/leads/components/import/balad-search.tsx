@@ -5,115 +5,81 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { Loader2, MapPin, Pause, Play, Search, Square } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useImportSearch } from './hooks/use-import-search';
 import { ImportToolbar } from './import-toolbar';
-import { generateSearchKeywords } from './keywords/generator';
 import { ResultCard } from './result-card';
-import { SearchConfig } from './search-config';
 import { SearchMap } from './search-map';
 import { generateGridPoints } from './services/balad.service';
-import type { BaladPlace } from './types';
 
-export function BaladSearch() {
-  const { data: industries = [] } = useListOptions('INDUSTRY');
-  const [keyword, setKeyword] = useState('');
-  const [latitude, setLatitude] = useState('35.6607');
-  const [longitude, setLongitude] = useState('51.3156');
-  const [radius, setRadius] = useState('2');
-  const [zoom, setZoom] = useState('19');
-  const [step, setStep] = useState('0.2');
-  const [loading, setLoading] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [places, setPlaces] = useState<BaladPlace[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [importing, setImporting] = useState(false);
-  const [importingOne, setImportingOne] = useState<string | null>(null);
+interface BaladSearchProps {
+  sharedParams: {
+    keyword: string;
+    latitude: string;
+    longitude: string;
+    radius: string;
+    zoom: string;
+    step: string;
+  };
+}
+
+export function BaladSearch({ sharedParams }: BaladSearchProps) {
+  const [showMap, setShowMap] = useState(false);
   const [progress, setProgress] = useState('');
   const [progressPercent, setProgressPercent] = useState(0);
-  const [showMap, setShowMap] = useState(false);
-  const [showDuplicates, setShowDuplicates] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [gridPoints, setGridPoints] = useState<
     Array<{ lat: number; lng: number; searched: boolean }>
   >([]);
   const [currentPoint, setCurrentPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [paused, setPaused] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const pauseRef = useRef(false);
   const resumeRef = useRef<() => void>(() => {});
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
-  const [showHidden, setShowHidden] = useState(false);
 
-  // فیلتر کردن نتایج
-  const filteredPlaces = useMemo(() => {
-    let result = places;
-
-    // فیلتر جستجو
-    if (searchQuery.trim()) {
-      const query = searchQuery.trim().toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.businessName.toLowerCase().includes(query) ||
-          p.phoneNumber.includes(query) ||
-          p.address?.toLowerCase().includes(query) ||
-          p.category?.toLowerCase().includes(query)
-      );
-    }
-
-    // فیلتر تکراری‌ها
-    if (!showDuplicates) {
-      result = result.filter((p) => !p.isExisting);
-    }
-
-    // فیلتر مخفی‌ها (اگر showHidden false باشه)
-    if (!showHidden) {
-      result = result.filter((p) => !hiddenIds.has(p.id));
-    }
-
-    return result;
-  }, [places, searchQuery, showDuplicates, hiddenIds, showHidden]);
-
-  useEffect(() => {
-    if (!keyword && industries.length > 0) {
-      const first = industries[0].value.replace(/\u200C/g, ' ').trim();
-      const aliases = generateSearchKeywords({ keyword: first });
-      setKeyword(aliases.join(', '));
-    }
-  }, [industries, keyword]);
-
-  useEffect(() => {
-    try {
-      const points = generateGridPoints(
-        parseFloat(latitude),
-        parseFloat(longitude),
-        parseFloat(radius),
-        parseFloat(step)
-      );
-      setGridPoints(points.map((p) => ({ ...p, searched: false })));
-    } catch {}
-  }, [latitude, longitude, radius, step]);
-
-  const handleHide = (id: string) => {
-    setHiddenIds((prev) => new Set([...prev, id]));
-    // اگر آیتم انتخاب شده بود، انتخابش رو هم بردار
-    if (selected.has(id)) {
-      setSelected((prev) => {
-        const n = new Set(prev);
-        n.delete(id);
-        return n;
+  const {
+    loading,
+    setLoading,
+    places,
+    setPlaces,
+    selected,
+    setSelected,
+    filteredPlaces,
+    importing,
+    importingOne,
+    showDuplicates,
+    setShowDuplicates,
+    searchQuery,
+    setSearchQuery,
+    hiddenIds,
+    showHidden,
+    toggle,
+    toggleAll,
+    handleHide,
+    handleShowAllHidden,
+    handleImport,
+    handleImportOne,
+    updatePlace,
+  } = useImportSearch({
+    searchFn: async ({ keyword, lat, lng, radius }) => {
+      const params = new URLSearchParams({
+        keyword,
+        lat,
+        lng,
+        radius,
+        step: sharedParams.step,
       });
-    }
-  };
+      const res = await fetch(`/api/leads/search-balad?${params}`);
+      return res.json();
+    },
+    sharedParams,
+    sourceName: 'بلد',
+  });
 
-  const handleShowAllHidden = () => {
-    setHiddenIds(new Set());
-    setShowHidden(false);
-  };
-
-  async function handleSearch() {
+  const handleSearchWithProgress = async () => {
+    // تنظیمات اولیه
     setLoading(true);
     setPaused(false);
     pauseRef.current = false;
@@ -122,12 +88,13 @@ export function BaladSearch() {
     setProgress('در حال شروع...');
     setProgressPercent(0);
 
+    // تولید نقاط شبکه
     try {
       const points = generateGridPoints(
-        parseFloat(latitude),
-        parseFloat(longitude),
-        parseFloat(radius),
-        parseFloat(step)
+        parseFloat(sharedParams.latitude),
+        parseFloat(sharedParams.longitude),
+        parseFloat(sharedParams.radius),
+        parseFloat(sharedParams.step)
       );
       setGridPoints(points.map((p) => ({ ...p, searched: false })));
     } catch {}
@@ -137,11 +104,11 @@ export function BaladSearch() {
 
     try {
       const params = new URLSearchParams({
-        keyword,
-        lat: latitude,
-        lng: longitude,
-        radius,
-        step,
+        keyword: sharedParams.keyword,
+        lat: sharedParams.latitude,
+        lng: sharedParams.longitude,
+        radius: sharedParams.radius,
+        step: sharedParams.step,
       });
 
       const res = await fetch(`/api/leads/search-balad?${params}`, { signal: controller.signal });
@@ -152,6 +119,7 @@ export function BaladSearch() {
       const seenIds = new Set<string>();
 
       while (true) {
+        // بررسی توقف موقت
         if (pauseRef.current) {
           await new Promise<void>((resolve) => {
             resumeRef.current = resolve;
@@ -169,8 +137,11 @@ export function BaladSearch() {
             const data = JSON.parse(line);
 
             if (data.type === 'progress') {
+              // به‌روزرسانی پیشرفت
               setProgress(data.message);
-              if (data.total > 0) setProgressPercent(Math.round((data.current / data.total) * 100));
+              if (data.total > 0) {
+                setProgressPercent(Math.round((data.current / data.total) * 100));
+              }
               if (data.point) {
                 setCurrentPoint(data.point);
                 setGridPoints((prev) =>
@@ -182,14 +153,17 @@ export function BaladSearch() {
                 );
               }
             } else if (data.type === 'place') {
+              // افزودن مکان جدید
               if (!seenIds.has(data.place.id)) {
                 seenIds.add(data.place.id);
                 setPlaces((prev) => [...prev, data.place]);
               }
             } else if (data.type === 'done') {
+              // پایان جستجو
               setProgress(`${data.total} سرنخ پیدا شد`);
               setProgressPercent(100);
               setCurrentPoint(null);
+              toast.success(`جستجو کامل شد - ${data.total} سرنخ`);
             }
           } catch {}
         }
@@ -199,6 +173,7 @@ export function BaladSearch() {
         toast.success('جستجو متوقف شد');
       } else {
         toast.error('خطا در جستجو');
+        console.error('Search error:', err);
       }
     } finally {
       setLoading(false);
@@ -206,60 +181,25 @@ export function BaladSearch() {
       setCurrentPoint(null);
       abortControllerRef.current = null;
     }
-  }
+  };
 
-  function handlePause() {
+  // توابع کنترل توقف و ادامه
+  const handlePause = () => {
     setPaused(true);
     pauseRef.current = true;
     toast('جستجو متوقف شد', { icon: '⏸' });
-  }
-  function handleResume() {
+  };
+
+  const handleResume = () => {
     setPaused(false);
     pauseRef.current = false;
     resumeRef.current();
     toast.success('جستجو ادامه یافت');
-  }
-  function handleCancel() {
+  };
+
+  const handleCancel = () => {
     abortControllerRef.current?.abort();
-  }
-
-  function toggle(id: string) {
-    setSelected((prev) => {
-      const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  }
-  function toggleAll() {
-    const av = filteredPlaces.filter((p) => !p.isExisting);
-    setSelected(selected.size === av.length ? new Set() : new Set(av.map((p) => p.id)));
-  }
-
-  async function importPlaces(ids: string[]) {
-    const leads = places
-      .filter((p) => ids.includes(p.id))
-      .map((p) => ({ ...p, industry: keyword.split(',')[0], source: 'بلد' }));
-    const res = await fetch('/api/leads/bulk-import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leads }),
-    });
-    const r = await res.json();
-    toast.success(`${r.imported} وارد شد`);
-    setPlaces((prev) => prev.map((p) => (ids.includes(p.id) ? { ...p, isExisting: true } : p)));
-    setSelected(new Set());
-  }
-
-  async function handleImport() {
-    setImporting(true);
-    await importPlaces(Array.from(selected));
-    setImporting(false);
-  }
-  async function handleImportOne(place: BaladPlace) {
-    setImportingOne(place.id);
-    await importPlaces([place.id]);
-    setImportingOne(null);
-  }
+  };
 
   return (
     <div className="space-y-5">
@@ -268,21 +208,7 @@ export function BaladSearch() {
           <CardTitle>جستجو در بلد</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
-          <SearchConfig
-            keyword={keyword}
-            latitude={latitude}
-            longitude={longitude}
-            radius={radius}
-            zoom={zoom}
-            step={step}
-            onKeywordChange={setKeyword}
-            onLatitudeChange={setLatitude}
-            onLongitudeChange={setLongitude}
-            onRadiusChange={setRadius}
-            onZoomChange={setZoom}
-            onStepChange={setStep}
-          />
-
+          {/* Progress Bar */}
           {loading && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -293,9 +219,13 @@ export function BaladSearch() {
             </div>
           )}
 
+          {/* دکمه‌های کنترل */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {!loading ? (
-              <Button className="w-full gap-2 sm:w-auto sm:flex-1" onClick={handleSearch}>
+              <Button
+                className="w-full gap-2 sm:w-auto sm:flex-1"
+                onClick={handleSearchWithProgress}
+              >
                 <Search className="h-4 w-4" /> جستجو
               </Button>
             ) : (
@@ -326,7 +256,7 @@ export function BaladSearch() {
                   variant="outline"
                   size="sm"
                   onClick={handleImport}
-                  disabled={importing}
+                  disabled={importing || selected.size === 0}
                   className="flex-1"
                 >
                   ایمپورت ({places.length})
@@ -346,15 +276,18 @@ export function BaladSearch() {
         </CardContent>
       </Card>
 
-      {/* Main content area with map */}
+      {/* نقشه + نتایج */}
       {showMap && loading && gridPoints.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="order-1 h-80 lg:sticky lg:top-4 lg:order-2 lg:h-[calc(100vh-12rem)]">
             <SearchMap
-              center={{ lat: parseFloat(latitude), lng: parseFloat(longitude) }}
+              center={{
+                lat: parseFloat(sharedParams.latitude),
+                lng: parseFloat(sharedParams.longitude),
+              }}
               gridPoints={gridPoints}
               currentPoint={currentPoint}
-              zoom={parseInt(zoom)}
+              zoom={parseInt(sharedParams.zoom)}
             />
           </div>
 
@@ -404,9 +337,7 @@ export function BaladSearch() {
                           importing={importingOne === place.id}
                           isHidden={hiddenIds.has(place.id)}
                           onCheckedChange={() => toggle(place.id)}
-                          onSave={(id, updated) =>
-                            setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
-                          }
+                          onSave={updatePlace}
                           onImportOne={handleImportOne}
                           onHide={handleHide}
                         />
@@ -420,6 +351,7 @@ export function BaladSearch() {
         </div>
       ) : (
         <>
+          {/* حالت لودینگ بدون نقشه */}
           {loading && places.length === 0 && (
             <Card>
               <CardContent className="py-8">
@@ -432,7 +364,8 @@ export function BaladSearch() {
             </Card>
           )}
 
-          {places.length > 0 && (
+          {/* نتایج بدون نقشه */}
+          {places.length > 0 && !showMap && (
             <Card>
               <CardHeader>
                 <ImportToolbar
@@ -467,9 +400,7 @@ export function BaladSearch() {
                         importing={importingOne === place.id}
                         isHidden={hiddenIds.has(place.id)}
                         onCheckedChange={() => toggle(place.id)}
-                        onSave={(id, updated) =>
-                          setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
-                        }
+                        onSave={updatePlace}
                         onImportOne={handleImportOne}
                         onHide={handleHide}
                       />
