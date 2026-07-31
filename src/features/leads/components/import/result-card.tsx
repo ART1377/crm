@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { Copy, Globe, MapPin, Phone, Plus, Star } from 'lucide-react';
+import { Copy, Globe, MapPin, Phone, Plus, Star, X } from 'lucide-react';
 import { EditPlaceDialog } from './edit-place-dialog';
 import type { BaladPlace } from './types';
 
@@ -16,9 +16,11 @@ interface Props {
   index: number;
   total: number;
   importing?: boolean;
+  isHidden?: boolean;
   onCheckedChange: () => void;
   onSave: (id: string, place: BaladPlace) => void;
   onImportOne?: (place: BaladPlace) => void;
+  onHide?: (id: string) => void;
 }
 
 export function ResultCard({
@@ -27,15 +29,20 @@ export function ResultCard({
   index,
   total,
   importing,
+  isHidden = false,
   onCheckedChange,
   onSave,
   onImportOne,
+  onHide,
 }: Props) {
   const { copy: copyName } = useCopyToClipboard();
   const { copy: copyPhone } = useCopyToClipboard();
   const { copy: copyAddress } = useCopyToClipboard();
 
   const hasExtraInfo = place.website || place.rating || place.category;
+
+  // اگر مخفی شده بود، نمایش نده
+  if (isHidden) return null;
 
   return (
     <div
@@ -62,15 +69,15 @@ export function ResultCard({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h4 className="text-foreground truncate text-sm font-semibold">
+              <h4 className="text-foreground text-sm font-semibold wrap-break-word">
                 {place.businessName}
               </h4>
               {place.isExisting && (
                 <Badge
                   variant="secondary"
-                  className="border-amber-200 bg-amber-100 text-[10px] text-amber-800"
+                  className="shrink-0 border-amber-200 bg-amber-100 text-[10px] text-amber-800"
                 >
                   ⚠️ تکراری
                 </Badge>
@@ -116,11 +123,28 @@ export function ResultCard({
           </div>
 
           <div className="flex shrink-0 items-center gap-0.5">
+            {/* دکمه مخفی‌سازی */}
+            {!place.isExisting && onHide && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground h-8 w-8 rounded-lg transition-all hover:bg-red-50 hover:text-red-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onHide(place.id);
+                }}
+                title="مخفی کردن از لیست"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+
+            {/* دکمه ایمپورت */}
             {!place.isExisting && onImportOne && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-primary hover:bg-primary/10 h-8 w-8 rounded-lg"
+                className="text-primary hover:bg-primary/10 h-8 w-8 rounded-lg transition-all"
                 disabled={importing}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -130,6 +154,8 @@ export function ResultCard({
                 <Plus className="h-4 w-4" />
               </Button>
             )}
+
+            {/* دکمه ویرایش */}
             <EditPlaceDialog place={place} onSave={onSave} isExisting={place.isExisting} />
           </div>
         </div>

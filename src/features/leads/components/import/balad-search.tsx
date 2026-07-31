@@ -44,11 +44,14 @@ export function BaladSearch() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const pauseRef = useRef(false);
   const resumeRef = useRef<() => void>(() => {});
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [showHidden, setShowHidden] = useState(false);
 
   // فیلتر کردن نتایج
   const filteredPlaces = useMemo(() => {
     let result = places;
 
+    // فیلتر جستجو
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
       result = result.filter(
@@ -60,12 +63,18 @@ export function BaladSearch() {
       );
     }
 
+    // فیلتر تکراری‌ها
     if (!showDuplicates) {
       result = result.filter((p) => !p.isExisting);
     }
 
+    // فیلتر مخفی‌ها (اگر showHidden false باشه)
+    if (!showHidden) {
+      result = result.filter((p) => !hiddenIds.has(p.id));
+    }
+
     return result;
-  }, [places, searchQuery, showDuplicates]);
+  }, [places, searchQuery, showDuplicates, hiddenIds, showHidden]);
 
   useEffect(() => {
     if (!keyword && industries.length > 0) {
@@ -86,6 +95,23 @@ export function BaladSearch() {
       setGridPoints(points.map((p) => ({ ...p, searched: false })));
     } catch {}
   }, [latitude, longitude, radius, step]);
+
+  const handleHide = (id: string) => {
+    setHiddenIds((prev) => new Set([...prev, id]));
+    // اگر آیتم انتخاب شده بود، انتخابش رو هم بردار
+    if (selected.has(id)) {
+      setSelected((prev) => {
+        const n = new Set(prev);
+        n.delete(id);
+        return n;
+      });
+    }
+  };
+
+  const handleShowAllHidden = () => {
+    setHiddenIds(new Set());
+    setShowHidden(false);
+  };
 
   async function handleSearch() {
     setLoading(true);
@@ -350,12 +376,14 @@ export function BaladSearch() {
                     places={filteredPlaces}
                     selected={selected}
                     importing={importing}
+                    hiddenCount={hiddenIds.size}
                     onToggleAll={toggleAll}
                     onImport={handleImport}
-                    onImportOne={handleImportOne}
                     onSearchChange={setSearchQuery}
                     onToggleDuplicates={setShowDuplicates}
+                    onShowHidden={handleShowAllHidden}
                     showDuplicates={showDuplicates}
+                    showHidden={showHidden}
                     searchQuery={searchQuery}
                   />
                 </CardHeader>
@@ -374,11 +402,13 @@ export function BaladSearch() {
                           index={index}
                           total={filteredPlaces.length}
                           importing={importingOne === place.id}
+                          isHidden={hiddenIds.has(place.id)}
                           onCheckedChange={() => toggle(place.id)}
                           onSave={(id, updated) =>
                             setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
                           }
                           onImportOne={handleImportOne}
+                          onHide={handleHide}
                         />
                       ))
                     )}
@@ -409,12 +439,14 @@ export function BaladSearch() {
                   places={filteredPlaces}
                   selected={selected}
                   importing={importing}
+                  hiddenCount={hiddenIds.size}
                   onToggleAll={toggleAll}
                   onImport={handleImport}
-                  onImportOne={handleImportOne}
                   onSearchChange={setSearchQuery}
                   onToggleDuplicates={setShowDuplicates}
+                  onShowHidden={handleShowAllHidden}
                   showDuplicates={showDuplicates}
+                  showHidden={showHidden}
                   searchQuery={searchQuery}
                 />
               </CardHeader>
@@ -433,11 +465,13 @@ export function BaladSearch() {
                         index={index}
                         total={filteredPlaces.length}
                         importing={importingOne === place.id}
+                        isHidden={hiddenIds.has(place.id)}
                         onCheckedChange={() => toggle(place.id)}
                         onSave={(id, updated) =>
                           setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
                         }
                         onImportOne={handleImportOne}
+                        onHide={handleHide}
                       />
                     ))
                   )}

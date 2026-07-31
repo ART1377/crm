@@ -11,6 +11,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
@@ -18,8 +19,6 @@ import { useChangeLeadStatus } from '@/features/leads/hooks/use-leads';
 
 import { useLeadsPage } from '../../hooks/use-leads-page';
 import { BulkActionsBar } from './bulk-actions-bar';
-import { BulkDeleteDialog } from './bulk-delete-dialog';
-import { DeleteLeadDialog } from './delete-dialog';
 import { LeadsEmptyState } from './empty';
 import { ExportDialog } from './export-dialog';
 import { LeadsFilters } from './filters';
@@ -144,20 +143,23 @@ export function LeadsPage() {
       </Card>
 
       {/* دیالوگ حذف تکی */}
-      <DeleteLeadDialog
+      <DeleteConfirmDialog
         open={Boolean(deleteId)}
         onClose={closeDeleteDialog}
         onConfirm={handleDelete}
+        title="حذف سرنخ"
+        description="آیا از حذف این سرنخ اطمینان دارید؟ این عملیات قابل بازگشت نیست."
         isPending={deleteIsPending}
       />
 
       {/* دیالوگ حذف گروهی */}
-      <BulkDeleteDialog
+      <DeleteConfirmDialog
         open={isBulkDeleteDialogOpen}
         onClose={closeBulkDeleteDialog}
         onConfirm={handleBulkDelete}
+        title="حذف گروهی سرنخ‌ها"
+        description={`آیا از حذف ${selectedIds.length} سرنخ انتخاب شده اطمینان دارید؟ این عملیات غیرقابل بازگشت است و تمام فعالیت‌ها و وظایف مرتبط نیز حذف می‌شوند.`}
         isPending={isBulkDeleting}
-        count={selectedIds.length}
       />
     </PageWrapper>
   );

@@ -29,6 +29,8 @@ export function GoogleSearch() {
   const [importingOne, setImportingOne] = useState<string | null>(null);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [showHidden, setShowHidden] = useState(false);
 
   const filteredPlaces = useMemo(() => {
     let result = places;
@@ -48,8 +50,12 @@ export function GoogleSearch() {
       result = result.filter((p) => !p.isExisting);
     }
 
+    if (!showHidden) {
+      result = result.filter((p) => !hiddenIds.has(p.id));
+    }
+
     return result;
-  }, [places, searchQuery, showDuplicates]);
+  }, [places, searchQuery, showDuplicates, hiddenIds, showHidden]);
 
   useEffect(() => {
     if (!keyword && industries.length > 0) {
@@ -58,6 +64,22 @@ export function GoogleSearch() {
       setKeyword(aliases.join(', '));
     }
   }, [industries, keyword]);
+
+  const handleHide = (id: string) => {
+    setHiddenIds((prev) => new Set([...prev, id]));
+    if (selected.has(id)) {
+      setSelected((prev) => {
+        const n = new Set(prev);
+        n.delete(id);
+        return n;
+      });
+    }
+  };
+
+  const handleShowAllHidden = () => {
+    setHiddenIds(new Set());
+    setShowHidden(false);
+  };
 
   async function handleSearch() {
     setLoading(true);
@@ -158,12 +180,14 @@ export function GoogleSearch() {
               places={filteredPlaces}
               selected={selected}
               importing={importing}
+              hiddenCount={hiddenIds.size}
               onToggleAll={toggleAll}
               onImport={handleImport}
-              onImportOne={handleImportOne}
               onSearchChange={setSearchQuery}
               onToggleDuplicates={setShowDuplicates}
+              onShowHidden={handleShowAllHidden}
               showDuplicates={showDuplicates}
+              showHidden={showHidden}
               searchQuery={searchQuery}
             />
           </CardHeader>
@@ -182,11 +206,13 @@ export function GoogleSearch() {
                     index={index}
                     total={filteredPlaces.length}
                     importing={importingOne === place.id}
+                    isHidden={hiddenIds.has(place.id)}
                     onCheckedChange={() => toggle(place.id)}
                     onSave={(id, updated) =>
                       setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)))
                     }
                     onImportOne={handleImportOne}
+                    onHide={handleHide}
                   />
                 ))
               )}

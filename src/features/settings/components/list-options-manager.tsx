@@ -149,9 +149,9 @@ export function ListOptionsManager({ type, title }: ListOptionsManagerProps) {
       <DeleteConfirmDialog
         open={!!deleting}
         onClose={() => setDeleting(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (deleting) {
-            deleteOption.mutate(deleting);
+            await deleteOption.mutateAsync(deleting);
             setDeleting(null);
           }
         }}

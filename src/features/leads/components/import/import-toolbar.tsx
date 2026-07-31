@@ -7,19 +7,21 @@ import { Button } from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff, Search } from 'lucide-react';
+import { Eye, EyeOff, RotateCcw, Search } from 'lucide-react';
 import type { BaladPlace } from './types';
 
 interface ImportToolbarProps {
   places: BaladPlace[];
   selected: Set<string>;
   importing: boolean;
+  hiddenCount?: number;
   onToggleAll: () => void;
   onImport: () => void;
-  onImportOne: (place: BaladPlace) => void;
   onSearchChange: (query: string) => void;
   onToggleDuplicates: (show: boolean) => void;
+  onShowHidden?: () => void;
   showDuplicates: boolean;
+  showHidden?: boolean;
   searchQuery: string;
 }
 
@@ -27,11 +29,12 @@ export function ImportToolbar({
   places,
   selected,
   importing,
+  hiddenCount = 0,
   onToggleAll,
   onImport,
-  onImportOne,
   onSearchChange,
   onToggleDuplicates,
+  onShowHidden,
   showDuplicates,
   searchQuery,
 }: ImportToolbarProps) {
@@ -56,9 +59,30 @@ export function ImportToolbar({
               ⚠️ {duplicateCount} تکراری
             </Badge>
           )}
+          {hiddenCount > 0 && (
+            <Badge
+              variant="outline"
+              className="border-gray-200 bg-gray-50 text-[10px] text-gray-500"
+            >
+              👻 {hiddenCount} مخفی
+            </Badge>
+          )}
         </CardTitle>
 
         <div className="flex items-center gap-2">
+          {/* دکمه نمایش مخفی‌ها */}
+          {hiddenCount > 0 && onShowHidden && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onShowHidden}
+              className="h-8 gap-1.5 px-2.5 text-xs"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              نمایش مخفی‌ها
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"
