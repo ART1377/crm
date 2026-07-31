@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
-import { Layers, MapPin, Plus, Search, StepForward, Tag, Target, X, ZoomIn } from 'lucide-react';
+import { Layers, MapPin, Plus, Search, StepForward, Target, X, ZoomIn } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
+import { IndustrySelector } from './industry-selector';
 import { generateSearchKeywords } from './keywords/generator';
 import { PresetConfig } from './preset-config';
 
@@ -61,27 +62,49 @@ export function SearchConfig({
   const { data: industries = [] } = useListOptions('INDUSTRY');
   const [newKeyword, setNewKeyword] = useState('');
 
+  // استخراج صنایع از کلیدواژه‌ها
   const keywords = keyword
     .split(',')
     .map((k) => k.trim())
     .filter(Boolean);
 
-  const defaultKeywords = useMemo(() => {
-    const first = keywords[0] ?? '';
-    return generateSearchKeywords({ keyword: first });
-  }, [keywords[0]]);
-
-  const availableDefaults = defaultKeywords.filter((k) => !keywords.includes(k));
-
-  const selectedIndustry = industries.find((item) => {
-    const clean = item.value.replace(/\u200C/g, ' ').trim();
-    return clean === keywords[0];
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>(() => {
+    // اگر کلیدواژه‌ها وجود داره، اولین صنعت رو انتخاب کن
+    if (keywords.length > 0) {
+      const firstKeyword = keywords[0];
+      const matchedIndustry = industries.find((item) => {
+        const clean = item.value.replace(/\u200C/g, ' ').trim();
+        return (
+          clean === firstKeyword ||
+          generateSearchKeywords({ keyword: clean }).includes(firstKeyword)
+        );
+      });
+      if (matchedIndustry) {
+        // کلیدواژه‌های این صنعت رو استخراج کن
+        const indKeywords = generateSearchKeywords({ keyword: matchedIndustry.value });
+        const allKeywords = indKeywords.join(', ');
+        if (allKeywords === keyword) {
+          return [matchedIndustry.value];
+        }
+      }
+    }
+    return [];
   });
 
-  function handleIndustryChange(value: string) {
-    const aliases = generateSearchKeywords({ keyword: value });
-    onKeywordChange(aliases.join(', '));
-  }
+  const handleIndustryChange = (industries: string[], newKeywords: string) => {
+    setSelectedIndustries(industries);
+    onKeywordChange(newKeywords);
+  };
+
+  const defaultKeywords = useMemo(() => {
+    if (selectedIndustries.length === 0) return [];
+    // کلیدواژه‌های پیشنهادی از همه صنایع انتخاب شده
+    const all = selectedIndustries.flatMap((ind) => generateSearchKeywords({ keyword: ind }));
+    // حذف تکراری‌ها
+    return [...new Set(all)];
+  }, [selectedIndustries]);
+
+  const availableDefaults = defaultKeywords.filter((k) => !keywords.includes(k));
 
   function removeKeyword(index: number) {
     const next = keywords.filter((_, i) => i !== index);
@@ -134,27 +157,12 @@ export function SearchConfig({
         </div>
       )}
 
-      {/* Industry Select */}
-      <div className="space-y-2">
-        <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50">
-            <Tag className="h-3.5 w-3.5 text-amber-600" />
-          </div>
-          صنعت
-        </Label>
-        <Select value={selectedIndustry?.value ?? ''} onValueChange={handleIndustryChange}>
-          <SelectTrigger className="border-muted bg-muted/20 h-11! w-full rounded-xl border-2 text-sm transition-all focus:border-amber-200 focus:bg-white">
-            <SelectValue placeholder="یک صنعت انتخاب کنید" />
-          </SelectTrigger>
-          <SelectContent>
-            {industries.map((item) => (
-              <SelectItem key={item.id} value={item.value}>
-                {item.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Industry Selector - جدید */}
+      <IndustrySelector
+        selectedIndustries={selectedIndustries}
+        onChange={handleIndustryChange}
+        options={industries.map((item) => item.value)}
+      />
 
       {/* Keywords */}
       <div className="space-y-2.5">
@@ -192,7 +200,7 @@ export function SearchConfig({
           <div className="space-y-1.5">
             <p className="text-muted-foreground text-[10px]">کلیدواژه‌های پیشنهادی:</p>
             <div className="flex flex-wrap gap-1">
-              {availableDefaults.map((kw) => (
+              {availableDefaults.slice(0, 10).map((kw) => (
                 <Badge
                   key={kw}
                   variant="outline"
@@ -203,6 +211,11 @@ export function SearchConfig({
                   {kw}
                 </Badge>
               ))}
+              {availableDefaults.length > 10 && (
+                <span className="text-muted-foreground self-center text-[10px]">
+                  +{availableDefaults.length - 10} بیشتر
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -369,7 +382,7 @@ export function SearchConfig({
         <Button
           className="w-full gap-2"
           onClick={onSearch}
-          disabled={isSearching || selectedSourcesCount === 0}
+          disabled={isSearching || selectedSourcesCount === 0 || selectedIndustries.length === 0}
           size="lg"
         >
           {isSearching ? (
@@ -384,6 +397,11 @@ export function SearchConfig({
               {selectedSourcesCount > 0 && (
                 <Badge variant="secondary" className="ml-2 text-[10px]">
                   {selectedSourcesCount} منبع
+                </Badge>
+              )}
+              {selectedIndustries.length > 0 && (
+                <Badge variant="secondary" className="ml-1 text-[10px]">
+                  {selectedIndustries.length} صنعت
                 </Badge>
               )}
             </>

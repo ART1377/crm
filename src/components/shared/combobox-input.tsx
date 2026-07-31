@@ -74,7 +74,7 @@ export function ComboboxInput({
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-full">
       <div className="relative">
         {icon && (
           <div className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2">
