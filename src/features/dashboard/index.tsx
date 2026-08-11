@@ -1,3 +1,5 @@
+// src/features/dashboard/index.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -15,11 +17,12 @@ import { ConversionCard } from './components/conversion-card';
 import { IndustryChart } from './components/industry-chart';
 import { IndustryTable } from './components/industry-table';
 import { DashboardSkeleton } from './components/skeleton';
+import { SourceIndustryTable } from './components/source-industry-table';
 import { StatusCards } from './components/status-cards';
+import { TasksOverview } from './components/tasks-overview';
 import { TasksProgressCard } from './components/tasks-progress-card';
 import { WeeklyCalendar } from './components/weekly-chart';
 import { useDashboardData } from './hooks/use-dashboard-data';
-import { SourceIndustryTable } from './components/source-industry-table';
 
 export function DashboardPage() {
   const {
@@ -58,6 +61,7 @@ export function DashboardPage() {
         />
       }
     >
+      {/* کارت‌های آماری */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard title="کل سرنخ‌ها" value={stats.total} subtitle="تعداد کل" icon={Users} />
         <StatCard
@@ -83,8 +87,10 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* کارت‌های وضعیت */}
       <StatusCards statusCounts={statusCounts} />
 
+      {/* نرخ تبدیل + پیشرفت تسک‌ها */}
       <div className="grid gap-4 lg:grid-cols-2">
         <ConversionCard rate={conversionRate} customers={stats.customers} total={stats.total} />
         <TasksProgressCard
@@ -94,8 +100,10 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* تقویم فعالیت */}
       <WeeklyCalendar data={dailyActivity} />
 
+      {/* جدول و نمودار صنعت */}
       <div className="grid gap-4 lg:grid-cols-2">
         <IndustryTable
           entries={sortedIndustryEntries}
@@ -106,7 +114,11 @@ export function DashboardPage() {
         <IndustryChart data={industryPieData} />
       </div>
 
+      {/* جدول منبع × صنعت */}
       <SourceIndustryTable data={sourceByIndustry} />
+
+      {/* ✅ بخش جدید تسک‌ها */}
+      <TasksOverview />
     </PageWrapper>
   );
 }

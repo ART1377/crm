@@ -1,3 +1,5 @@
+// src/app/api/leads/[id]/change-status/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 
 import { OVERDUE_DAYS } from '@/constants/constants';
@@ -31,14 +33,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
-    // Auto-create follow-up task
-    if (status === 'CALLED' || status === 'MESSAGED') {
+    // ✅ Auto-create follow-up task for CALLED, MESSAGED, and FOLLOW_UP
+    if (status === 'CALLED' || status === 'MESSAGED' || status === 'FOLLOW_UP') {
       const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
+      dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS); // NOW 25 days (changed in constants)
+
+      // تعیین عنوان مناسب بر اساس وضعیت
+      let title = 'پیگیری';
+      if (status === 'CALLED') title = 'پیگیری تماس';
+      else if (status === 'MESSAGED') title = 'پیگیری پیام';
+      else if (status === 'FOLLOW_UP') title = 'پیگیری وضعیت';
+
       await prisma.task.create({
         data: {
           leadId: id,
-          title: status === 'CALLED' ? 'پیگیری تماس' : 'پیگیری پیام',
+          title,
           dueDate,
         },
       });

@@ -139,7 +139,7 @@ export function TaskFilters({
           {/* Row 2: Sort */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <Select value={filters.sortBy} onValueChange={onSortByChange}>
-              <SelectTrigger className="w-full sm:w-40">
+              <SelectTrigger className="w-full">
                 <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
                 <SelectValue placeholder="مرتب‌سازی" />
               </SelectTrigger>
@@ -152,7 +152,7 @@ export function TaskFilters({
             </Select>
 
             <Select value={filters.sortOrder} onValueChange={onSortOrderChange}>
-              <SelectTrigger className="w-full sm:w-32">
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
