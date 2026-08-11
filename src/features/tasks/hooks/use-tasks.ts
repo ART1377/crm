@@ -1,3 +1,5 @@
+// src/features/tasks/hooks/use-tasks.ts
+
 'use client';
 
 import toast from 'react-hot-toast';
@@ -15,6 +17,20 @@ export function useTasks(leadId: string) {
     queryKey: [TASKS_QUERY_KEY, leadId],
     queryFn: () => tasksService.getByLeadId(leadId),
     enabled: !!leadId,
+  });
+}
+
+export function useAllTasks(filters: {
+  status?: string;
+  dueDate?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  search?: string;
+}) {
+  return useQuery({
+    queryKey: [TASKS_QUERY_KEY, 'all', filters],
+    queryFn: () => tasksService.getAll(filters),
+    staleTime: 30 * 1000,
   });
 }
 
@@ -64,14 +80,14 @@ export function useUpdateTask() {
   });
 }
 
-export function useDeleteTask(leadId: string) {
+export function useDeleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (taskId: string) => tasksService.delete(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
-      toast.success('پیگیری حذف شد');
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+      toast.success('تسک حذف شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -87,6 +103,37 @@ export function useDeleteAllTasks(leadId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
       toast.success('همه پیگیری‌ها حذف شدند');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useBulkDeleteTasks() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ids: string[]) => tasksService.bulkDelete(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+      toast.success('تسک‌ها با موفقیت حذف شدند');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'خطا در حذف گروهی');
+    },
+  });
+}
+
+export function useBulkUpdateTasks() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ ids, data }: { ids: string[]; data: { isCompleted: boolean } }) =>
+      tasksService.bulkUpdate(ids, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+      toast.success('وضعیت تسک‌ها بروزرسانی شد');
     },
     onError: (error: Error) => {
       toast.error(error.message);
