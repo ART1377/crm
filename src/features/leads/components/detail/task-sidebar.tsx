@@ -18,7 +18,7 @@ import { EditTaskDialog } from './edit-task-dialog';
 
 export function TaskSidebar({ tasks, leadId }: { tasks: Task[]; leadId: string }) {
   const updateTask = useUpdateTask();
-  const deleteTask = useDeleteTask(leadId);
+  const deleteTask = useDeleteTask();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [showDeleteAll, setShowDeleteAll] = useState(false);
   const deleteAllTasks = useDeleteAllTasks(leadId);
