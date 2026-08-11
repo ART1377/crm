@@ -2,11 +2,12 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { parseAsString, useQueryStates } from 'nuqs';
+import { debounce, parseAsString, useQueryStates } from 'nuqs';
 
 import { leadsService } from '@/features/leads/api/leads.api';
 import { useBulkDeleteLeads, useDeleteLead, useLeads } from '@/features/leads/hooks/use-leads';
 
+import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_DELAY } from '@/constants/constants';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
@@ -14,7 +15,9 @@ export function useLeadsPage() {
   const [params, setParams] = useQueryStates(
     {
       status: parseAsString.withDefault(''),
-      search: parseAsString.withDefault(''),
+      search: parseAsString
+        .withDefault('')
+        .withOptions({ limitUrlUpdates: debounce(SEARCH_DEBOUNCE_DELAY) }),
       dateFrom: parseAsString.withDefault(''),
       dateTo: parseAsString.withDefault(''),
       industry: parseAsString.withDefault(''),
@@ -23,7 +26,7 @@ export function useLeadsPage() {
       sortBy: parseAsString.withDefault('createdAt'),
       sortOrder: parseAsString.withDefault('desc'),
     },
-    { history: 'push', shallow: false }
+    { history: 'push', shallow: true }
   );
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -38,7 +41,7 @@ export function useLeadsPage() {
   const queryFilters = useMemo(
     () => ({
       status: params.status || undefined,
-      search: debouncedSearch.length >= 3 ? debouncedSearch : undefined,
+      search: debouncedSearch.length >= MIN_SEARCH_LENGTH ? debouncedSearch : undefined,
       dateFrom: params.dateFrom || undefined,
       dateTo: params.dateTo || undefined,
       industry: params.industry || undefined,

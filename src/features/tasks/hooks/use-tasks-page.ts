@@ -4,10 +4,11 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { parseAsString, useQueryStates } from 'nuqs';
+import { debounce, parseAsString, useQueryStates } from 'nuqs';
 
 import { useAllTasks, useBulkDeleteTasks, useDeleteTask } from '@/features/tasks/hooks/use-tasks';
 
+import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_DELAY } from '@/constants/constants';
 import { useDebounce } from '@/hooks/use-debounce';
 
 export function useTasksPage() {
@@ -15,11 +16,13 @@ export function useTasksPage() {
     {
       status: parseAsString.withDefault('all'),
       dueDate: parseAsString.withDefault('all'),
-      search: parseAsString.withDefault(''),
+      search: parseAsString
+        .withDefault('')
+        .withOptions({ limitUrlUpdates: debounce(SEARCH_DEBOUNCE_DELAY) }),
       sortBy: parseAsString.withDefault('dueDate'),
       sortOrder: parseAsString.withDefault('asc'),
     },
-    { history: 'push', shallow: false }
+    { history: 'push', shallow: true }
   );
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -35,7 +38,7 @@ export function useTasksPage() {
     () => ({
       status: params.status,
       dueDate: params.dueDate,
-      search: debouncedSearch,
+      search: debouncedSearch.length >= MIN_SEARCH_LENGTH ? debouncedSearch : undefined,
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
     }),
