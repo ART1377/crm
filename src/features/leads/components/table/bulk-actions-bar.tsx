@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { downloadMultiVCard } from '@/lib/utils';
 import { LEAD_STATUSES } from '../../constants/leads-constants';
+import { downloadMultiVCard } from '@/lib/utils';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -47,26 +47,26 @@ export function BulkActionsBar({
   };
 
   return (
-    <div className="bg-primary/5 border-primary/20 mb-3 rounded-lg border p-2 sm:p-3">
+    <div className="bg-primary/5 border-primary/20 mb-3 rounded-lg border p-3">
       {/* ردیف اول: تعداد و دکمه بستن */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium sm:text-sm">{selectedCount} سرنخ انتخاب شد</span>
+        <span className="text-sm font-medium">{selectedCount} سرنخ انتخاب شد</span>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClearSelection}
-          className="hover:bg-primary/10 h-7 w-7 p-0 sm:h-8 sm:w-auto sm:px-3"
+          className="h-8 gap-1.5 px-3"
         >
-          <X className="h-4 w-4 sm:ml-1.5" />
-          <span className="hidden sm:inline">لغو انتخاب</span>
+          <X className="h-4 w-4" />
+          لغو انتخاب
         </Button>
       </div>
 
-      {/* ردیف دوم: اکشن‌ها */}
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+      {/* ردیف دوم: اکشن‌ها - هر کدوم در یک خط جدا در موبایل */}
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
         <Select value="" onValueChange={onBulkStatusChange}>
-          <SelectTrigger className="h-8 min-w-25 flex-1 text-xs sm:h-9 sm:min-w-35 sm:text-sm">
-            <SelectValue placeholder="تغییر وضعیت" />
+          <SelectTrigger className="h-9 w-full text-sm sm:w-40">
+            <SelectValue placeholder="تغییر وضعیت گروهی" />
           </SelectTrigger>
           <SelectContent>
             {LEAD_STATUSES.map((s) => (
@@ -79,26 +79,24 @@ export function BulkActionsBar({
 
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={handleBulkExport}
           disabled={selectedLeads.length === 0}
-          className="h-8 flex-1 gap-1 text-xs sm:h-9 sm:flex-none sm:gap-1.5 sm:text-sm"
+          className="w-full gap-2 sm:w-auto"
         >
-          <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">ذخیره مخاطبین</span>
-          <span className="sm:hidden">{selectedLeads.length}</span>
+          <Download className="h-4 w-4" />
+          ذخیره مخاطبین ({selectedLeads.length})
         </Button>
 
         <Button
           variant="destructive"
-          size="sm"
+          size="default"
           onClick={onBulkDelete}
           disabled={isDeleting}
-          className="h-8 flex-1 gap-1 text-xs sm:h-9 sm:flex-none sm:gap-1.5 sm:text-sm"
+          className="w-full gap-2 sm:w-auto"
         >
-          <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">حذف گروهی</span>
-          <span className="sm:hidden">حذف</span>
+          <Trash2 className="h-4 w-4" />
+          {isDeleting ? 'در حال حذف...' : 'حذف گروهی'}
         </Button>
       </div>
     </div>
