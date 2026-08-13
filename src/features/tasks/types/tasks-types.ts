@@ -6,8 +6,13 @@ export interface Task {
   isCompleted: boolean;
   completedAt?: string | null;
   lead?: {
+    id: string;
     businessName: string;
     phoneNumber: string;
+    contactPerson?: string | null;
+    secondaryPhone?: string | null;
+    industry?: string;
+    notes?: string | null;
   };
   createdAt: string;
 }

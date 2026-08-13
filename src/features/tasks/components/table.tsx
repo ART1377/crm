@@ -5,7 +5,7 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/routes/routes';
-import { CheckCircle2, Circle, Clock, Trash2, User } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Contact, Trash2, User } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,10 @@ import {
 
 import { useUpdateTask } from '@/features/tasks/hooks/use-tasks';
 
-import { cn, formatDate } from '@/lib/utils';
+import { useCopyToClipboard } from '@/hooks/use-copy';
+import { downloadVCard, formatDate } from '@/lib/utils';
+
+import { cn } from '@/lib/utils';
 
 import { Task } from '../types/tasks-types';
 import { getTaskDueInfo, getTaskStatusBadge } from '../utils/task-utils';
@@ -42,7 +45,8 @@ export function TasksTable({
   onSelectOne,
 }: TasksTableProps) {
   const updateTask = useUpdateTask();
-
+  const { copy } = useCopyToClipboard();
+console.log(tasks)
   const handleToggleComplete = (task: Task) => {
     updateTask.mutate({
       taskId: task.id,
@@ -51,6 +55,18 @@ export function TasksTable({
   };
 
   const allSelected = tasks.length > 0 && selectedIds.length === tasks.length;
+
+  const handleDownloadVCard = (task: Task) => {
+    if (!task.lead) return;
+    downloadVCard({
+      businessName: task.lead.businessName,
+      phoneNumber: task.lead.phoneNumber,
+      contactPerson: task.lead.contactPerson,
+      secondaryPhone: task.lead.secondaryPhone,
+      industry: task.lead.industry,
+      notes: task.lead.notes,
+    });
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -62,9 +78,10 @@ export function TasksTable({
             </TableHead>
             <TableHead className="min-w-40 text-start">عنوان</TableHead>
             <TableHead className="min-w-32 text-start">سرنخ</TableHead>
+            <TableHead className="min-w-32 text-start">شماره تماس</TableHead>
             <TableHead className="min-w-32 text-start">تاریخ سررسید</TableHead>
             <TableHead className="min-w-24 text-start">وضعیت</TableHead>
-            <TableHead className="min-w-24 text-start">عملیات</TableHead>
+            <TableHead className="min-w-48 text-start">عملیات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,6 +134,19 @@ export function TasksTable({
                   )}
                 </TableCell>
                 <TableCell>
+                  {task.lead ? (
+                    <a
+                      href={`tel:${task.lead.phoneNumber}`}
+                      className="text-primary text-sm hover:underline"
+                      dir="ltr"
+                    >
+                      {task.lead.phoneNumber}
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">---</span>
+                  )}
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col gap-0.5">
                     <span className="text-sm" dir="ltr">
                       {formatDate(dueDate)}
@@ -145,14 +175,30 @@ export function TasksTable({
                   <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-muted-foreground h-8 w-8 hover:text-red-500"
-                    onClick={() => onDelete(task.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-0.5">
+                    {task.lead && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          copy(task.lead!.phoneNumber, 'شماره کپی شد');
+                          handleDownloadVCard(task);
+                        }}
+                        title="کپی شماره و ذخیره مخاطب"
+                      >
+                        <Contact className="h-4 w-4 text-blue-500" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground h-8 w-8 hover:text-red-500"
+                      onClick={() => onDelete(task.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             );
