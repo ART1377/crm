@@ -118,6 +118,7 @@ export function LeadsPage() {
               {selectedIds.length > 0 && (
                 <BulkActionsBar
                   selectedCount={selectedIds.length}
+                  selectedLeads={leads.filter((lead) => selectedIds.includes(lead.id))}
                   onBulkStatusChange={handleBulkStatusChange}
                   onBulkDelete={openBulkDeleteDialog}
                   onClearSelection={handleClearSelection}

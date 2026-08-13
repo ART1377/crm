@@ -18,7 +18,6 @@ import { TasksTable } from './components/table';
 import { useTasksPage } from './hooks/use-tasks-page';
 
 export function TasksPage() {
-  
   const {
     tasks,
     isLoading,
@@ -101,6 +100,7 @@ export function TasksPage() {
                       <BulkActionsBar
                         selectedIds={selectedIds}
                         selectedCount={selectedIds.length}
+                        selectedTasks={tasks.filter((task) => selectedIds.includes(task.id))}
                         onBulkDelete={openBulkDeleteDialog}
                         onClearSelection={handleClearSelection}
                         isDeleting={isBulkDeleting}

@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 
 import { useBulkUpdateTasks } from '@/features/tasks/hooks/use-tasks';
+import { downloadVCard } from '@/lib/utils';
 
 interface BulkActionsBarProps {
   selectedIds: string[];
@@ -21,6 +22,18 @@ interface BulkActionsBarProps {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   isDeleting?: boolean;
+  selectedTasks: Array<{
+    id: string;
+    leadId: string;
+    lead?: {
+      businessName: string;
+      phoneNumber: string;
+      contactPerson?: string | null;
+      secondaryPhone?: string | null;
+      industry?: string;
+      notes?: string | null;
+    };
+  }>;
 }
 
 export function BulkActionsBar({
@@ -29,6 +42,7 @@ export function BulkActionsBar({
   onBulkDelete,
   onClearSelection,
   isDeleting = false,
+  selectedTasks,
 }: BulkActionsBarProps) {
   const bulkUpdate = useBulkUpdateTasks();
 
@@ -38,9 +52,24 @@ export function BulkActionsBar({
     bulkUpdate.mutate({ ids: selectedIds, data: { isCompleted } });
   };
 
+  const handleBulkExport = () => {
+    selectedTasks.forEach((task) => {
+      if (task.lead) {
+        downloadVCard({
+          businessName: task.lead.businessName,
+          phoneNumber: task.lead.phoneNumber,
+          contactPerson: task.lead.contactPerson,
+          secondaryPhone: task.lead.secondaryPhone,
+          industry: task.lead.industry,
+          notes: task.lead.notes,
+        });
+      }
+    });
+  };
+
   return (
     <div className="bg-primary/5 border-primary/20 mb-3 flex flex-wrap items-center gap-3 rounded-lg border p-3">
-      <span className="text-sm font-medium">{selectedCount} تسک انتخاب شد</span>
+      <span className="text-sm font-medium">{selectedCount} تسک</span>
 
       <Select value="" onValueChange={handleStatusChange} disabled={bulkUpdate.isPending}>
         <SelectTrigger className="h-8 w-40">
@@ -63,6 +92,10 @@ export function BulkActionsBar({
       >
         <Trash2 className="h-4 w-4" />
         {isDeleting ? 'در حال حذف...' : 'حذف گروهی'}
+      </Button>
+
+      <Button variant="outline" size="sm" onClick={handleBulkExport} className="gap-1.5">
+        <Download className="h-4 w-4" />
       </Button>
 
       <Button variant="ghost" size="sm" onClick={onClearSelection} className="mr-auto">
