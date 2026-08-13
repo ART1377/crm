@@ -191,6 +191,47 @@ export function downloadVCard(lead: {
 
 // src/lib/utils.ts (اضافه کردن تابع)
 
+export function downloadMultiVCard(
+  leads: Array<{
+    businessName: string;
+    phoneNumber: string;
+    contactPerson?: string | null;
+    secondaryPhone?: string | null;
+    industry?: string;
+    notes?: string | null;
+  }>
+) {
+  if (!leads || leads.length === 0) return;
+
+  // ساخت VCard برای هر سرنخ
+  const vcards = leads.map((lead) => {
+    return generateVCard(lead.businessName, lead.phoneNumber, {
+      contactPerson: lead.contactPerson,
+      secondaryPhone: lead.secondaryPhone,
+      organization: lead.industry || '',
+      notes: lead.notes || undefined,
+    });
+  });
+
+  // ترکیب همه VCardها با جداکننده
+  const combinedVCard = vcards.join('\n');
+
+  // اسم فایل
+  const fileName = `contacts-${new Date().toLocaleDateString('fa-IR').replace(/\//g, '-')}`;
+
+  const blob = new Blob([combinedVCard], { type: 'text/vcard;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${fileName}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// src/lib/utils.ts (اضافه کردن تابع)
+
 export function getDisplayUrl(url: string): string {
   try {
     const parsed = new URL(url);
