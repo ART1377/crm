@@ -1,14 +1,6 @@
 import { Task } from '@/features/tasks/types/tasks-types';
 
-export type LeadStatus =
-  | 'NEW'
-  | 'CALLED'
-  | 'MESSAGED'
-  | 'CONTACTED'
-  | 'FOLLOW_UP'
-  | 'CUSTOMER'
-  | 'NOT_INTERESTED'
-  | 'INVALID';
+export type LeadStatus = 'NEW' | 'CALLED' | 'MESSAGED' | 'CONTACTED' | 'FOLLOW_UP' | 'CUSTOMER';
 
 export type LeadSource = string;
 
