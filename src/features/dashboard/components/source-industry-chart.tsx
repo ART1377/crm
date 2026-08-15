@@ -5,11 +5,11 @@ import { Link2 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface SourceIndustryTableProps {
+interface SourceIndustryChartProps {
   data: { source: string; industry: string; _count: { id: number } }[];
 }
 
-export function SourceIndustryTable({ data }: SourceIndustryTableProps) {
+export function SourceIndustryChart({ data }: SourceIndustryChartProps) {
   if (!data.length) return null;
 
   // Group by source

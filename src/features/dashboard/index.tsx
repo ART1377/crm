@@ -17,7 +17,7 @@ import { IndustryChart } from './components/industry-chart';
 import { IndustryTable } from './components/industry-table';
 import { DashboardSkeleton } from './components/skeleton';
 import { SourceConversionTable } from './components/source-conversion-table';
-import { SourceIndustryTable } from './components/source-industry-table';
+import { SourceIndustryChart } from './components/source-industry-chart';
 import { StatusCards } from './components/status-cards';
 import { TasksOverview } from './components/tasks-overview';
 import { TasksProgressCard } from './components/tasks-progress-card';
@@ -102,19 +102,16 @@ export function DashboardPage() {
 
       <WeeklyCalendar data={dailyActivity} />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <IndustryTable
-          entries={sortedIndustryEntries}
-          sortBy={industrySortBy}
-          sortDirection={industrySortDirection}
-          onSortChange={setIndustrySortBy}
-          sourceByIndustryAndStatus={sourceByIndustryAndStatus}
-        />
-        <IndustryChart data={industryPieData} />
-      </div>
-
-      <SourceIndustryTable data={sourceByIndustry} />
+      <IndustryTable
+        entries={sortedIndustryEntries}
+        sortBy={industrySortBy}
+        sortDirection={industrySortDirection}
+        onSortChange={setIndustrySortBy}
+        sourceByIndustryAndStatus={sourceByIndustryAndStatus}
+      />
+      <IndustryChart data={industryPieData} />
       <SourceConversionTable data={conversionData} totalLeads={totalLeads} />
+      <SourceIndustryChart data={sourceByIndustry} />
       <TasksOverview />
     </PageWrapper>
   );

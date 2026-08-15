@@ -15,9 +15,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { CONTACT_STATUSES } from '../utils/dashboard-utils';
 
 const CONVERSION_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER'];
-const CONTACT_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER', 'CONTACTED'];
 
 const statusColors: Record<string, string> = {
   CALLED: 'bg-cyan-100 text-cyan-800',
@@ -46,19 +46,23 @@ interface SourceConversionTableProps {
 export function SourceConversionTable({ data, totalLeads }: SourceConversionTableProps) {
   const { sourceMap, sourceTotals, statusTotals, sortedSources } = data;
 
-  // محاسبه مجموع ۴ وضعیت اصلی در کل
+  // مجموع ۴ وضعیت اصلی
   const totalConverted = CONVERSION_STATUSES.reduce(
     (sum, status) => sum + (statusTotals[status] || 0),
     0
   );
 
-  // مجموع سرنخ‌هایی که حداقل یک بار تماس گرفته شده‌اند (شامل CALLED و CONTACTED)
+  // مجموع سرنخ‌های تماس گرفته شده (شامل CALLED + CONTACTED + ...)
   const totalContacted = CONTACT_STATUSES.reduce(
     (sum, status) => sum + (statusTotals[status] || 0),
     0
   );
 
-  const overallConversionRate = totalContacted > 0 ? (totalConverted / totalContacted) * 100 : 0;
+  // نرخ تبدیل کلی = (۴ وضعیت) / (کل سرنخ‌ها)
+  const overallConversionRate = totalLeads > 0 ? (totalConverted / totalLeads) * 100 : 0;
+
+  // نرخ بهره‌وری کلی = (۴ وضعیت) / (تماس گرفته‌ها)
+  const overallEfficiencyRate = totalContacted > 0 ? (totalConverted / totalContacted) * 100 : 0;
 
   return (
     <Card className="col-span-full min-h-fit">
@@ -93,13 +97,12 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                 (sum, status) => sum + (statuses[status] || 0),
                 0
               );
-              const conversionRate = total > 0 ? (converted / total) * 100 : 0;
-
-              // محاسبه نرخ بهره‌وری: نسبت ۴ وضعیت به کل سرنخ‌های تماس گرفته شده (شامل CALLED + CONTACTED)
               const contactedCount = CONTACT_STATUSES.reduce(
                 (sum, status) => sum + (statuses[status] || 0),
                 0
               );
+
+              const conversionRate = total > 0 ? (converted / total) * 100 : 0;
               const efficiencyRate = contactedCount > 0 ? (converted / contactedCount) * 100 : 0;
 
               return (
@@ -138,7 +141,6 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                     );
                   })}
 
-                  {/* نرخ تبدیل (نسبت به کل) */}
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span
@@ -160,7 +162,6 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                     </div>
                   </TableCell>
 
-                  {/* نرخ بهره‌وری از تماس (نسبت به تماس گرفته‌ها + CALLED) */}
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span
@@ -230,7 +231,7 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                     )}
                   </span>
                   <span className="text-muted-foreground text-[9px]">
-                    {totalConverted} از {totalContacted}
+                    {totalConverted} از {totalLeads}
                   </span>
                 </div>
               </TableCell>
@@ -239,11 +240,16 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                 <div className="flex flex-col items-center">
                   <span
                     className={cn(
-                      'inline-flex items-center gap-1 font-semibold tabular-nums text-blue-600'
+                      'inline-flex items-center gap-1 font-semibold tabular-nums',
+                      overallEfficiencyRate >= 50 ? 'text-blue-600' : 'text-blue-400'
                     )}
                   >
-                    100%
-                    <TrendingUp className="h-3 w-3 text-blue-500" />
+                    {overallEfficiencyRate.toFixed(1)}%
+                    {overallEfficiencyRate >= 50 ? (
+                      <TrendingUp className="h-3 w-3 text-blue-500" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 text-blue-400" />
+                    )}
                   </span>
                   <span className="text-muted-foreground text-[9px]">
                     {totalConverted} از {totalContacted}

@@ -30,6 +30,7 @@ export interface IndustryStatsItem {
 }
 
 export const SUMMARY_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER'];
+export const CONTACT_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER', 'CONTACTED'];
 
 export function buildIndustryMap(
   industryStats: IndustryStatsItem[]
@@ -118,13 +119,17 @@ export function prepareConversionData(data: SourceConversionItem[]): {
 } {
   const sourceMap: Record<string, Record<string, number>> = {};
   const statusTotals: Record<string, number> = {};
-  for (const status of SUMMARY_STATUSES) statusTotals[status] = 0;
+
+  // مقداردهی اولیه برای همه وضعیت‌های مرتبط (شامل CONTACTED)
+  for (const status of CONTACT_STATUSES) {
+    statusTotals[status] = 0;
+  }
 
   for (const item of data) {
     const source = item.source || 'نامشخص';
     if (!sourceMap[source]) sourceMap[source] = {};
     sourceMap[source][item.status] = (sourceMap[source][item.status] || 0) + item._count.id;
-    if (SUMMARY_STATUSES.includes(item.status)) {
+    if (CONTACT_STATUSES.includes(item.status)) {
       statusTotals[item.status] = (statusTotals[item.status] || 0) + item._count.id;
     }
   }
