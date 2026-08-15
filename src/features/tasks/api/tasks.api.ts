@@ -18,6 +18,7 @@ export const tasksService = {
     sortBy?: string;
     sortOrder?: string;
     search?: string;
+    overdueDays?: string;
   }) {
     const query = new URLSearchParams();
     if (params?.status) query.append('status', params.status);
@@ -25,6 +26,8 @@ export const tasksService = {
     if (params?.sortBy) query.append('sortBy', params.sortBy);
     if (params?.sortOrder) query.append('sortOrder', params.sortOrder);
     if (params?.search) query.append('search', params.search);
+    if (params?.overdueDays) query.append('overdueDays', params.overdueDays);
+
     const url = `/tasks${query.toString() ? '?' + query.toString() : ''}`;
     return apiClient.get(url) as Promise<Task[]>;
   },

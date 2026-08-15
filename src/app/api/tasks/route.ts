@@ -1,29 +1,27 @@
 // src/app/api/tasks/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status'); // 'completed' | 'pending' | 'all'
-    const dueDate = searchParams.get('dueDate'); // 'today' | 'week' | 'month' | 'overdue' | 'all'
+    const status = searchParams.get('status');
+    const dueDate = searchParams.get('dueDate');
     const sortBy = searchParams.get('sortBy') || 'dueDate';
     const sortOrder = searchParams.get('sortOrder') || 'asc';
     const search = searchParams.get('search');
+    const overdueDays = searchParams.get('overdueDays');
 
     const where: Prisma.TaskWhereInput = {};
 
-    // فیلتر وضعیت
     if (status === 'completed') {
       where.isCompleted = true;
     } else if (status === 'pending') {
       where.isCompleted = false;
     }
 
-    // فیلتر تاریخ
     const now = new Date();
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
@@ -48,9 +46,14 @@ export async function GET(request: NextRequest) {
     } else if (dueDate === 'overdue') {
       where.dueDate = { lt: today };
       where.isCompleted = false;
+      if (overdueDays) {
+        const days = parseInt(overdueDays);
+        const cutoff = new Date(today);
+        cutoff.setDate(cutoff.getDate() - days);
+        where.dueDate = { lt: cutoff };
+      }
     }
 
-    // جستجو
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },

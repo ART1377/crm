@@ -1,14 +1,25 @@
 // src/features/tasks/components/skeleton.tsx
 
-import { Card, CardContent } from '@/components/ui/card';
+import { PageHeader } from '@/components/shared/page-header';
+import { PageWrapper } from '@/components/shared/page-wrapper';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function TasksSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-9 w-32" />
+    <PageWrapper
+      header={
+        <PageHeader
+          title={<Skeleton className="h-7 w-40" />}
+        />
+      }
+    >
       <Card>
-        <CardContent className="p-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-4 rounded-full" />
+        </CardHeader>
+        <CardContent>
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="mb-4 flex items-center gap-4">
               <Skeleton className="h-5 w-5 rounded" />
@@ -21,6 +32,6 @@ export function TasksSkeleton() {
           ))}
         </CardContent>
       </Card>
-    </div>
+    </PageWrapper>
   );
 }

@@ -21,6 +21,7 @@ export function useTasksPage() {
         .withOptions({ limitUrlUpdates: debounce(SEARCH_DEBOUNCE_DELAY) }),
       sortBy: parseAsString.withDefault('dueDate'),
       sortOrder: parseAsString.withDefault('asc'),
+      overdueDays: parseAsString.withDefault(''),
     },
     { history: 'push', shallow: true }
   );
@@ -41,8 +42,16 @@ export function useTasksPage() {
       search: debouncedSearch.length >= MIN_SEARCH_LENGTH ? debouncedSearch : undefined,
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
+      overdueDays: params.overdueDays,
     }),
-    [params.status, params.dueDate, debouncedSearch, params.sortBy, params.sortOrder]
+    [
+      params.status,
+      params.dueDate,
+      debouncedSearch,
+      params.sortBy,
+      params.sortOrder,
+      params.overdueDays,
+    ]
   );
 
   const { data: tasks = [], isLoading, isFetching, refetch } = useAllTasks(queryFilters);

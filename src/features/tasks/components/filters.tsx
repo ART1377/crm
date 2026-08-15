@@ -39,6 +39,7 @@ interface TaskFiltersProps {
     search: string;
     sortBy: string;
     sortOrder: string;
+    overdueDays: string;
   };
   counts: {
     all: number;
@@ -166,6 +167,26 @@ export function TaskFilters({
                 <SelectItem value="desc">نزولی</SelectItem>
               </SelectContent>
             </Select>
+
+            {filters.dueDate === 'overdue' && (
+              <Select
+                value={filters.overdueDays}
+                onValueChange={(v) => onFilterChange('overdueDays', v)}
+              >
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="روز دیرکرد" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">همه</SelectItem>
+                  <SelectItem value="1">بیشتر از ۱ روز</SelectItem>
+                  <SelectItem value="3">بیشتر از ۳ روز</SelectItem>
+                  <SelectItem value="7">بیشتر از ۷ روز</SelectItem>
+                  <SelectItem value="10">بیشتر از ۱۰ روز</SelectItem>
+                  <SelectItem value="14">بیشتر از ۱۴ روز</SelectItem>
+                  <SelectItem value="21">بیشتر از ۲۱ روز</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {hasActiveFilters && (
