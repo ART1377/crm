@@ -70,30 +70,36 @@ export function TaskFilters({
     <Card className="overflow-visible">
       <CardContent className="p-4">
         <div className="space-y-3">
-          {/* Tabs - تاریخ */}
-          <div className="overflow-x-auto pb-1">
-            <Tabs
-              value={filters.dueDate}
-              onValueChange={(value) => onFilterChange('dueDate', value)}
-              className="w-full"
-            >
-              <TabsList className="bg-muted/50 inline-flex h-auto w-full min-w-max gap-1 rounded-lg p-1">
-                {DUE_DATE_FILTERS.map((filter) => (
-                  <TabsTrigger
-                    key={filter.value}
-                    value={filter.value}
-                    className="shrink-0 px-3 py-1.5 text-xs data-[state=active]:bg-white"
-                  >
-                    {filter.label}
-                    {counts[filter.value as keyof typeof counts] !== undefined && (
-                      <Badge variant="secondary" className="mr-1.5 h-5 px-1.5 text-[10px]">
-                        {counts[filter.value as keyof typeof counts]}
-                      </Badge>
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+          {/* Tabs - تاریخ با اسکرول افقی */}
+          <div className="relative">
+            {/* سایه‌های نشان‌دهنده قابلیت اسکرول */}
+            <div className="from-background pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-2 bg-linear-to-l to-transparent" />
+            <div className="from-background pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-2 bg-linear-to-r to-transparent" />
+
+            <div className="scrollbar-thumb-muted-foreground/20 scrollbar-thin scrollbar-track-transparent overflow-x-auto pb-1">
+              <Tabs
+                value={filters.dueDate}
+                onValueChange={(value) => onFilterChange('dueDate', value)}
+                className="w-full"
+              >
+                <TabsList className="bg-muted/50 inline-flex h-auto w-max min-w-full gap-1 rounded-lg p-1">
+                  {DUE_DATE_FILTERS.map((filter) => (
+                    <TabsTrigger
+                      key={filter.value}
+                      value={filter.value}
+                      className="shrink-0 px-3 py-1.5 text-xs data-[state=active]:bg-white"
+                    >
+                      {filter.label}
+                      {counts[filter.value as keyof typeof counts] !== undefined && (
+                        <Badge variant="secondary" className="mr-1.5 h-5 px-1.5 text-[10px]">
+                          {counts[filter.value as keyof typeof counts]}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </div>
           </div>
 
           {/* Row 1: Search + Status */}
@@ -139,7 +145,7 @@ export function TaskFilters({
           {/* Row 2: Sort */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <Select value={filters.sortBy} onValueChange={onSortByChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-40">
                 <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
                 <SelectValue placeholder="مرتب‌سازی" />
               </SelectTrigger>
@@ -152,7 +158,7 @@ export function TaskFilters({
             </Select>
 
             <Select value={filters.sortOrder} onValueChange={onSortOrderChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full sm:w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
