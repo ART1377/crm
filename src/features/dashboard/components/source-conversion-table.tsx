@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const CONVERSION_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER'];
+const CONTACT_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER', 'CONTACTED'];
 
 const statusColors: Record<string, string> = {
   CALLED: 'bg-cyan-100 text-cyan-800',
@@ -50,7 +51,14 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
     (sum, status) => sum + (statusTotals[status] || 0),
     0
   );
-  const overallConversionRate = totalLeads > 0 ? (totalConverted / totalLeads) * 100 : 0;
+
+  // مجموع سرنخ‌هایی که حداقل یک بار تماس گرفته شده‌اند (شامل CALLED و CONTACTED)
+  const totalContacted = CONTACT_STATUSES.reduce(
+    (sum, status) => sum + (statusTotals[status] || 0),
+    0
+  );
+
+  const overallConversionRate = totalContacted > 0 ? (totalConverted / totalContacted) * 100 : 0;
 
   return (
     <Card className="col-span-full min-h-fit">
@@ -74,6 +82,7 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                 </TableHead>
               ))}
               <TableHead className="text-center text-green-600">✅ نرخ تبدیل</TableHead>
+              <TableHead className="text-center text-blue-600">📊 نرخ بهره‌وری از تماس</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -85,6 +94,13 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                 0
               );
               const conversionRate = total > 0 ? (converted / total) * 100 : 0;
+
+              // محاسبه نرخ بهره‌وری: نسبت ۴ وضعیت به کل سرنخ‌های تماس گرفته شده (شامل CALLED + CONTACTED)
+              const contactedCount = CONTACT_STATUSES.reduce(
+                (sum, status) => sum + (statuses[status] || 0),
+                0
+              );
+              const efficiencyRate = contactedCount > 0 ? (converted / contactedCount) * 100 : 0;
 
               return (
                 <TableRow key={source} className="hover:bg-muted/50">
@@ -122,6 +138,7 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                     );
                   })}
 
+                  {/* نرخ تبدیل (نسبت به کل) */}
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span
@@ -139,6 +156,28 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                       </span>
                       <span className="text-muted-foreground text-[9px]">
                         {converted} از {total}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  {/* نرخ بهره‌وری از تماس (نسبت به تماس گرفته‌ها + CALLED) */}
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 font-semibold tabular-nums',
+                          efficiencyRate >= 50 ? 'text-blue-600' : 'text-blue-400'
+                        )}
+                      >
+                        {efficiencyRate.toFixed(1)}%
+                        {efficiencyRate >= 50 ? (
+                          <TrendingUp className="h-3 w-3 text-blue-500" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 text-blue-400" />
+                        )}
+                      </span>
+                      <span className="text-muted-foreground text-[9px]">
+                        {converted} از {contactedCount}
                       </span>
                     </div>
                   </TableCell>
@@ -191,7 +230,23 @@ export function SourceConversionTable({ data, totalLeads }: SourceConversionTabl
                     )}
                   </span>
                   <span className="text-muted-foreground text-[9px]">
-                    {totalConverted} از {totalLeads}
+                    {totalConverted} از {totalContacted}
+                  </span>
+                </div>
+              </TableCell>
+
+              <TableCell className="text-center">
+                <div className="flex flex-col items-center">
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 font-semibold tabular-nums text-blue-600'
+                    )}
+                  >
+                    100%
+                    <TrendingUp className="h-3 w-3 text-blue-500" />
+                  </span>
+                  <span className="text-muted-foreground text-[9px]">
+                    {totalConverted} از {totalContacted}
                   </span>
                 </div>
               </TableCell>
