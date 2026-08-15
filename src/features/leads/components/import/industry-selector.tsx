@@ -31,9 +31,6 @@ export function IndustrySelector({ selectedIndustries, onChange, options }: Indu
     onChange(newIndustries, uniqueKeywords.join(', '));
   };
 
-  // تبدیل آرایه به رشته برای MultiSelect
-  const selectedValue = selectedIndustries.join(',');
-
   // گزینه‌های MultiSelect
   const multiSelectOptions = options.map((opt) => ({
     value: opt,

@@ -75,7 +75,7 @@ export function useImportSearch({ searchFn, sharedParams, sourceName }: UseImpor
       if (result.total === 0) {
         toast('نتیجه‌ای پیدا نشد');
       }
-    } catch (error) {
+    } catch {
       toast.error('خطا در جستجو');
     } finally {
       setLoading(false);

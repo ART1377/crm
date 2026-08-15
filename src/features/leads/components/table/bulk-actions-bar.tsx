@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { LEAD_STATUSES } from '../../constants/leads-constants';
 import { downloadMultiVCard } from '@/lib/utils';
+import { LEAD_STATUSES } from '../../constants/leads-constants';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -51,12 +51,7 @@ export function BulkActionsBar({
       {/* ردیف اول: تعداد و دکمه بستن */}
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium">{selectedCount} سرنخ انتخاب شد</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClearSelection}
-          className="h-8 gap-1.5 px-3"
-        >
+        <Button variant="ghost" size="sm" onClick={onClearSelection} className="h-8 gap-1.5 px-3">
           <X className="h-4 w-4" />
           لغو انتخاب
         </Button>

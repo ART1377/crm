@@ -1,10 +1,6 @@
 const BaleIcon = ({ className }: { className: string }) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 1000 999.72"
-      className={className}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 999.72" className={className}>
       <defs>
         <linearGradient
           id="linear-gradient"

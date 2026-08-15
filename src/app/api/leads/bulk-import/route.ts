@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         status: 'NEW',
         address: lead.address || null,
         website: lead.website || null,
-        rating: lead.rating ? parseFloat(lead.rating) : null, 
+        rating: lead.rating ? parseFloat(lead.rating) : null,
         category: lead.category || null,
         notes: noteParts.filter(Boolean).join(' | ') || null,
       });

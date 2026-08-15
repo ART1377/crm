@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
     .trim();
   const lat = parseFloat(req.nextUrl.searchParams.get('lat') || '35.6607');
   const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3156');
-  const radiusKm = parseFloat(req.nextUrl.searchParams.get('radius') || '2');
 
   let browser;
   try {

@@ -46,7 +46,7 @@ export function TasksTable({
 }: TasksTableProps) {
   const updateTask = useUpdateTask();
   const { copy } = useCopyToClipboard();
-console.log(tasks)
+  console.log(tasks);
   const handleToggleComplete = (task: Task) => {
     updateTask.mutate({
       taskId: task.id,

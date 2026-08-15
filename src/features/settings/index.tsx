@@ -8,12 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
+import { DeduplicateManager } from './components/deduplicate-manager';
 import { SenderInfoForm } from './components/info-form';
 import { ListOptionsManager } from './components/list-options-manager';
 import { MessengersTable } from './components/messengers-table';
 import { SettingsPageSkeleton } from './components/skeleton';
 import { useSettingsPage } from './hooks/use-settings-page';
-import { DeduplicateManager } from './components/deduplicate-manager';
 
 const TABS = [
   { value: 'general', label: 'فرستنده', icon: Settings2 },

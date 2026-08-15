@@ -7,13 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function TasksSkeleton() {
   return (
-    <PageWrapper
-      header={
-        <PageHeader
-          title={<Skeleton className="h-7 w-40" />}
-        />
-      }
-    >
+    <PageWrapper header={<PageHeader title={<Skeleton className="h-7 w-40" />} />}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <Skeleton className="h-6 w-40" />
