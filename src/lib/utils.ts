@@ -24,18 +24,6 @@ export function formatDate(date: Date | string): string {
   return new Intl.DateTimeFormat('fa-IR', options).format(d);
 }
 
-// نسخه ساده‌تر - فقط تاریخ بدون ساعت
-export function formatDateOnly(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-
-  return new Intl.DateTimeFormat('fa-IR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: 'Asia/Tehran',
-  }).format(d);
-}
-
 // تابع کمکی برای دیپ لینک پیام‌رسان‌ها
 const DEFAULT_LINKS: Record<string, string> = {
   WHATSAPP: 'https://wa.me/{phone}?text={message}',

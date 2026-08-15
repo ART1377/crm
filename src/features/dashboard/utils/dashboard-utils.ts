@@ -4,12 +4,6 @@ import { LEAD_STATUSES } from '@/features/leads/constants/leads-constants';
 
 export type IndustryEntry = [string, Record<string, number>];
 
-export interface SourceByIndustryItem {
-  source: string;
-  industry: string;
-  _count: { id: number };
-}
-
 export interface SourceByIndustryAndStatusItem {
   source: string;
   industry: string;

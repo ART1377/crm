@@ -37,10 +37,3 @@ export function getTaskStatusBadge(task: Task) {
   if (isOverdue) return { label: 'دیرکرد', variant: 'destructive' as const };
   return { label: 'در انتظار', variant: 'default' as const };
 }
-
-export function getTaskStatusLabel(task: Task): string {
-  if (task.isCompleted) return 'انجام شده';
-  const isOverdue = new Date(task.dueDate) < new Date();
-  if (isOverdue) return 'دیرکرد';
-  return 'در انتظار';
-}

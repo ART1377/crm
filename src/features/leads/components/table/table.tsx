@@ -25,8 +25,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { getSourceLabel } from '@/features/leads/lead-helpers';
-
 import { downloadVCard, formatDate } from '@/lib/utils';
 
 import { useCopyToClipboard } from '@/hooks/use-copy';
@@ -55,6 +53,9 @@ export function LeadsTable({
   const someSelected = selectedIds.length > 0 && selectedIds.length < leads.length;
   const checkboxRef = useRef<HTMLButtonElement>(null);
   const { copy } = useCopyToClipboard();
+  const getSourceLabel = (source: string) => {
+    return source || '---';
+  };
 
   useEffect(() => {
     if (checkboxRef.current) {

@@ -21,14 +21,6 @@ export const ALL_COLUMNS = [
 
 export type ColumnKey = (typeof ALL_COLUMNS)[number]['key'];
 
-export const DEFAULT_COLUMNS: ColumnKey[] = [
-  'businessName',
-  'phoneNumber',
-  'industry',
-  'source',
-  'status',
-];
-
 function normalizePhoneNumber(value: string): string {
   if (!value) return '';
   return value

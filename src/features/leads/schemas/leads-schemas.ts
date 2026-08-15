@@ -16,9 +16,3 @@ export const leadSchema = z.object({
   rating: z.number().min(0).max(5).optional(), // حذف .nullable()
   category: z.string().optional(),
 });
-
-export const activitySchema = z.object({
-  type: z.enum(['CALL', 'MESSAGE', 'NOTE', 'STATUS_CHANGE']),
-  summary: z.string().min(1, 'خلاصه فعالیت الزامی است'),
-  detail: z.string().optional(),
-});

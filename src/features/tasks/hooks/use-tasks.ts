@@ -12,14 +12,6 @@ import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from '@/lib/query-keys';
 
 import { CreateTaskData } from '../types/tasks-types';
 
-export function useTasks(leadId: string) {
-  return useQuery({
-    queryKey: [TASKS_QUERY_KEY, leadId],
-    queryFn: () => tasksService.getByLeadId(leadId),
-    enabled: !!leadId,
-  });
-}
-
 export function useAllTasks(filters: {
   status?: string;
   dueDate?: string;

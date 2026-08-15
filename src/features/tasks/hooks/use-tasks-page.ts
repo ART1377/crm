@@ -153,6 +153,7 @@ export function useTasksPage() {
       search: params.search,
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
+      overdueDays: params.overdueDays,
     },
     counts,
     hasFilters,
