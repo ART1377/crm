@@ -17,6 +17,7 @@ import { ConversionCard } from './components/conversion-card';
 import { IndustryChart } from './components/industry-chart';
 import { IndustryTable } from './components/industry-table';
 import { DashboardSkeleton } from './components/skeleton';
+import { SourceConversionTable } from './components/source-conversion-table';
 import { SourceIndustryTable } from './components/source-industry-table';
 import { StatusCards } from './components/status-cards';
 import { TasksOverview } from './components/tasks-overview';
@@ -40,6 +41,8 @@ export function DashboardPage() {
     setIndustrySortBy,
     industrySortDirection,
     sourceByIndustry,
+    sourceByIndustryAndStatus,
+    sourceConversionStats,
   } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
@@ -110,13 +113,15 @@ export function DashboardPage() {
           sortBy={industrySortBy}
           sortDirection={industrySortDirection}
           onSortChange={setIndustrySortBy}
+          sourceByIndustryAndStatus={sourceByIndustryAndStatus}
         />
         <IndustryChart data={industryPieData} />
       </div>
 
       {/* جدول منبع × صنعت */}
       <SourceIndustryTable data={sourceByIndustry} />
-
+      {/* جدول نرخ تبدیل بر اساس منبع */}
+      <SourceConversionTable data={sourceConversionStats} totalLeads={stats.total} />
       {/* ✅ بخش جدید تسک‌ها */}
       <TasksOverview />
     </PageWrapper>

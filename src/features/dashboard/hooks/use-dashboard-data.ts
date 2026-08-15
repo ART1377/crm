@@ -19,6 +19,8 @@ export function useDashboardData() {
   const customers = stats?.customers ?? 0;
 
   const sourceByIndustry = analytics?.sourceByIndustry ?? [];
+  const sourceByIndustryAndStatus = analytics?.sourceByIndustryAndStatus ?? [];
+  const sourceConversionStats = analytics?.sourceConversionStats ?? [];
 
   const conversionRate = total > 0 ? Math.round((customers / total) * 100) : 0;
 
@@ -37,7 +39,6 @@ export function useDashboardData() {
     name,
     value: Object.values(statuses).reduce((a, b) => a + b, 0),
   }));
-
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -83,5 +84,7 @@ export function useDashboardData() {
     setIndustrySortBy: handleIndustrySort,
     industrySortDirection,
     sourceByIndustry,
+    sourceByIndustryAndStatus,
+    sourceConversionStats,
   };
 }

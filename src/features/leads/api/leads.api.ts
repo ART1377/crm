@@ -78,6 +78,17 @@ export const leadsService = {
       industryStats: { industry: string; status: string; _count: { id: number } }[];
       dailyActivity: { date: string; count: number }[];
       sourceByIndustry: { source: string; industry: string; _count: { id: number } }[];
+      sourceByIndustryAndStatus: {
+        source: string;
+        industry: string;
+        status: string;
+        _count: { id: number };
+      }[];
+      sourceConversionStats: {
+        source: string;
+        status: string;
+        _count: { id: number };
+      }[];
     }>;
   },
 
