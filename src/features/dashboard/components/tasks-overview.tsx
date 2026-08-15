@@ -2,10 +2,9 @@
 
 'use client';
 
+import { AlertCircle, Calendar, CheckCircle2, Clock, ListTodo, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-
-import { ROUTES } from '@/routes/routes';
-import { AlertCircle, Calendar, CheckCircle2, Clock, ListTodo } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,21 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { useAllTasks } from '@/features/tasks/hooks/use-tasks';
-
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/routes/routes';
 
 export function TasksOverview() {
-  const { data: todayTasks = [], isLoading: todayLoading } = useAllTasks({
-    status: 'all',
-    dueDate: 'today',
-  });
+  const { data: allTasks = [], isLoading } = useAllTasks({ status: 'all', dueDate: 'all' });
 
-  const { data: allTasks = [], isLoading: allLoading } = useAllTasks({
-    status: 'all',
-    dueDate: 'all',
-  });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const isLoading = todayLoading || allLoading;
+  const todayTasks = useMemo(() => {
+    return allTasks.filter((task) => {
+      const due = new Date(task.dueDate);
+      due.setHours(0, 0, 0, 0);
+      return due.getTime() === today.getTime();
+    });
+  }, [allTasks, today]);
 
   const total = allTasks.length;
   const pending = allTasks.filter((t) => !t.isCompleted).length;
@@ -37,9 +37,7 @@ export function TasksOverview() {
   const todayTasksList = todayTasks.slice(0, 3);
   const hasMoreToday = todayTasks.length > 3;
 
-  if (isLoading) {
-    return <TasksOverviewSkeleton />;
-  }
+  if (isLoading) return <TasksOverviewSkeleton />;
 
   return (
     <Card className="col-span-full min-h-fit">
@@ -52,13 +50,11 @@ export function TasksOverview() {
         </CardTitle>
         <Link href="/tasks">
           <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-            مشاهده همه
-            <span className="text-muted-foreground text-[10px]">({total})</span>
+            مشاهده همه <span className="text-muted-foreground text-[10px]">({total})</span>
           </Button>
         </Link>
       </CardHeader>
       <CardContent>
-        {/* آمار تسک‌ها */}
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatItem
             label="کل تسک‌ها"
@@ -94,7 +90,6 @@ export function TasksOverview() {
           />
         </div>
 
-        {/* لیست تسک‌های امروز */}
         <div>
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -177,7 +172,6 @@ export function TasksOverview() {
                   </Link>
                 );
               })}
-
               {hasMoreToday && (
                 <Link href="/tasks?dueDate=today">
                   <Button variant="ghost" size="sm" className="w-full text-xs">
@@ -193,22 +187,16 @@ export function TasksOverview() {
   );
 }
 
-// کامپوننت آماری کوچک با قابلیت لینک
-function StatItem({
-  label,
-  value,
-  icon: Icon,
-  color,
-  bgColor,
-  href,
-}: {
+interface StatItemProps {
   label: string;
   value: number;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   bgColor: string;
   href?: string;
-}) {
+}
+
+function StatItem({ label, value, icon: Icon, color, bgColor, href }: StatItemProps) {
   const content = (
     <div className="hover:border-primary/30 hover:bg-primary/5 flex items-center gap-3 rounded-lg border p-3 transition-all">
       <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', bgColor)}>
@@ -220,15 +208,9 @@ function StatItem({
       </div>
     </div>
   );
-
-  if (href) {
-    return <Link href={href}>{content}</Link>;
-  }
-
-  return content;
+  return href ? <Link href={href}>{content}</Link> : content;
 }
 
-// اسکلتون
 function TasksOverviewSkeleton() {
   return (
     <Card className="col-span-full">

@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp, ArrowUpDown, PieChart, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -14,21 +15,24 @@ import {
 } from '@/components/ui/table';
 
 import { LEAD_STATUSES } from '@/features/leads/constants/leads-constants';
-
 import { cn } from '@/lib/utils';
+
+import {
+  calculateColumnTotals,
+  calculateGrandTotal,
+  getSummaryTotal,
+  type IndustryEntry,
+  type SourceByIndustryAndStatusItem,
+  SUMMARY_STATUSES,
+} from '../utils/dashboard-utils';
 import { SourceDetailPopover } from './source-detail-popover';
 
 interface IndustryTableProps {
-  entries: [string, Record<string, number>][];
+  entries: IndustryEntry[];
   sortBy: string;
   sortDirection: 'asc' | 'desc';
   onSortChange: (column: string) => void;
-  sourceByIndustryAndStatus: {
-    source: string;
-    industry: string;
-    status: string;
-    _count: { id: number };
-  }[];
+  sourceByIndustryAndStatus: SourceByIndustryAndStatusItem[];
 }
 
 const SORT_COLUMNS = [
@@ -38,9 +42,6 @@ const SORT_COLUMNS = [
 
 const MAX_BAR_WIDTH = 60;
 
-// وضعیت‌هایی که در ستون جمع نمایش داده میشن
-const SUMMARY_STATUSES = ['CALLED', 'MESSAGED', 'FOLLOW_UP', 'CUSTOMER'];
-
 export function IndustryTable({
   entries,
   sortBy,
@@ -48,64 +49,36 @@ export function IndustryTable({
   onSortChange,
   sourceByIndustryAndStatus,
 }: IndustryTableProps) {
-  // محاسبه مجموع کل برای درصد
-  const grandTotal = entries.reduce(
-    (sum, [, statuses]) => sum + Object.values(statuses).reduce((a, b) => a + b, 0),
-    0
-  );
+  const grandTotal = useMemo(() => calculateGrandTotal(entries), [entries]);
+  const columnTotals = useMemo(() => calculateColumnTotals(entries), [entries]);
+  const summaryTotal = useMemo(() => getSummaryTotal(columnTotals), [columnTotals]);
 
-  const maxTotal = Math.max(
-    ...entries.map(([, statuses]) => Object.values(statuses).reduce((a, b) => a + b, 0)),
-    1
-  );
-
-  const getPercentage = (value: number) => {
-    if (grandTotal === 0) return 0;
-    return (value / grandTotal) * 100;
-  };
-
-  const formatPercent = (value: number) => {
-    return value.toFixed(1);
-  };
-
-  const renderCell = (industry: string, statusKey: string, count: number) => {
-    return (
-      <SourceDetailPopover
-        industry={industry}
-        statusKey={statusKey}
-        count={count}
-        sourceByIndustryAndStatus={sourceByIndustryAndStatus}
-        grandTotal={grandTotal}
-      >
-        {count}
-      </SourceDetailPopover>
+  const maxTotal = useMemo(() => {
+    return Math.max(
+      ...entries.map(([, statuses]) => Object.values(statuses).reduce((a, b) => a + b, 0)),
+      1
     );
-  };
+  }, [entries]);
 
-  // محاسبه مجموع هر ستون در کل صنایع
-  const columnTotals: Record<string, number> = {};
+  const getPercentage = (value: number) => (grandTotal === 0 ? 0 : (value / grandTotal) * 100);
+  const formatPercent = (value: number) => value.toFixed(1);
 
-  // مقداردهی اولیه
-  columnTotals['total'] = 0;
-  for (const status of LEAD_STATUSES) {
-    columnTotals[status.value] = 0;
-  }
-  for (const status of SUMMARY_STATUSES) {
-    columnTotals[status] = 0;
-  }
-
-  // محاسبه مجموع‌ها
-  for (const [, statuses] of entries) {
-    for (const [status, count] of Object.entries(statuses)) {
-      columnTotals[status] = (columnTotals[status] || 0) + count;
-      columnTotals['total'] = (columnTotals['total'] || 0) + count;
-    }
-  }
-
-  // محاسبه summaryTotal برای ردیف جمع کل
-  const summaryTotal = SUMMARY_STATUSES.reduce(
-    (sum, status) => sum + (columnTotals[status] || 0),
-    0
+  const renderCell = (
+    industry: string,
+    statusKey: string,
+    count: number,
+    align?: 'start' | 'center' | 'end'
+  ) => (
+    <SourceDetailPopover
+      industry={industry}
+      statusKey={statusKey}
+      count={count}
+      sourceByIndustryAndStatus={sourceByIndustryAndStatus}
+      grandTotal={grandTotal}
+      align={align || 'center'}
+    >
+      {count}
+    </SourceDetailPopover>
   );
 
   return (
@@ -149,25 +122,21 @@ export function IndustryTable({
                   </TableHead>
                 );
               })}
-              {/* ستون جدید جمع */}
               <TableHead className="text-center font-bold text-green-600">
                 <span className="whitespace-nowrap">✅ جمع</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* ردیف‌های هر صنعت */}
             {entries.map(([industry, statuses], index) => {
               const total = Object.values(statuses).reduce((a, b) => a + b, 0);
               const barWidth = (total / maxTotal) * MAX_BAR_WIDTH;
               const totalPercent = getPercentage(total);
-
-              // محاسبه جمع وضعیت‌های مشخص شده برای این صنعت
-              const summaryTotal = SUMMARY_STATUSES.reduce(
+              const summaryTotalForIndustry = SUMMARY_STATUSES.reduce(
                 (sum, status) => sum + (statuses[status] ?? 0),
                 0
               );
-              const summaryPercent = getPercentage(summaryTotal);
+              const summaryPercent = getPercentage(summaryTotalForIndustry);
 
               return (
                 <TableRow
@@ -194,7 +163,6 @@ export function IndustryTable({
                     </Link>
                   </TableCell>
 
-                  {/* ستون کل با درصد */}
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span className="inline-flex items-center gap-1.5 font-semibold tabular-nums">
@@ -209,7 +177,6 @@ export function IndustryTable({
                     </div>
                   </TableCell>
 
-                  {/* ستون‌های وضعیت با درصد */}
                   {LEAD_STATUSES.map(({ value, color }) => {
                     const count = statuses[value] ?? 0;
                     const percent = getPercentage(count);
@@ -234,14 +201,15 @@ export function IndustryTable({
                     );
                   })}
 
-                  {/* ستون جمع */}
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
                       <span className="inline-flex items-center gap-1 font-semibold text-green-600 tabular-nums">
-                        {renderCell(industry, 'summary', summaryTotal)}
-                        {summaryTotal > 0 && <TrendingUp className="h-3 w-3 text-green-400" />}
+                        {renderCell(industry, 'summary', summaryTotalForIndustry, 'end')}
+                        {summaryTotalForIndustry > 0 && (
+                          <TrendingUp className="h-3 w-3 text-green-400" />
+                        )}
                       </span>
-                      {summaryTotal > 0 && (
+                      {summaryTotalForIndustry > 0 && (
                         <span className="text-muted-foreground text-[9px]">
                           {formatPercent(summaryPercent)}%
                         </span>
@@ -252,7 +220,6 @@ export function IndustryTable({
               );
             })}
 
-            {/* ✅ ردیف جمع کل */}
             <TableRow className="bg-primary/5 border-primary/20 border-t-2 font-bold">
               <TableCell className="text-primary font-bold">
                 <div className="flex items-center gap-2">
@@ -261,17 +228,15 @@ export function IndustryTable({
                 </div>
               </TableCell>
 
-              {/* جمع کل ستون کل */}
               <TableCell className="text-center">
                 <div className="flex flex-col items-center">
                   <span className="text-primary inline-flex items-center gap-1.5 font-semibold tabular-nums">
-                    {renderCell('جمع کل', 'total', columnTotals['total'])}
+                    {renderCell('جمع کل', 'summary', summaryTotal, 'end')}
                   </span>
                   <span className="text-muted-foreground text-[10px]">{formatPercent(100)}%</span>
                 </div>
               </TableCell>
 
-              {/* جمع کل هر وضعیت */}
               {LEAD_STATUSES.map(({ value, color }) => {
                 const count = columnTotals[value] || 0;
                 const percent = getPercentage(count);
@@ -296,7 +261,6 @@ export function IndustryTable({
                 );
               })}
 
-              {/* جمع کل ستون جمع */}
               <TableCell className="text-center">
                 <div className="flex flex-col items-center">
                   <span className="inline-flex items-center gap-1 font-semibold text-green-600 tabular-nums">

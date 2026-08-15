@@ -1,8 +1,9 @@
-// src/features/dashboard/hooks/use-dashboard.ts
+// src/features/dashboard/hooks/use-dashboard-data.ts
 
 import { useLeadsAnalytics, useLeadsStats } from '@/features/dashboard/hooks/use-dashboard';
 import { useTodayTasks } from '@/features/tasks/hooks/use-tasks';
 import { useMemo, useState } from 'react';
+import { buildIndustryMap, prepareConversionData } from '../utils/dashboard-utils';
 
 export function useDashboardData() {
   const { data: stats, isLoading: statsLoading } = useLeadsStats();
@@ -17,11 +18,6 @@ export function useDashboardData() {
   const newLeads = stats?.newLeads ?? 0;
   const activeLeads = (stats?.called ?? 0) + (stats?.followedUp ?? 0) + (stats?.messaged ?? 0);
   const customers = stats?.customers ?? 0;
-
-  const sourceByIndustry = analytics?.sourceByIndustry ?? [];
-  const sourceByIndustryAndStatus = analytics?.sourceByIndustryAndStatus ?? [];
-  const sourceConversionStats = analytics?.sourceConversionStats ?? [];
-
   const conversionRate = total > 0 ? Math.round((customers / total) * 100) : 0;
 
   const pendingTasks = todayTasks.filter((t) => !t.isCompleted).length;
@@ -29,16 +25,22 @@ export function useDashboardData() {
   const taskProgress =
     todayTasks.length > 0 ? Math.round((completedTasks / todayTasks.length) * 100) : 0;
 
-  const industryMap: Record<string, Record<string, number>> = {};
-  for (const item of analytics?.industryStats ?? []) {
-    if (!industryMap[item.industry]) industryMap[item.industry] = {};
-    industryMap[item.industry][item.status] = item._count.id;
-  }
+  const sourceByIndustry = analytics?.sourceByIndustry ?? [];
+  const sourceByIndustryAndStatus = analytics?.sourceByIndustryAndStatus ?? [];
+  const sourceConversionStats = analytics?.sourceConversionStats ?? [];
+  const dailyActivity = analytics?.dailyActivity ?? [];
 
-  const industryPieData = Object.entries(industryMap).map(([name, statuses]) => ({
-    name,
-    value: Object.values(statuses).reduce((a, b) => a + b, 0),
-  }));
+  const industryMap = useMemo(
+    () => buildIndustryMap(analytics?.industryStats ?? []),
+    [analytics?.industryStats]
+  );
+
+  const industryPieData = useMemo(() => {
+    return Object.entries(industryMap).map(([name, statuses]) => ({
+      name,
+      value: Object.values(statuses).reduce((a, b) => a + b, 0),
+    }));
+  }, [industryMap]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -58,6 +60,11 @@ export function useDashboardData() {
     });
   }, [industryMap, industrySortBy, industrySortDirection]);
 
+  const conversionData = useMemo(
+    () => prepareConversionData(sourceConversionStats),
+    [sourceConversionStats]
+  );
+
   const handleIndustrySort = (column: string) => {
     if (industrySortBy === column) {
       setIndustrySortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'));
@@ -74,10 +81,8 @@ export function useDashboardData() {
     taskProgress,
     pendingTasks,
     completedTasks,
-    industryMap,
     industryPieData,
-    todayTasks,
-    dailyActivity: analytics?.dailyActivity ?? [],
+    dailyActivity,
     statusCounts,
     sortedIndustryEntries,
     industrySortBy,
@@ -85,6 +90,7 @@ export function useDashboardData() {
     industrySortDirection,
     sourceByIndustry,
     sourceByIndustryAndStatus,
-    sourceConversionStats,
+    conversionData,
+    totalLeads: total,
   };
 }

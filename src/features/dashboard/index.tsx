@@ -2,16 +2,15 @@
 
 'use client';
 
-import Link from 'next/link';
-
-import { ROUTES } from '@/routes/routes';
 import { Building2, Phone, Plus, Users } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
+import { ROUTES } from '@/routes/routes';
 import { StatCard } from './components/card';
 import { ConversionCard } from './components/conversion-card';
 import { IndustryChart } from './components/industry-chart';
@@ -42,7 +41,8 @@ export function DashboardPage() {
     industrySortDirection,
     sourceByIndustry,
     sourceByIndustryAndStatus,
-    sourceConversionStats,
+    conversionData,
+    totalLeads,
   } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
@@ -64,7 +64,6 @@ export function DashboardPage() {
         />
       }
     >
-      {/* کارت‌های آماری */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard title="کل سرنخ‌ها" value={stats.total} subtitle="تعداد کل" icon={Users} />
         <StatCard
@@ -90,10 +89,8 @@ export function DashboardPage() {
         />
       </div>
 
-      {/* کارت‌های وضعیت */}
       <StatusCards statusCounts={statusCounts} />
 
-      {/* نرخ تبدیل + پیشرفت تسک‌ها */}
       <div className="grid gap-4 lg:grid-cols-2">
         <ConversionCard rate={conversionRate} customers={stats.customers} total={stats.total} />
         <TasksProgressCard
@@ -103,10 +100,8 @@ export function DashboardPage() {
         />
       </div>
 
-      {/* تقویم فعالیت */}
       <WeeklyCalendar data={dailyActivity} />
 
-      {/* جدول و نمودار صنعت */}
       <div className="grid gap-4 lg:grid-cols-2">
         <IndustryTable
           entries={sortedIndustryEntries}
@@ -118,11 +113,8 @@ export function DashboardPage() {
         <IndustryChart data={industryPieData} />
       </div>
 
-      {/* جدول منبع × صنعت */}
       <SourceIndustryTable data={sourceByIndustry} />
-      {/* جدول نرخ تبدیل بر اساس منبع */}
-      <SourceConversionTable data={sourceConversionStats} totalLeads={stats.total} />
-      {/* ✅ بخش جدید تسک‌ها */}
+      <SourceConversionTable data={conversionData} totalLeads={totalLeads} />
       <TasksOverview />
     </PageWrapper>
   );
