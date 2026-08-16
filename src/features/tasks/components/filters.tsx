@@ -79,11 +79,12 @@ export function TaskFilters({
 
             <div className="scrollbar-thumb-muted-foreground/20 scrollbar-thin scrollbar-track-transparent overflow-x-auto pb-1">
               <Tabs
+                dir="rtl"
                 value={filters.dueDate}
                 onValueChange={(value) => onFilterChange('dueDate', value)}
                 className="w-full"
               >
-                <TabsList className="bg-muted/50 inline-flex h-auto w-max min-w-full gap-1 rounded-lg p-1">
+                <TabsList className="bg-muted/50 inline-flex h-auto w-full min-w-fit gap-1 rounded-lg p-1">
                   {DUE_DATE_FILTERS.map((filter) => (
                     <TabsTrigger
                       key={filter.value}
@@ -146,7 +147,7 @@ export function TaskFilters({
           {/* Row 2: Sort */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <Select value={filters.sortBy} onValueChange={onSortByChange}>
-              <SelectTrigger className="w-full sm:w-40">
+              <SelectTrigger className="w-full">
                 <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
                 <SelectValue placeholder="مرتب‌سازی" />
               </SelectTrigger>
@@ -159,7 +160,7 @@ export function TaskFilters({
             </Select>
 
             <Select value={filters.sortOrder} onValueChange={onSortOrderChange}>
-              <SelectTrigger className="w-full sm:w-32">
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -173,7 +174,7 @@ export function TaskFilters({
                 value={filters.overdueDays}
                 onValueChange={(v) => onFilterChange('overdueDays', v)}
               >
-                <SelectTrigger className="w-full sm:w-40">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="روز دیرکرد" />
                 </SelectTrigger>
                 <SelectContent>
