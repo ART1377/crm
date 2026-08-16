@@ -1,6 +1,7 @@
 // src/app/api/tasks/route.ts
 
 import { prisma } from '@/lib/prisma';
+import { toEnglishDigits } from '@/lib/sanitize';
 import { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -54,10 +55,16 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // ✅ جستجو در عنوان، نام سرنخ، شماره تماس و شماره دوم
     if (search) {
+      // تبدیل اعداد فارسی/عربی به انگلیسی برای جستجوی شماره
+      const englishSearch = toEnglishDigits(search);
+
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { lead: { businessName: { contains: search, mode: 'insensitive' } } },
+        { lead: { phoneNumber: { contains: englishSearch, mode: 'insensitive' } } },
+        { lead: { secondaryPhone: { contains: englishSearch, mode: 'insensitive' } } },
       ];
     }
 

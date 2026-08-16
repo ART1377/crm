@@ -5,7 +5,7 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/routes/routes';
-import { CheckCircle2, Circle, Clock, Contact, Trash2, User } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Contact, Phone, Trash2, User } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ import {
 import { useUpdateTask } from '@/features/tasks/hooks/use-tasks';
 
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { downloadVCard, formatDate } from '@/lib/utils';
+import { downloadVCard, formatDate, isMobilePhone } from '@/lib/utils';
 
 import { cn } from '@/lib/utils';
 
@@ -68,6 +68,23 @@ export function TasksTable({
     });
   };
 
+  const renderPhoneCell = (phone: string | null | undefined) => {
+    if (!phone) return <span className="text-muted-foreground text-sm">---</span>;
+
+    const isMobile = isMobilePhone(phone);
+
+    return (
+      <div className="flex items-center gap-1.5">
+        <Phone
+          className={cn('h-3.5 w-3.5', isMobile ? 'text-green-500' : 'text-muted-foreground')}
+        />
+        <a href={`tel:${phone}`} className="text-primary text-sm hover:underline" dir="ltr">
+          {phone}
+        </a>
+      </div>
+    );
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -78,6 +95,7 @@ export function TasksTable({
             </TableHead>
             <TableHead className="min-w-40 text-start">عنوان</TableHead>
             <TableHead className="min-w-32 text-start">سرنخ</TableHead>
+            <TableHead className="min-w-32 text-start">شخص تماس</TableHead>
             <TableHead className="min-w-32 text-start">شماره تماس</TableHead>
             <TableHead className="min-w-32 text-start">شماره دوم</TableHead>
             <TableHead className="min-w-32 text-start">تاریخ سررسید</TableHead>
@@ -95,7 +113,7 @@ export function TasksTable({
                 key={task.id}
                 className={cn(
                   selectedIds.includes(task.id) && 'bg-primary/5',
-                  task.isCompleted && 'opacity-75'
+                  task.isCompleted && 'opacity-50'
                 )}
               >
                 <TableCell>
@@ -135,27 +153,22 @@ export function TasksTable({
                   )}
                 </TableCell>
                 <TableCell>
+                  {task.lead?.contactPerson ? (
+                    <span className="text-sm">{task.lead.contactPerson}</span>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">---</span>
+                  )}
+                </TableCell>
+                <TableCell>
                   {task.lead ? (
-                    <a
-                      href={`tel:${task.lead.phoneNumber}`}
-                      className="text-primary text-sm hover:underline"
-                      dir="ltr"
-                    >
-                      {task.lead.phoneNumber}
-                    </a>
+                    renderPhoneCell(task.lead.phoneNumber)
                   ) : (
                     <span className="text-muted-foreground text-sm">---</span>
                   )}
                 </TableCell>
                 <TableCell>
                   {task.lead?.secondaryPhone ? (
-                    <a
-                      href={`tel:${task.lead.secondaryPhone}`}
-                      className="text-primary text-sm hover:underline"
-                      dir="ltr"
-                    >
-                      {task.lead.secondaryPhone}
-                    </a>
+                    renderPhoneCell(task.lead.secondaryPhone)
                   ) : (
                     <span className="text-muted-foreground text-sm">---</span>
                   )}

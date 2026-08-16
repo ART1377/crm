@@ -235,3 +235,21 @@ export function getDisplayUrl(url: string): string {
     return url.length > 30 ? url.slice(0, 30) + '...' : url;
   }
 }
+
+export function isMobilePhone(phone: string): boolean {
+  if (!phone) return false;
+
+  // حذف تمام کاراکترهای غیرعددی
+  const cleaned = phone.replace(/[^0-9]/g, '');
+
+  // بررسی الگوهای شماره موبایل ایران
+  // 1. شروع با 09 و 11 رقم (0912...)
+  // 2. شروع با 9 و 10 رقم (912...)
+  // 3. شروع با +989 و 12 رقم (+98912...)
+  return (
+    (cleaned.startsWith('09') && cleaned.length === 11) ||
+    (cleaned.startsWith('9') && cleaned.length === 10) ||
+    (cleaned.startsWith('989') && cleaned.length === 12) ||
+    (cleaned.startsWith('00989') && cleaned.length === 13)
+  );
+}
