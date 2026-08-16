@@ -46,7 +46,7 @@ export function TasksTable({
 }: TasksTableProps) {
   const updateTask = useUpdateTask();
   const { copy } = useCopyToClipboard();
-  console.log(tasks);
+
   const handleToggleComplete = (task: Task) => {
     updateTask.mutate({
       taskId: task.id,
@@ -79,6 +79,7 @@ export function TasksTable({
             <TableHead className="min-w-40 text-start">عنوان</TableHead>
             <TableHead className="min-w-32 text-start">سرنخ</TableHead>
             <TableHead className="min-w-32 text-start">شماره تماس</TableHead>
+            <TableHead className="min-w-32 text-start">شماره دوم</TableHead>
             <TableHead className="min-w-32 text-start">تاریخ سررسید</TableHead>
             <TableHead className="min-w-24 text-start">وضعیت</TableHead>
             <TableHead className="min-w-48 text-start">عملیات</TableHead>
@@ -141,6 +142,19 @@ export function TasksTable({
                       dir="ltr"
                     >
                       {task.lead.phoneNumber}
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">---</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {task.lead?.secondaryPhone ? (
+                    <a
+                      href={`tel:${task.lead.secondaryPhone}`}
+                      className="text-primary text-sm hover:underline"
+                      dir="ltr"
+                    >
+                      {task.lead.secondaryPhone}
                     </a>
                   ) : (
                     <span className="text-muted-foreground text-sm">---</span>
