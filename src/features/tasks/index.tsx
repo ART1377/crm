@@ -12,6 +12,7 @@ import { PageWrapper } from '@/components/shared/page-wrapper';
 
 import { BulkActionsBar } from './components/bulk-actions-bar';
 import { TasksEmptyState } from './components/empty';
+import { ExportDialog } from './components/export-dialog';
 import { TaskFilters } from './components/filters';
 import { TasksSkeleton } from './components/skeleton';
 import { TasksTable } from './components/table';
@@ -43,6 +44,7 @@ export function TasksPage() {
     closeBulkDeleteDialog,
     handleSortByChange,
     handleSortOrderChange,
+    exportAllTasks,
   } = useTasksPage();
 
   return (
@@ -75,7 +77,10 @@ export function TasksPage() {
       <Card className="min-h-100 flex-1 overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{counts.all} تسک پیدا شد</CardTitle>
-          {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
+          <div className="flex items-center gap-2">
+            <ExportDialog totalCount={counts.all} onExportAll={exportAllTasks} />
+            {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
+          </div>
         </CardHeader>
         <CardContent>
           {/* فقط بخش نتایج تغییر میکنه */}

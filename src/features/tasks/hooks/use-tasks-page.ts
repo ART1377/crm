@@ -10,6 +10,7 @@ import { useAllTasks, useBulkDeleteTasks, useDeleteTask } from '@/features/tasks
 
 import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_DELAY } from '@/constants/constants';
 import { useDebounce } from '@/hooks/use-debounce';
+import { tasksService } from '../api/tasks.api';
 
 export function useTasksPage() {
   const [params, setParams] = useQueryStates(
@@ -141,6 +142,14 @@ export function useTasksPage() {
     refetch();
   }, [selectedIds, bulkDeleteTasks, refetch]);
 
+  const exportAllTasks = useCallback(async () => {
+    const result = await tasksService.getAll({
+      ...queryFilters,
+      // بدون limit برای دریافت همه
+    });
+    return result;
+  }, [queryFilters]);
+
   const hasFilters = params.status !== 'all' || params.dueDate !== 'all' || Boolean(params.search);
 
   return {
@@ -175,5 +184,6 @@ export function useTasksPage() {
     openBulkDeleteDialog: () => setIsBulkDeleteDialogOpen(true),
     closeBulkDeleteDialog: () => setIsBulkDeleteDialogOpen(false),
     handleBulkDelete,
+    exportAllTasks,
   };
 }
