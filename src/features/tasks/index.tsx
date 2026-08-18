@@ -3,6 +3,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -45,26 +46,30 @@ export function TasksPage() {
     handleSortByChange,
     handleSortOrderChange,
     exportAllTasks,
+    exportSelectedTasks,
   } = useTasksPage();
+
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isExportingSelected, setIsExportingSelected] = useState(false);
+
+  const handleExportSelected = () => {
+    if (selectedIds.length === 0) return;
+    setIsExportingSelected(true);
+    setExportDialogOpen(true);
+  };
+
+  const handleExportAll = async () => {
+    return exportAllTasks();
+  };
+
+  const handleExportSelectedTasks = async () => {
+    return exportSelectedTasks();
+  };
 
   return (
     <PageWrapper
-      header={
-        <PageHeader
-          title="مدیریت تسک‌ها"
-          description="همه پیگیری‌ها و وظایف در یک نگاه"
-          // actions={
-          //   <Link href="/leads" className="w-full sm:w-auto">
-          //     <Button size="lg" className="w-full sm:w-auto">
-          //       <Plus className="ml-2 h-5 w-5" />
-          //       افزودن تسک جدید
-          //     </Button>
-          //   </Link>
-          // }
-        />
-      }
+      header={<PageHeader title="مدیریت تسک‌ها" description="همه پیگیری‌ها و وظایف در یک نگاه" />}
     >
-      {/* فیلترها - همیشه نمایش داده میشن */}
       <TaskFilters
         filters={filters}
         counts={counts}
@@ -78,19 +83,16 @@ export function TasksPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{counts.all} تسک پیدا شد</CardTitle>
           <div className="flex items-center gap-2">
-            <ExportDialog totalCount={counts.all} onExportAll={exportAllTasks} />
+            <ExportDialog totalCount={counts.all} onExportAll={handleExportAll} />
             {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
           </div>
         </CardHeader>
         <CardContent>
-          {/* فقط بخش نتایج تغییر میکنه */}
           <div className="relative">
-            {/* اگر لودینگ اولیه باشه، اسکلتون نشون بده */}
             {isLoading ? (
               <TasksSkeleton />
             ) : (
               <>
-                {/* Overlay لودینگ روی جدول هنگام فیلتر */}
                 {isFetching && (
                   <div className="bg-background/50 absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm">
                     <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -109,6 +111,7 @@ export function TasksPage() {
                         onBulkDelete={openBulkDeleteDialog}
                         onClearSelection={handleClearSelection}
                         isDeleting={isBulkDeleting}
+                        onExportSelected={handleExportSelected}
                       />
                     )}
                     <TasksTable
@@ -145,6 +148,16 @@ export function TasksPage() {
         description={`آیا از حذف ${selectedIds.length} تسک انتخاب شده اطمینان دارید؟ این عملیات غیرقابل بازگشت است.`}
         isPending={isBulkDeleting}
       />
+
+      {/* دیالوگ خروجی انتخابی */}
+      {isExportingSelected && (
+        <ExportDialog
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
+          totalCount={selectedIds.length}
+          onExportAll={handleExportSelectedTasks}
+        />
+      )}
     </PageWrapper>
   );
 }

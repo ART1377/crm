@@ -22,6 +22,7 @@ interface BulkActionsBarProps {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   isDeleting?: boolean;
+  onExportSelected: () => void; // جدید
   selectedTasks: Array<{
     id: string;
     leadId: string;
@@ -42,6 +43,7 @@ export function BulkActionsBar({
   onBulkDelete,
   onClearSelection,
   isDeleting = false,
+  onExportSelected,
   selectedTasks,
 }: BulkActionsBarProps) {
   const bulkUpdate = useBulkUpdateTasks();
@@ -94,6 +96,17 @@ export function BulkActionsBar({
             <SelectItem value="pending">در انتظار</SelectItem>
           </SelectContent>
         </Select>
+
+        {/* دکمه خروجی گروهی */}
+        <Button
+          variant="outline"
+          size="default"
+          onClick={onExportSelected}
+          className="w-full gap-2 sm:w-auto"
+        >
+          <Download className="h-4 w-4" />
+          خروجی ({selectedCount})
+        </Button>
 
         <Button
           variant="outline"

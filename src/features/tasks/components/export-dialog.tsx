@@ -25,17 +25,36 @@ import { ALL_COLUMNS, type ColumnKey, exportToCsv, exportToText } from '../utils
 interface ExportDialogProps {
   totalCount: number;
   onExportAll: () => Promise<Task[]>;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function ExportDialog({ totalCount, onExportAll }: ExportDialogProps) {
+export function ExportDialog({
+  totalCount,
+  onExportAll,
+  trigger,
+  open: controlledOpen,
+  onOpenChange,
+}: ExportDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [format, setFormat] = useState<'csv' | 'txt'>('txt');
   const [columns, setColumns] = useState<ColumnKey[]>(['title', 'leadName', 'dueDate', 'status']);
   const [splitCount, setSplitCount] = useState('1');
-  const [open, setOpen] = useState(false);
   const [generatedParts, setGeneratedParts] = useState<{ name: string; tasks: Task[] }[] | null>(
     null
   );
   const [loading, setLoading] = useState(false);
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = (open: boolean) => {
+    if (controlledOpen !== undefined) {
+      onOpenChange?.(open);
+    } else {
+      setInternalOpen(open);
+    }
+    if (!open) setGeneratedParts(null);
+  };
 
   const splitNumber = parseInt(splitCount) || 1;
   const tasksPerFile = Math.ceil(totalCount / splitNumber);
@@ -81,18 +100,14 @@ export function ExportDialog({ totalCount, onExportAll }: ExportDialogProps) {
   const handleReset = () => setGeneratedParts(null);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) setGeneratedParts(null);
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={totalCount === 0} className="gap-2">
-          <Download className="h-4 w-4" />
-          خروجی ({totalCount})
-        </Button>
+        {trigger || (
+          <Button variant="outline" size="sm" disabled={totalCount === 0} className="gap-2">
+            <Download className="h-4 w-4" />
+            خروجی ({totalCount})
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="flex max-h-[90dvh] max-w-md! flex-col overflow-hidden">
         <DialogHeader className="shrink-0">

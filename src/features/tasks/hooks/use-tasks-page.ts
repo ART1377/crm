@@ -150,6 +150,12 @@ export function useTasksPage() {
     return result;
   }, [queryFilters]);
 
+  const exportSelectedTasks = useCallback(async () => {
+    if (selectedIds.length === 0) return [];
+    const selectedTasks = tasks.filter((task) => selectedIds.includes(task.id));
+    return selectedTasks;
+  }, [selectedIds, tasks]);
+
   const hasFilters = params.status !== 'all' || params.dueDate !== 'all' || Boolean(params.search);
 
   return {
@@ -185,5 +191,6 @@ export function useTasksPage() {
     closeBulkDeleteDialog: () => setIsBulkDeleteDialogOpen(false),
     handleBulkDelete,
     exportAllTasks,
+    exportSelectedTasks,
   };
 }
