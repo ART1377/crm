@@ -23,6 +23,7 @@ export function useTasksPage() {
       sortBy: parseAsString.withDefault('dueDate'),
       sortOrder: parseAsString.withDefault('asc'),
       overdueDays: parseAsString.withDefault(''),
+      hasMobile: parseAsString.withDefault(''),
     },
     { history: 'push', shallow: true }
   );
@@ -44,6 +45,7 @@ export function useTasksPage() {
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
       overdueDays: params.overdueDays,
+      hasMobile: params.hasMobile,
     }),
     [
       params.status,
@@ -52,6 +54,7 @@ export function useTasksPage() {
       params.sortBy,
       params.sortOrder,
       params.overdueDays,
+      params.hasMobile,
     ]
   );
 
@@ -114,6 +117,7 @@ export function useTasksPage() {
       search: '',
       sortBy: 'dueDate',
       sortOrder: 'asc',
+      hasMobile: '',
     });
   }, [setParams]);
 
@@ -169,6 +173,7 @@ export function useTasksPage() {
       sortBy: params.sortBy,
       sortOrder: params.sortOrder,
       overdueDays: params.overdueDays,
+      hasMobile: params.hasMobile,
     },
     counts,
     hasFilters,

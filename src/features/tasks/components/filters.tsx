@@ -40,6 +40,7 @@ interface TaskFiltersProps {
     sortBy: string;
     sortOrder: string;
     overdueDays: string;
+    hasMobile: string;
   };
   counts: {
     all: number;
@@ -65,7 +66,14 @@ export function TaskFilters({
   onClearFilters,
 }: TaskFiltersProps) {
   const hasActiveFilters =
-    filters.status !== 'all' || filters.dueDate !== 'all' || Boolean(filters.search);
+    filters.status !== 'all' ||
+    filters.dueDate !== 'all' ||
+    Boolean(filters.search) ||
+    Boolean(filters.hasMobile);
+
+  const toggleMobileFilter = () => {
+    onFilterChange('hasMobile', filters.hasMobile === 'true' ? '' : 'true');
+  };
 
   return (
     <Card className="overflow-visible">
@@ -73,7 +81,6 @@ export function TaskFilters({
         <div className="space-y-3">
           {/* Tabs - تاریخ با اسکرول افقی */}
           <div className="relative">
-            {/* سایه‌های نشان‌دهنده قابلیت اسکرول */}
             <div className="from-background pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-2 bg-linear-to-l to-transparent" />
             <div className="from-background pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-2 bg-linear-to-r to-transparent" />
 
@@ -171,7 +178,7 @@ export function TaskFilters({
 
             {filters.dueDate === 'overdue' && (
               <Select
-                value={filters.overdueDays}
+                value={filters.overdueDays || ''}
                 onValueChange={(v) => onFilterChange('overdueDays', v)}
               >
                 <SelectTrigger className="w-full">
@@ -188,17 +195,30 @@ export function TaskFilters({
                 </SelectContent>
               </Select>
             )}
+
+            <button
+              type="button"
+              onClick={toggleMobileFilter}
+              className={`inline-flex min-w-fit cursor-pointer! items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                filters.hasMobile === 'true'
+                  ? 'bg-primary/10 text-primary ring-primary/40 ring-1'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted ring-1 ring-primary/10'
+              } `}
+            >
+              <span>📱</span>
+              {filters.hasMobile === 'true' ? 'فقط موبایل' : 'همه شماره‌ها'}
+            </button>
           </div>
 
+          {/* دکمه‌های پایین */}
           {hasActiveFilters && (
             <Button
               variant="destructive"
-              size="lg"
               onClick={onClearFilters}
-              className="w-full gap-1.5"
+              className="w-full gap-1.5 text-xs"
             >
-              <RotateCcw className="h-4 w-4" />
-              بازنشانی همه فیلترها
+              <RotateCcw className="h-3.5 w-3.5" />
+              بازنشانی فیلترها
             </Button>
           )}
         </div>

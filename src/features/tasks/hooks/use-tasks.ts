@@ -18,6 +18,7 @@ export function useAllTasks(filters: {
   sortBy?: string;
   sortOrder?: string;
   search?: string;
+  hasMobile?: string;
 }) {
   return useQuery({
     queryKey: [TASKS_QUERY_KEY, 'all', filters],

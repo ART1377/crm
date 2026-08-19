@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'asc';
     const search = searchParams.get('search');
     const overdueDays = searchParams.get('overdueDays');
+    const hasMobile = searchParams.get('hasMobile'); // جدید
 
     const where: Prisma.TaskWhereInput = {};
 
@@ -55,9 +56,20 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // ✅ جستجو در عنوان، نام سرنخ، شماره تماس و شماره دوم
+    // ✅ فیلتر شماره موبایل
+    if (hasMobile === 'true') {
+      where.lead = {
+        OR: [
+          { phoneNumber: { startsWith: '09' } },
+          { phoneNumber: { startsWith: '9' } },
+          { phoneNumber: { startsWith: '+989' } },
+          { phoneNumber: { startsWith: '00989' } },
+        ],
+      };
+    }
+
+    // جستجو در عنوان، نام سرنخ، شماره تماس و شماره دوم
     if (search) {
-      // تبدیل اعداد فارسی/عربی به انگلیسی برای جستجوی شماره
       const englishSearch = toEnglishDigits(search);
 
       where.OR = [
