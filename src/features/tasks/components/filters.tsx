@@ -202,7 +202,7 @@ export function TaskFilters({
               className={`inline-flex min-w-fit cursor-pointer! items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                 filters.hasMobile === 'true'
                   ? 'bg-primary/10 text-primary ring-primary/40 ring-1'
-                  : 'bg-muted/50 text-muted-foreground hover:bg-muted ring-1 ring-primary/10'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted ring-primary/10 ring-1'
               } `}
             >
               <span>📱</span>
