@@ -1,3 +1,5 @@
+// src/features/leads/hooks/use-leads-page.ts
+
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
@@ -5,9 +7,15 @@ import { useCallback, useMemo, useState } from 'react';
 import { debounce, parseAsString, useQueryStates } from 'nuqs';
 
 import { leadsService } from '@/features/leads/api/leads.api';
-import { useBulkDeleteLeads, useDeleteLead, useLeads } from '@/features/leads/hooks/use-leads';
+import {
+  useBulkDeleteLeads,
+  useBulkUpdateIndustry,
+  useDeleteLead,
+  useLeads,
+} from '@/features/leads/hooks/use-leads';
 
 import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_DELAY } from '@/constants/constants';
+import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
@@ -37,6 +45,12 @@ export function useLeadsPage() {
 
   const deleteLead = useDeleteLead();
   const bulkDeleteLeads = useBulkDeleteLeads();
+
+  const bulkUpdateIndustry = useBulkUpdateIndustry();
+
+  // ✅ گرفتن صنایع از لیست آپشن‌ها
+  const { data: industryOptions = [] } = useListOptions('INDUSTRY');
+  const industries = industryOptions.map((item) => item.value);
 
   const queryFilters = useMemo(
     () => ({
@@ -177,5 +191,7 @@ export function useLeadsPage() {
     handleBulkDelete,
     openBulkDeleteDialog,
     closeBulkDeleteDialog,
+    bulkUpdateIndustry,
+    industries,
   };
 }

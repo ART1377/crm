@@ -125,4 +125,12 @@ export const leadsService = {
       message: string;
     }>;
   },
+
+  async bulkUpdateIndustry(ids: string[], industry: string) {
+    return apiClient.patch('/leads/bulk-update-industry', { ids, industry }) as Promise<{
+      success: boolean;
+      updatedCount: number;
+      message: string;
+    }>;
+  },
 };

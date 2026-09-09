@@ -103,6 +103,22 @@ export function useChangeLeadStatus() {
   });
 }
 
+export function useBulkUpdateIndustry() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ ids, industry }: { ids: string[]; industry: string }) =>
+      leadsService.bulkUpdateIndustry(ids, industry),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      toast.success(data.message || `صنعت ${variables.ids.length} سرنخ با موفقیت تغییر یافت`);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'خطا در تغییر صنعت گروهی');
+    },
+  });
+}
+
 export function useUpdateChannels() {
   const queryClient = useQueryClient();
 

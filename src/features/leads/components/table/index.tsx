@@ -55,6 +55,8 @@ export function LeadsPage() {
     handleBulkDelete,
     openBulkDeleteDialog,
     closeBulkDeleteDialog,
+    industries,
+    bulkUpdateIndustry,
   } = useLeadsPage();
 
   const changeStatus = useChangeLeadStatus();
@@ -74,6 +76,21 @@ export function LeadsPage() {
       handleClearSelection();
     },
     [selectedIds, leads, changeStatus, handleClearSelection]
+  );
+
+  const handleBulkIndustryChange = useCallback(
+    (industry: string) => {
+      if (!industry || selectedIds.length === 0) return;
+      bulkUpdateIndustry.mutate(
+        { ids: selectedIds, industry },
+        {
+          onSuccess: () => {
+            handleClearSelection();
+          },
+        }
+      );
+    },
+    [selectedIds, bulkUpdateIndustry, handleClearSelection]
   );
 
   if (isLoading) return <LeadsPageSkeleton />;
@@ -119,7 +136,9 @@ export function LeadsPage() {
                 <BulkActionsBar
                   selectedCount={selectedIds.length}
                   selectedLeads={leads.filter((lead) => selectedIds.includes(lead.id))}
+                  industries={industries}
                   onBulkStatusChange={handleBulkStatusChange}
+                  onBulkIndustryChange={handleBulkIndustryChange}
                   onBulkDelete={openBulkDeleteDialog}
                   onClearSelection={handleClearSelection}
                   isDeleting={isBulkDeleting}
@@ -143,7 +162,6 @@ export function LeadsPage() {
         </CardContent>
       </Card>
 
-      {/* دیالوگ حذف تکی */}
       <DeleteConfirmDialog
         open={Boolean(deleteId)}
         onClose={closeDeleteDialog}
@@ -153,7 +171,6 @@ export function LeadsPage() {
         isPending={deleteIsPending}
       />
 
-      {/* دیالوگ حذف گروهی */}
       <DeleteConfirmDialog
         open={isBulkDeleteDialogOpen}
         onClose={closeBulkDeleteDialog}

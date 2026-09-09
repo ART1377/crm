@@ -27,7 +27,9 @@ interface BulkActionsBarProps {
     industry?: string;
     notes?: string | null;
   }>;
+  industries: string[];
   onBulkStatusChange: (status: string) => void;
+  onBulkIndustryChange: (industry: string) => void;
   onBulkDelete: () => void;
   onClearSelection: () => void;
   isDeleting?: boolean;
@@ -36,7 +38,9 @@ interface BulkActionsBarProps {
 export function BulkActionsBar({
   selectedCount,
   selectedLeads,
+  industries,
   onBulkStatusChange,
+  onBulkIndustryChange,
   onBulkDelete,
   onClearSelection,
   isDeleting = false,
@@ -61,12 +65,25 @@ export function BulkActionsBar({
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
         <Select value="" onValueChange={onBulkStatusChange}>
           <SelectTrigger className="h-9 w-full text-sm sm:w-40">
-            <SelectValue placeholder="تغییر وضعیت گروهی" />
+            <SelectValue placeholder="تغییر وضعیت" />
           </SelectTrigger>
           <SelectContent>
             {LEAD_STATUSES.map((s) => (
               <SelectItem key={s.value} value={s.value}>
                 {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value="" onValueChange={onBulkIndustryChange} disabled={industries.length === 0}>
+          <SelectTrigger className="h-9 w-full text-sm sm:w-40">
+            <SelectValue placeholder="تغییر صنعت" />
+          </SelectTrigger>
+          <SelectContent>
+            {industries.map((industry) => (
+              <SelectItem key={industry} value={industry}>
+                {industry}
               </SelectItem>
             ))}
           </SelectContent>
