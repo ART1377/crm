@@ -2,7 +2,8 @@
 
 'use client';
 
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import type { LayerGroup, Map } from 'leaflet';
+import { useEffect, useRef } from 'react';
 
 interface GridPoint {
   lat: number;
@@ -17,128 +18,131 @@ interface SearchMapProps {
   zoom?: number;
 }
 
-export function SearchMap({ center, gridPoints, currentPoint, zoom = 19 }: SearchMapProps) {
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
-  });
+type LeafletModule = typeof import('leaflet');
 
-  if (!isLoaded) {
-    return (
-      <div className="border-muted bg-muted/20 text-muted-foreground flex h-full items-center justify-center rounded-xl border-2 text-sm">
-        در حال بارگذاری نقشه...
-      </div>
-    );
-  }
+export function SearchMap({ center, gridPoints, currentPoint, zoom = 19 }: SearchMapProps) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markersLayerRef = useRef<LayerGroup | null>(null);
+  const LRef = useRef<LeafletModule | null>(null);
+
+  // مقداردهی اولیه نقشه
+  useEffect(() => {
+    let isMounted = true;
+
+    const initMap = async () => {
+      // ✅ import داینامیک Leaflet
+      const L = (await import('leaflet')).default;
+
+      // ✅ import CSS
+      await import('leaflet/dist/leaflet.css');
+
+      if (!isMounted || !mapContainerRef.current || mapRef.current) return;
+
+      LRef.current = L;
+
+      const map = L.map(mapContainerRef.current).setView([center.lat, center.lng], zoom);
+      mapRef.current = map;
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      }).addTo(map);
+
+      markersLayerRef.current = L.layerGroup().addTo(map);
+
+      // رسم نقاط
+      drawMarkers();
+    };
+
+    initMap();
+
+    return () => {
+      isMounted = false;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // تابع رسم نقاط
+  const drawMarkers = () => {
+    const L = LRef.current;
+    if (!L || !markersLayerRef.current) return;
+
+    markersLayerRef.current.clearLayers();
+
+    // نقاط جستجو شده
+    gridPoints
+      .filter((p) => p.searched)
+      .forEach((point: GridPoint) => {
+        L.circleMarker([point.lat, point.lng], {
+          radius: 4,
+          fillColor: '#22c55e',
+          color: '#22c55e',
+          weight: 1,
+          opacity: 0.7,
+          fillOpacity: 0.7,
+        }).addTo(markersLayerRef.current!);
+      });
+
+    // نقاط جستجو نشده
+    gridPoints
+      .filter((p) => !p.searched)
+      .forEach((point: GridPoint) => {
+        L.circleMarker([point.lat, point.lng], {
+          radius: 3,
+          fillColor: '#94a3b8',
+          color: '#94a3b8',
+          weight: 1,
+          opacity: 0.5,
+          fillOpacity: 0.5,
+        }).addTo(markersLayerRef.current!);
+      });
+
+    // نقطه فعلی
+    if (currentPoint) {
+      L.circleMarker([currentPoint.lat, currentPoint.lng], {
+        radius: 8,
+        fillColor: '#3b82f6',
+        color: '#3b82f6',
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.8,
+      }).addTo(markersLayerRef.current);
+    }
+
+    // مرکز
+    L.circleMarker([center.lat, center.lng], {
+      radius: 8,
+      fillColor: '#ef4444',
+      color: 'white',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 1,
+    }).addTo(markersLayerRef.current);
+  };
+
+  // آپدیت مرکز
+  useEffect(() => {
+    if (mapRef.current && LRef.current) {
+      mapRef.current.setView([center.lat, center.lng], zoom);
+    }
+  }, [center.lat, center.lng, zoom]);
+
+  // آپدیت نقاط
+  useEffect(() => {
+    drawMarkers();
+  }, [gridPoints, currentPoint, center]);
 
   const searchedCount = gridPoints.filter((p) => p.searched).length;
   const totalCount = gridPoints.length;
 
   return (
-    <div className="border-muted relative h-full overflow-hidden rounded-xl border-2">
-      <GoogleMap
-        center={center}
-        zoom={zoom}
-        mapContainerStyle={{ height: '100%', width: '100%' }}
-        options={{
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false,
-        }}
-      >
-        {/* Searched points - green */}
-        {gridPoints
-          .filter((p) => p.searched)
-          .map((point, i) => (
-            <Marker
-              key={`searched-${i}`}
-              position={{ lat: point.lat, lng: point.lng }}
-              icon={{
-                url:
-                  'data:image/svg+xml;utf8,' +
-                  encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
-                    <circle cx="6" cy="6" r="5" fill="#22c55e" opacity="0.7"/>
-                  </svg>
-                `),
-                scaledSize: new google.maps.Size(12, 12),
-              }}
-            />
-          ))}
+    <div className="relative h-full overflow-hidden rounded-xl border-2">
+      <div ref={mapContainerRef} className="h-full w-full" />
 
-        {/* Unsearched points - gray */}
-        {gridPoints
-          .filter((p) => !p.searched)
-          .map((point, i) => (
-            <Marker
-              key={`unsearched-${i}`}
-              position={{ lat: point.lat, lng: point.lng }}
-              icon={{
-                url:
-                  'data:image/svg+xml;utf8,' +
-                  encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
-                    <circle cx="5" cy="5" r="4" fill="#94a3b8" opacity="0.5"/>
-                  </svg>
-                `),
-                scaledSize: new google.maps.Size(10, 10),
-              }}
-            />
-          ))}
-
-        {/* Current scanning point with pulse animation */}
-        {currentPoint && (
-          <>
-            <Marker
-              position={{ lat: currentPoint.lat, lng: currentPoint.lng }}
-              icon={{
-                url:
-                  'data:image/svg+xml;utf8,' +
-                  encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="18" fill="none" stroke="#3b82f6" stroke-width="3" opacity="0.6">
-                      <animate attributeName="r" from="10" to="20" dur="1.2s" repeatCount="indefinite"/>
-                      <animate attributeName="opacity" from="0.8" to="0" dur="1.2s" repeatCount="indefinite"/>
-                    </circle>
-                  </svg>
-                `),
-                scaledSize: new google.maps.Size(40, 40),
-                anchor: new google.maps.Point(20, 20),
-              }}
-            />
-            <Marker
-              position={{ lat: currentPoint.lat, lng: currentPoint.lng }}
-              icon={{
-                url:
-                  'data:image/svg+xml;utf8,' +
-                  encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <circle cx="8" cy="8" r="6" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                  </svg>
-                `),
-                scaledSize: new google.maps.Size(16, 16),
-                anchor: new google.maps.Point(8, 8),
-              }}
-            />
-          </>
-        )}
-
-        {/* Center marker */}
-        <Marker
-          position={center}
-          icon={{
-            url:
-              'data:image/svg+xml;utf8,' +
-              encodeURIComponent(`
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="#ef4444" stroke="white" stroke-width="2"/>
-              </svg>
-            `),
-            scaledSize: new google.maps.Size(24, 24),
-          }}
-        />
-      </GoogleMap>
-
-      {/* Legend */}
       <div className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-lg bg-black/60 px-3 py-1.5 text-[10px] text-white backdrop-blur-sm">
         🟢 {searchedCount} جستجو شده
         {' | '}⚪ {totalCount - searchedCount} در انتظار

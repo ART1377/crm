@@ -1,4 +1,9 @@
+// src/features/leads/components/import/map-picker.tsx
+
 'use client';
+
+import type { LeafletMouseEvent, Map, Marker } from 'leaflet';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -10,16 +15,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { MapPin, Search, X } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-type MapType = 'google' | 'balad';
 
 interface MapPickerProps {
   value: { lat: string; lng: string };
   onChange: (lat: string, lng: string) => void;
 }
+
+type LeafletModule = typeof import('leaflet');
 
 export function MapPicker({ value, onChange }: MapPickerProps) {
   const [open, setOpen] = useState(false);
@@ -27,32 +30,129 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
   const [lng, setLng] = useState(value.lng);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [mapType, setMapType] = useState<MapType>('google');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const center = { lat: parseFloat(lat) || 35.6892, lng: parseFloat(lng) || 51.389 };
+  const [mapReady, setMapReady] = useState(false);
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
-  });
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markerRef = useRef<Marker | null>(null);
+  const LRef = useRef<LeafletModule | null>(null);
 
   useEffect(() => {
     setLat(value.lat);
     setLng(value.lng);
   }, [value.lat, value.lng]);
 
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      setLat(e.latLng.lat().toFixed(6));
-      setLng(e.latLng.lng().toFixed(6));
+  // ✅ useEffect جدا برای مقداردهی نقشه
+  useEffect(() => {
+    if (!open) {
+      // وقتی دیالوگ بسته میشه، نقشه رو پاک کن
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
+        LRef.current = null;
+        setMapReady(false);
+      }
+      return;
     }
-  }, []);
 
-  const handleMarkerDrag = useCallback((e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      setLat(e.latLng.lat().toFixed(6));
-      setLng(e.latLng.lng().toFixed(6));
+    let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const initMap = async () => {
+      // ✅ صبر کن تا Dialog کاملاً باز بشه
+      timeoutId = setTimeout(async () => {
+        if (!isMounted || !mapContainerRef.current || mapRef.current) return;
+
+        try {
+          // ✅ import داینامیک Leaflet
+          const L = (await import('leaflet')).default;
+          await import('leaflet/dist/leaflet.css');
+
+          if (!isMounted || !mapContainerRef.current) return;
+
+          LRef.current = L;
+
+          // رفع مشکل آیکون
+          delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
+          L.Icon.Default.mergeOptions({
+            iconRetinaUrl:
+              'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+            shadowUrl:
+              'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+          });
+
+          const center: [number, number] = [parseFloat(lat) || 35.6892, parseFloat(lng) || 51.389];
+
+          const map = L.map(mapContainerRef.current, {
+            center,
+            zoom: 15,
+          });
+          mapRef.current = map;
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+          }).addTo(map);
+
+          const marker = L.marker(center, { draggable: true }).addTo(map);
+          markerRef.current = marker;
+
+          // کلیک روی نقشه
+          map.on('click', (e: LeafletMouseEvent) => {
+            const { lat: newLat, lng: newLng } = e.latlng;
+            setLat(newLat.toFixed(6));
+            setLng(newLng.toFixed(6));
+            marker.setLatLng([newLat, newLng]);
+          });
+
+          // درگ مارکر
+          marker.on('dragend', () => {
+            const pos = marker.getLatLng();
+            setLat(pos.lat.toFixed(6));
+            setLng(pos.lng.toFixed(6));
+          });
+
+          setMapReady(true);
+
+          // ✅ Invalidate size برای رفع مشکل رندر در Dialog
+          setTimeout(() => {
+            if (mapRef.current && isMounted) {
+              mapRef.current.invalidateSize();
+            }
+          }, 100);
+        } catch (error) {
+          console.error('Map init error:', error);
+        }
+      }, 100); // ✅ ۱۰۰ میلی‌ثانیه تأخیر
+    };
+
+    initMap();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
+        LRef.current = null;
+        setMapReady(false);
+      }
+    };
+  }, [open]);
+
+  // ✅ آپدیت مارکر وقتی lat/lng تغییر می‌کنه
+  useEffect(() => {
+    if (markerRef.current && mapRef.current && mapReady) {
+      const newPos: [number, number] = [parseFloat(lat), parseFloat(lng)];
+      if (!isNaN(newPos[0]) && !isNaN(newPos[1])) {
+        markerRef.current.setLatLng(newPos);
+        mapRef.current.setView(newPos, mapRef.current.getZoom());
+      }
     }
-  }, []);
+  }, [lat, lng, mapReady]);
 
   const handleSearch = async () => {
     if (!searchQuery) return;
@@ -63,8 +163,15 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
       );
       const data = await res.json();
       if (data.length > 0) {
-        setLat(parseFloat(data[0].lat).toFixed(6));
-        setLng(parseFloat(data[0].lon).toFixed(6));
+        const newLat = parseFloat(data[0].lat).toFixed(6);
+        const newLng = parseFloat(data[0].lon).toFixed(6);
+        setLat(newLat);
+        setLng(newLng);
+        if (mapRef.current && markerRef.current) {
+          const pos: [number, number] = [parseFloat(newLat), parseFloat(newLng)];
+          markerRef.current.setLatLng(pos);
+          mapRef.current.setView(pos, 15);
+        }
       }
     } catch {
     } finally {
@@ -77,8 +184,6 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
     setOpen(false);
   };
 
-  const baladUrl = `https://balad.ir/#15/${lat}/${lng}`;
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -87,38 +192,17 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
           انتخاب از روی نقشه
         </Button>
       </DialogTrigger>
-      <DialogContent className="">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>انتخاب موقعیت</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Map type toggle */}
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant={mapType === 'google' ? 'default' : 'outline'}
-              onClick={() => setMapType('google')}
-              className="rounded-lg text-xs"
-            >
-              گوگل مپ
-            </Button>
-            <Button
-              size="sm"
-              variant={mapType === 'balad' ? 'default' : 'outline'}
-              onClick={() => setMapType('balad')}
-              className="rounded-lg text-xs"
-            >
-              نقشه بلد
-            </Button>
-          </div>
-
           {/* Search */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
               <Input
-                ref={inputRef}
                 placeholder="جستجوی مکان..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -151,50 +235,12 @@ export function MapPicker({ value, onChange }: MapPickerProps) {
 
           {/* Map */}
           <div className="relative h-80 overflow-hidden rounded-xl border-2 sm:h-96">
-            {mapType === 'google' ? (
-              isLoaded ? (
-                <GoogleMap
-                  center={center}
-                  zoom={15}
-                  mapContainerStyle={{ height: '100%', width: '100%' }}
-                  onClick={handleMapClick}
-                  options={{
-                    streetViewControl: false,
-                    mapTypeControl: false,
-                    fullscreenControl: false,
-                  }}
-                >
-                  <Marker
-                    position={center}
-                    draggable
-                    onDragEnd={handleMarkerDrag}
-                    animation={google.maps.Animation.DROP}
-                  />
-                </GoogleMap>
-              ) : (
-                <div className="bg-muted/20 text-muted-foreground flex h-full items-center justify-center text-sm">
-                  <span className="border-primary mr-2 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" />
-                  در حال بارگذاری...
-                </div>
-              )
-            ) : (
-              <>
-                <iframe
-                  key={`balad-${lat}-${lng}`}
-                  src={baladUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  title="نقشه بلد"
-                />
-                <div className="pointer-events-none absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-full">
-                  <MapPin className="h-10 w-10 text-red-500 drop-shadow-lg" fill="currentColor" />
-                </div>
-                <div className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-lg bg-black/60 px-3 py-1.5 text-[10px] text-white backdrop-blur-sm">
-                  مختصات را با جستجو یا ورود دستی تغییر دهید
-                </div>
-              </>
+            <div ref={mapContainerRef} className="h-full w-full" />
+            {!mapReady && (
+              <div className="bg-muted/20 text-muted-foreground absolute inset-0 flex items-center justify-center text-sm">
+                <span className="border-primary mr-2 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" />
+                در حال بارگذاری نقشه...
+              </div>
             )}
           </div>
 
