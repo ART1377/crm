@@ -80,6 +80,7 @@ export function useDeleteTask() {
     mutationFn: (taskId: string) => tasksService.delete(taskId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       toast.success('تسک حذف شد');
     },
     onError: (error: Error) => {
@@ -95,6 +96,7 @@ export function useDeleteAllTasks(leadId: string) {
     mutationFn: () => tasksService.deleteAll(leadId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, leadId] });
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       toast.success('همه پیگیری‌ها حذف شدند');
     },
     onError: (error: Error) => {
