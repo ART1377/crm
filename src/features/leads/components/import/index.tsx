@@ -55,6 +55,7 @@ export function ImportPage() {
     radius: '2',
     zoom: '19',
     step: '0.2',
+    selectedIndustries: [] as string[],
   });
 
   const toggleSource = (source: SearchSource) => {
@@ -84,7 +85,10 @@ export function ImportPage() {
               API
             </Badge>
           </div>
-          <BaladSearch sharedParams={searchParams} />
+          <BaladSearch
+            sharedParams={searchParams}
+            selectedIndustries={searchParams.selectedIndustries}
+          />
         </div>
       );
     }
@@ -187,6 +191,9 @@ export function ImportPage() {
           onRadiusChange={(v) => setSearchParams((p) => ({ ...p, radius: v }))}
           onZoomChange={(v) => setSearchParams((p) => ({ ...p, zoom: v }))}
           onStepChange={(v) => setSearchParams((p) => ({ ...p, step: v }))}
+          onIndustriesChange={(industries) =>
+            setSearchParams((p) => ({ ...p, selectedIndustries: industries }))
+          }
         />
 
         {/* نتایج جستجو از منابع انتخاب شده */}

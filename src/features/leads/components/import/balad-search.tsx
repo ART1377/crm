@@ -23,9 +23,10 @@ interface BaladSearchProps {
     zoom: string;
     step: string;
   };
+  selectedIndustries?: string[]; // ✅ اضافه شد
 }
 
-export function BaladSearch({ sharedParams }: BaladSearchProps) {
+export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSearchProps) {
   const [showMap, setShowMap] = useState(false);
   const [progress, setProgress] = useState('');
   const [progressPercent, setProgressPercent] = useState(0);
@@ -70,12 +71,14 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
         lng,
         radius,
         step: sharedParams.step,
+        industries: selectedIndustries.join(','), // ✅ اضافه شد
       });
       const res = await fetch(`/api/leads/search-balad?${params}`);
       return res.json();
     },
     sharedParams,
     sourceName: 'بلد',
+    selectedIndustries,
   });
 
   const handleSearchWithProgress = async () => {
@@ -109,6 +112,7 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
         lng: sharedParams.longitude,
         radius: sharedParams.radius,
         step: sharedParams.step,
+        industries: selectedIndustries.join(','), // ✅ اضافه شد
       });
 
       const res = await fetch(`/api/leads/search-balad?${params}`, { signal: controller.signal });
@@ -119,7 +123,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
       const seenIds = new Set<string>();
 
       while (true) {
-        // بررسی توقف موقت
         if (pauseRef.current) {
           await new Promise<void>((resolve) => {
             resumeRef.current = resolve;
@@ -137,7 +140,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
             const data = JSON.parse(line);
 
             if (data.type === 'progress') {
-              // به‌روزرسانی پیشرفت
               setProgress(data.message);
               if (data.total > 0) {
                 setProgressPercent(Math.round((data.current / data.total) * 100));
@@ -153,13 +155,11 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
                 );
               }
             } else if (data.type === 'place') {
-              // افزودن مکان جدید
               if (!seenIds.has(data.place.id)) {
                 seenIds.add(data.place.id);
                 setPlaces((prev) => [...prev, data.place]);
               }
             } else if (data.type === 'done') {
-              // پایان جستجو
               setProgress(`${data.total} سرنخ پیدا شد`);
               setProgressPercent(100);
               setCurrentPoint(null);
@@ -168,8 +168,8 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
           } catch {}
         }
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
         toast.success('جستجو متوقف شد');
       } else {
         toast.error('خطا در جستجو');
@@ -183,7 +183,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
     }
   };
 
-  // توابع کنترل توقف و ادامه
   const handlePause = () => {
     setPaused(true);
     pauseRef.current = true;
@@ -208,7 +207,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
           <CardTitle>جستجو در بلد</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
-          {/* Progress Bar */}
           {loading && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -219,7 +217,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
             </div>
           )}
 
-          {/* دکمه‌های کنترل */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {!loading ? (
               <Button
@@ -276,7 +273,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
         </CardContent>
       </Card>
 
-      {/* نقشه + نتایج */}
       {showMap && loading && gridPoints.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="order-1 h-80 lg:sticky lg:top-4 lg:order-2 lg:h-[calc(100vh-12rem)]">
@@ -351,7 +347,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
         </div>
       ) : (
         <>
-          {/* حالت لودینگ بدون نقشه */}
           {loading && places.length === 0 && (
             <Card>
               <CardContent className="py-8">
@@ -364,7 +359,6 @@ export function BaladSearch({ sharedParams }: BaladSearchProps) {
             </Card>
           )}
 
-          {/* نتایج بدون نقشه */}
           {places.length > 0 && !showMap && (
             <Card>
               <CardHeader>

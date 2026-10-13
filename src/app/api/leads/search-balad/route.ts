@@ -13,11 +13,13 @@ export async function GET(req: NextRequest) {
   const lng = parseFloat(req.nextUrl.searchParams.get('lng') || '51.3156');
   const radiusKm = parseFloat(req.nextUrl.searchParams.get('radius') || '2');
   const stepKm = parseFloat(req.nextUrl.searchParams.get('step') || '0.2');
+  // ✅ اضافه شد
+  const industriesParam = req.nextUrl.searchParams.get('industries') || '';
+  const selectedIndustries = industriesParam ? industriesParam.split(',').filter(Boolean) : [];
 
   const encoder = new TextEncoder();
   let aborted = false;
 
-  // Get existing phones upfront
   let existingPhones = new Set<string>();
   try {
     const existing = await prisma.lead.findMany({ select: { phoneNumber: true } });
@@ -27,7 +29,14 @@ export async function GET(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const event of searchBaladStream(keyword, lat, lng, radiusKm, stepKm)) {
+        for await (const event of searchBaladStream(
+          keyword,
+          lat,
+          lng,
+          radiusKm,
+          stepKm,
+          selectedIndustries // ✅ اضافه شد
+        )) {
           if (aborted) break;
 
           if (event.type === 'place') {

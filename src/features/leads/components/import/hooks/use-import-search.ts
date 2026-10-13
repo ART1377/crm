@@ -19,10 +19,16 @@ interface UseImportSearchProps {
     longitude: string;
     radius: string;
   };
-  sourceName: string; // اضافه شد - نام منبع (بلد، گوگل مپ، نشان)
+  sourceName: string;
+  selectedIndustries?: string[];
 }
 
-export function useImportSearch({ searchFn, sharedParams, sourceName }: UseImportSearchProps) {
+export function useImportSearch({
+  searchFn,
+  sharedParams,
+  sourceName,
+  selectedIndustries = [],
+}: UseImportSearchProps) {
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<BaladPlace[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -111,6 +117,20 @@ export function useImportSearch({ searchFn, sharedParams, sourceName }: UseImpor
     setShowHidden(false);
   };
 
+  // ✅ تابع کمکی برای تعیین صنعت هر مکان
+  const getIndustryForPlace = (place: BaladPlace): string => {
+    // 1. اگه place.searchedIndustry داره، از اون استفاده کن
+    if (place.searchedIndustry) {
+      return place.searchedIndustry;
+    }
+    // 2. اگه فقط یک صنعت انتخاب شده، از همون استفاده کن
+    if (selectedIndustries.length === 1) {
+      return selectedIndustries[0];
+    }
+    // 3. Fallback: اولین کلیدواژه
+    return sharedParams.keyword.split(',')[0];
+  };
+
   const handleImport = async () => {
     if (selected.size === 0) return;
     setImporting(true);
@@ -119,8 +139,8 @@ export function useImportSearch({ searchFn, sharedParams, sourceName }: UseImpor
         .filter((p) => selected.has(p.id))
         .map((p) => ({
           ...p,
-          industry: sharedParams.keyword.split(',')[0],
-          source: sourceName, // استفاده از sourceName به جای 'import'
+          industry: getIndustryForPlace(p),
+          source: sourceName,
         }));
 
       const res = await fetch('/api/leads/bulk-import', {
@@ -145,8 +165,8 @@ export function useImportSearch({ searchFn, sharedParams, sourceName }: UseImpor
       const leads = [
         {
           ...place,
-          industry: sharedParams.keyword.split(',')[0],
-          source: sourceName, // استفاده از sourceName به جای 'import'
+          industry: getIndustryForPlace(place),
+          source: sourceName,
         },
       ];
 

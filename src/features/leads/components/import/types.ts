@@ -9,4 +9,5 @@ export interface BaladPlace {
   ratingCount?: number;
   isExisting?: boolean;
   matchedKeyword?: string;
+  searchedIndustry?: string;
 }

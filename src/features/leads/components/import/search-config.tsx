@@ -40,6 +40,7 @@ interface Props {
   onSearch?: () => void;
   isSearching?: boolean;
   selectedSourcesCount?: number;
+  onIndustriesChange?: (industries: string[]) => void; // ✅ اضافه شد
 }
 
 export function SearchConfig({
@@ -58,18 +59,17 @@ export function SearchConfig({
   onSearch,
   isSearching = false,
   selectedSourcesCount = 0,
+  onIndustriesChange,
 }: Props) {
   const { data: industries = [] } = useListOptions('INDUSTRY');
   const [newKeyword, setNewKeyword] = useState('');
 
-  // استخراج صنایع از کلیدواژه‌ها
   const keywords = keyword
     .split(',')
     .map((k) => k.trim())
     .filter(Boolean);
 
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>(() => {
-    // اگر کلیدواژه‌ها وجود داره، اولین صنعت رو انتخاب کن
     if (keywords.length > 0) {
       const firstKeyword = keywords[0];
       const matchedIndustry = industries.find((item) => {
@@ -80,7 +80,6 @@ export function SearchConfig({
         );
       });
       if (matchedIndustry) {
-        // کلیدواژه‌های این صنعت رو استخراج کن
         const indKeywords = generateSearchKeywords({ keyword: matchedIndustry.value });
         const allKeywords = indKeywords.join(', ');
         if (allKeywords === keyword) {
@@ -94,13 +93,12 @@ export function SearchConfig({
   const handleIndustryChange = (industries: string[], newKeywords: string) => {
     setSelectedIndustries(industries);
     onKeywordChange(newKeywords);
+    onIndustriesChange?.(industries); // ✅ اضافه شد
   };
 
   const defaultKeywords = useMemo(() => {
     if (selectedIndustries.length === 0) return [];
-    // کلیدواژه‌های پیشنهادی از همه صنایع انتخاب شده
     const all = selectedIndustries.flatMap((ind) => generateSearchKeywords({ keyword: ind }));
-    // حذف تکراری‌ها
     return [...new Set(all)];
   }, [selectedIndustries]);
 
@@ -122,7 +120,6 @@ export function SearchConfig({
     onKeywordChange([...keywords, kw].join(', '));
   }
 
-  // محاسبه تعداد نقاط جستجو
   const calculateGridPoints = () => {
     const radiusNum = parseFloat(radius);
     const stepNum = parseFloat(step);
@@ -157,7 +154,7 @@ export function SearchConfig({
         </div>
       )}
 
-      {/* Industry Selector - جدید */}
+      {/* Industry Selector */}
       <IndustrySelector
         selectedIndustries={selectedIndustries}
         onChange={handleIndustryChange}
@@ -243,7 +240,6 @@ export function SearchConfig({
       {/* Radius & Step & Coordinates & Zoom */}
       <div className="border-muted bg-muted/10 rounded-xl border-2 p-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Radius */}
           <div className="space-y-2">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-green-50">
@@ -267,7 +263,6 @@ export function SearchConfig({
             </Select>
           </div>
 
-          {/* Step */}
           {onStepChange && (
             <div className="space-y-2">
               <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
@@ -297,7 +292,6 @@ export function SearchConfig({
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {/* Coordinates */}
           <div className="space-y-2">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-red-50">
@@ -323,7 +317,6 @@ export function SearchConfig({
             </div>
           </div>
 
-          {/* Zoom */}
           {onZoomChange && (
             <div className="space-y-2">
               <Label className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
@@ -352,7 +345,6 @@ export function SearchConfig({
           )}
         </div>
 
-        {/* Info: Total grid points */}
         <div className="mt-4 flex items-center justify-between rounded-lg bg-white/50 px-4 py-2 text-xs">
           <span className="text-muted-foreground">تعداد نقاط جستجو:</span>
           <Badge variant="secondary" className="font-mono">

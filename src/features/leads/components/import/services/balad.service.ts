@@ -1,6 +1,7 @@
 // src/features/leads/components/import/services/balad.service.ts
 
 import { sanitizePhone } from '@/lib/sanitize';
+import { generateSearchKeywords } from '../keywords/generator';
 import type { BaladPlace } from '../types';
 
 const SEARCH_API = 'https://search.raah.ir/v4/submit/';
@@ -93,10 +94,22 @@ async function searchTokens(keyword: string, lat: number, lng: number): Promise<
   }
 }
 
-// ✅ دریافت جزئیات با کش
-async function getPlace(token: string, keyword?: string): Promise<BaladPlace | null> {
+// ✅ دریافت جزئیات با کش و ذخیره matchedKeyword و searchedIndustry
+async function getPlace(
+  token: string,
+  matchedKeyword?: string,
+  searchedIndustry?: string
+): Promise<BaladPlace | null> {
   const cached = placeCache.get(token);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    // ✅ اگه کش داشت، اطلاعات keyword و industry رو هم به‌روز کن
+    if (cached.place) {
+      return {
+        ...cached.place,
+        matchedKeyword: matchedKeyword || cached.place.matchedKeyword,
+        searchedIndustry: searchedIndustry || cached.place.searchedIndustry,
+      };
+    }
     return cached.place;
   }
 
@@ -134,7 +147,8 @@ async function getPlace(token: string, keyword?: string): Promise<BaladPlace | n
       rating: place.rating?.score ?? null,
       ratingCount: place.rating?.count ?? null,
       isExisting: false,
-      matchedKeyword: keyword,
+      matchedKeyword,
+      searchedIndustry,
     };
 
     placeCache.set(token, { place: result, timestamp: Date.now() });
@@ -172,12 +186,24 @@ async function processConcurrently<T, R>(
   return results;
 }
 
+// ✅ تابع کمکی برای پیدا کردن صنعت مربوط به یک کلیدواژه
+function findIndustryForKeyword(keyword: string, industries: string[]): string | undefined {
+  for (const industry of industries) {
+    const keywords = generateSearchKeywords({ keyword: industry });
+    if (keywords.includes(keyword)) {
+      return industry;
+    }
+  }
+  return undefined;
+}
+
 export async function* searchBaladStream(
   keyword: string,
   lat: number,
   lng: number,
   radiusKm: number,
-  stepKm: number = 0.2
+  stepKm: number = 0.2,
+  selectedIndustries: string[] = []
 ): AsyncGenerator<
   | {
       type: 'progress';
@@ -210,11 +236,11 @@ export async function* searchBaladStream(
     }
   }
 
-  // ✅ پردازش دسته‌ای searchTokens
+  // ✅ پردازش دسته‌ای
   for (let i = 0; i < tasks.length; i += SEARCH_CONCURRENCY) {
     const batch = tasks.slice(i, i + SEARCH_CONCURRENCY);
 
-    // ✅ ذخیره توکن‌ها با keyword
+    // ✅ ذخیره توکن‌ها با keyword مربوطه
     const tokensWithKeyword: Array<{ token: string; keyword: string }> = [];
     let lastPoint: { lat: number; lng: number } | undefined;
 
@@ -236,7 +262,7 @@ export async function* searchBaladStream(
       }
     }
 
-    // ✅ حذف تکراری‌ها (بر اساس token) و فیلتر کش‌شده‌ها
+    // ✅ حذف تکراری‌ها و فیلتر کش‌شده‌ها
     const seenTokens = new Set<string>();
     const uniqueTokensWithKeyword = tokensWithKeyword.filter(({ token }) => {
       if (seenTokens.has(token) || placeCache.has(token)) return false;
@@ -244,12 +270,13 @@ export async function* searchBaladStream(
       return true;
     });
 
-    // ✅ دریافت جزئیات با keyword
+    // ✅ دریافت جزئیات POIها به صورت همزمان با keyword و industry
     if (uniqueTokensWithKeyword.length > 0) {
       const places = await processConcurrently(
         uniqueTokensWithKeyword,
         DETAIL_CONCURRENCY,
-        ({ token, keyword: kw }) => getPlace(token, kw)
+        ({ token, keyword: kw }) =>
+          getPlace(token, kw, findIndustryForKeyword(kw, selectedIndustries))
       );
 
       for (const place of places) {

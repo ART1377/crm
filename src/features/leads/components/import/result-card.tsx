@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { Copy, Globe, MapPin, Phone, Plus, Search, Star, X } from 'lucide-react';
+import { Copy, MapPin, Phone, Plus, Search, Tag, X } from 'lucide-react';
 import { EditPlaceDialog } from './edit-place-dialog';
 import type { BaladPlace } from './types';
 
@@ -184,7 +184,7 @@ export function ResultCard({
         {/* Extra info: Website, Category, Rating */}
         {hasExtraInfo && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            {place.rating && (
+            {/* {place.rating && (
               <Badge
                 variant="outline"
                 className="gap-1 border-amber-200 bg-amber-50 text-[11px] text-amber-700"
@@ -193,13 +193,37 @@ export function ResultCard({
                 {place.rating}
                 {place.ratingCount && <span className="text-[10px]">({place.ratingCount})</span>}
               </Badge>
-            )}
+            )} */}
+
             {place.category && (
               <Badge variant="outline" className="text-muted-foreground text-[11px]">
                 {place.category}
               </Badge>
             )}
-            {place.website && (
+
+            {/* ✅ صنعت سرچ‌شده */}
+            {place.searchedIndustry && (
+              <Badge
+                variant="outline"
+                className="gap-1 border-emerald-200 bg-emerald-50 text-[11px] text-emerald-700"
+              >
+                <Tag className="h-3 w-3" />
+                {place.searchedIndustry}
+              </Badge>
+            )}
+
+            {/* ✅ کلیدواژه‌ای که با اون پیدا شده */}
+            {place.matchedKeyword && (
+              <Badge
+                variant="outline"
+                className="gap-1 border-blue-200 bg-blue-50 text-[11px] text-blue-700"
+              >
+                <Search className="h-3 w-3" />
+                {place.matchedKeyword}
+              </Badge>
+            )}
+
+            {/* {place.website && (
               <Badge variant="outline" className="text-muted-foreground gap-1 text-[11px]">
                 <Globe className="h-3 w-3" />
                 <a
@@ -214,17 +238,7 @@ export function ResultCard({
                   وبسایت
                 </a>
               </Badge>
-            )}
-            {/* ✅ کلیدواژه‌ای که با اون پیدا شده */}
-            {place.matchedKeyword && (
-              <Badge
-                variant="outline"
-                className="gap-1 border-blue-200 bg-blue-50 text-[11px] text-blue-700"
-              >
-                <Search className="h-3 w-3" />
-                {place.matchedKeyword}
-              </Badge>
-            )}
+            )} */}
           </div>
         )}
       </div>
