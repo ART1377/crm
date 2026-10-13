@@ -94,7 +94,7 @@ async function searchTokens(keyword: string, lat: number, lng: number): Promise<
 }
 
 // ✅ دریافت جزئیات با کش
-async function getPlace(token: string): Promise<BaladPlace | null> {
+async function getPlace(token: string, keyword?: string): Promise<BaladPlace | null> {
   const cached = placeCache.get(token);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.place;
@@ -134,6 +134,7 @@ async function getPlace(token: string): Promise<BaladPlace | null> {
       rating: place.rating?.score ?? null,
       ratingCount: place.rating?.count ?? null,
       isExisting: false,
+      matchedKeyword: keyword,
     };
 
     placeCache.set(token, { place: result, timestamp: Date.now() });
@@ -213,32 +214,43 @@ export async function* searchBaladStream(
   for (let i = 0; i < tasks.length; i += SEARCH_CONCURRENCY) {
     const batch = tasks.slice(i, i + SEARCH_CONCURRENCY);
 
-    // اجرای همزمان searchTokens
+    // ✅ ذخیره توکن‌ها با keyword
+    const tokensWithKeyword: Array<{ token: string; keyword: string }> = [];
+    let lastPoint: { lat: number; lng: number } | undefined;
+
     const tokenResults = await Promise.allSettled(
       batch.map(async ({ keyword: kw, point }) => {
         const tokens = await searchTokens(kw, point.lat, point.lng);
-        return { tokens, point };
+        return { tokens, point, keyword: kw };
       })
     );
-
-    // جمع‌آوری توکن‌ها
-    const allTokens: string[] = [];
-    let lastPoint: { lat: number; lng: number } | undefined;
 
     for (const result of tokenResults) {
       searchCount++;
       if (result.status === 'fulfilled') {
-        allTokens.push(...result.value.tokens);
-        lastPoint = result.value.point;
+        const { tokens, point, keyword: kw } = result.value;
+        for (const token of tokens) {
+          tokensWithKeyword.push({ token, keyword: kw });
+        }
+        lastPoint = point;
       }
     }
 
-    // ✅ حذف تکراری‌ها و فیلتر کش‌شده‌ها
-    const uniqueTokens = [...new Set(allTokens)].filter((t) => !placeCache.has(t));
+    // ✅ حذف تکراری‌ها (بر اساس token) و فیلتر کش‌شده‌ها
+    const seenTokens = new Set<string>();
+    const uniqueTokensWithKeyword = tokensWithKeyword.filter(({ token }) => {
+      if (seenTokens.has(token) || placeCache.has(token)) return false;
+      seenTokens.add(token);
+      return true;
+    });
 
-    // ✅ دریافت جزئیات POIها به صورت همزمان
-    if (uniqueTokens.length > 0) {
-      const places = await processConcurrently(uniqueTokens, DETAIL_CONCURRENCY, getPlace);
+    // ✅ دریافت جزئیات با keyword
+    if (uniqueTokensWithKeyword.length > 0) {
+      const places = await processConcurrently(
+        uniqueTokensWithKeyword,
+        DETAIL_CONCURRENCY,
+        ({ token, keyword: kw }) => getPlace(token, kw)
+      );
 
       for (const place of places) {
         if (place && !seenPhones.has(place.phoneNumber) && place.phoneNumber.length >= 7) {

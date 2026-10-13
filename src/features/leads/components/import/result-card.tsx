@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { Copy, Globe, MapPin, Phone, Plus, Star, X } from 'lucide-react';
+import { Copy, Globe, MapPin, Phone, Plus, Search, Star, X } from 'lucide-react';
 import { EditPlaceDialog } from './edit-place-dialog';
 import type { BaladPlace } from './types';
 
@@ -213,6 +213,16 @@ export function ResultCard({
                 >
                   وبسایت
                 </a>
+              </Badge>
+            )}
+            {/* ✅ کلیدواژه‌ای که با اون پیدا شده */}
+            {place.matchedKeyword && (
+              <Badge
+                variant="outline"
+                className="gap-1 border-blue-200 bg-blue-50 text-[11px] text-blue-700"
+              >
+                <Search className="h-3 w-3" />
+                {place.matchedKeyword}
               </Badge>
             )}
           </div>
