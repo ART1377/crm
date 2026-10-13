@@ -8,5 +8,5 @@ export interface BaladPlace {
   rating?: number;
   ratingCount?: number;
   isExisting?: boolean;
-  matchedKeyword?: string; 
+  matchedKeyword?: string;
 }
