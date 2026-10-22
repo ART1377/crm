@@ -23,7 +23,7 @@ interface BaladSearchProps {
     zoom: string;
     step: string;
   };
-  selectedIndustries?: string[]; // ✅ اضافه شد
+  selectedIndustries?: string[];
 }
 
 export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSearchProps) {
@@ -64,25 +64,13 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
     handleImportOne,
     updatePlace,
   } = useImportSearch({
-    searchFn: async ({ keyword, lat, lng, radius }) => {
-      const params = new URLSearchParams({
-        keyword,
-        lat,
-        lng,
-        radius,
-        step: sharedParams.step,
-        industries: selectedIndustries.join(','), // ✅ اضافه شد
-      });
-      const res = await fetch(`/api/leads/search-balad?${params}`);
-      return res.json();
-    },
+    searchFn: async () => ({ places: [], total: 0 }), // ✅ خالی - دیگه استفاده نمیشه
     sharedParams,
     sourceName: 'بلد',
     selectedIndustries,
   });
 
   const handleSearchWithProgress = async () => {
-    // تنظیمات اولیه
     setLoading(true);
     setPaused(false);
     pauseRef.current = false;
@@ -91,7 +79,6 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
     setProgress('در حال شروع...');
     setProgressPercent(0);
 
-    // تولید نقاط شبکه
     try {
       const points = generateGridPoints(
         parseFloat(sharedParams.latitude),
@@ -112,7 +99,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
         lng: sharedParams.longitude,
         radius: sharedParams.radius,
         step: sharedParams.step,
-        industries: selectedIndustries.join(','), // ✅ اضافه شد
+        industries: selectedIndustries.join(','),
       });
 
       const res = await fetch(`/api/leads/search-balad?${params}`, { signal: controller.signal });
@@ -273,7 +260,8 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
         </CardContent>
       </Card>
 
-      {showMap && loading && gridPoints.length > 0 ? (
+      {/* ✅ شرط اصلاح شد: showMap فقط در حالت loading نمایش داده بشه */}
+      {showMap && (loading || places.length > 0) ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="order-1 h-80 lg:sticky lg:top-4 lg:order-2 lg:h-[calc(100vh-12rem)]">
             <SearchMap
@@ -288,7 +276,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
           </div>
 
           <div className="order-2 lg:order-1">
-            {places.length === 0 ? (
+            {places.length === 0 && loading ? (
               <Card className="h-full">
                 <CardContent className="flex h-full min-h-80 items-center justify-center py-8 lg:min-h-[calc(100vh-12rem)]">
                   <div className="flex flex-col items-center justify-center gap-3">
@@ -298,7 +286,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
                   </div>
                 </CardContent>
               </Card>
-            ) : (
+            ) : places.length > 0 ? (
               <Card>
                 <CardHeader>
                   <ImportToolbar
@@ -342,7 +330,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
                   </div>
                 </CardContent>
               </Card>
-            )}
+            ) : null}
           </div>
         </div>
       ) : (
@@ -359,7 +347,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
             </Card>
           )}
 
-          {places.length > 0 && !showMap && (
+          {places.length > 0 && (
             <Card>
               <CardHeader>
                 <ImportToolbar
