@@ -58,6 +58,8 @@ export function ImportPage() {
     selectedIndustries: [] as string[],
   });
 
+  const [activeKeyword, setActiveKeyword] = useState<string | null>(null);
+
   const toggleSource = (source: SearchSource) => {
     setSelectedSources((prev) => {
       const newSet = new Set(prev);
@@ -88,6 +90,7 @@ export function ImportPage() {
           <BaladSearch
             sharedParams={searchParams}
             selectedIndustries={searchParams.selectedIndustries}
+            onActiveKeywordChange={setActiveKeyword}
           />
         </div>
       );
@@ -194,6 +197,7 @@ export function ImportPage() {
           onIndustriesChange={(industries) =>
             setSearchParams((p) => ({ ...p, selectedIndustries: industries }))
           }
+          activeKeyword={activeKeyword}
         />
 
         {/* نتایج جستجو از منابع انتخاب شده */}

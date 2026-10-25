@@ -40,7 +40,8 @@ interface Props {
   onSearch?: () => void;
   isSearching?: boolean;
   selectedSourcesCount?: number;
-  onIndustriesChange?: (industries: string[]) => void; // ✅ اضافه شد
+  onIndustriesChange?: (industries: string[]) => void;
+  activeKeyword?: string | null;
 }
 
 export function SearchConfig({
@@ -60,6 +61,7 @@ export function SearchConfig({
   isSearching = false,
   selectedSourcesCount = 0,
   onIndustriesChange,
+  activeKeyword,
 }: Props) {
   const { data: industries = [] } = useListOptions('INDUSTRY');
   const [newKeyword, setNewKeyword] = useState('');
@@ -176,21 +178,36 @@ export function SearchConfig({
         </Label>
 
         <div className="flex flex-wrap gap-1.5">
-          {keywords.map((kw, i) => (
-            <Badge
-              key={`${kw}-${i}`}
-              variant="outline"
-              className="bg-primary/10 text-primary gap-1.5 py-1.5 pr-1.5 pl-3 text-xs font-normal transition-all"
-            >
-              {kw}
-              <button
-                onClick={() => removeKeyword(i)}
-                className="flex h-4 w-4 items-center justify-center rounded-full opacity-60 transition-all hover:bg-white/50 hover:opacity-100"
+          {keywords.map((kw, i) => {
+            const isActive = activeKeyword === kw; // ✅
+            return (
+              <Badge
+                key={`${kw}-${i}`}
+                variant="outline"
+                className={`gap-1.5 py-1.5 pr-1.5 pl-3 text-xs font-normal transition-all ${
+                  isActive
+                    ? 'border-primary bg-primary text-primary-foreground ring-primary/30 shadow-md ring-2'
+                    : 'bg-primary/10 text-primary'
+                }`}
               >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
+                {isActive && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                  </span>
+                )}
+                {kw}
+                {!isActive && (
+                  <button
+                    onClick={() => removeKeyword(i)}
+                    className="flex h-4 w-4 items-center justify-center rounded-full opacity-60 transition-all hover:bg-white/50 hover:opacity-100"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </Badge>
+            );
+          })}
         </div>
 
         {availableDefaults.length > 0 && (

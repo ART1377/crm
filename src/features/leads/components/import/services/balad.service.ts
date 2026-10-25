@@ -211,6 +211,7 @@ export async function* searchBaladStream(
       current: number;
       total: number;
       point?: { lat: number; lng: number };
+      keyword?: string;
     }
   | { type: 'place'; place: BaladPlace }
   | { type: 'done'; total: number }
@@ -239,6 +240,8 @@ export async function* searchBaladStream(
   // ✅ پردازش دسته‌ای
   for (let i = 0; i < tasks.length; i += SEARCH_CONCURRENCY) {
     const batch = tasks.slice(i, i + SEARCH_CONCURRENCY);
+
+    const currentKeyword = batch[0]?.keyword;
 
     // ✅ ذخیره توکن‌ها با keyword مربوطه
     const tokensWithKeyword: Array<{ token: string; keyword: string }> = [];
@@ -294,6 +297,7 @@ export async function* searchBaladStream(
       current: searchCount,
       total: totalSearches,
       point: lastPoint,
+      keyword: currentKeyword,
     };
   }
 

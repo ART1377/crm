@@ -24,9 +24,14 @@ interface BaladSearchProps {
     step: string;
   };
   selectedIndustries?: string[];
+  onActiveKeywordChange?: (keyword: string | null) => void;
 }
 
-export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSearchProps) {
+export function BaladSearch({
+  sharedParams,
+  selectedIndustries = [],
+  onActiveKeywordChange,
+}: BaladSearchProps) {
   const [showMap, setShowMap] = useState(false);
   const [progress, setProgress] = useState('');
   const [progressPercent, setProgressPercent] = useState(0);
@@ -141,6 +146,9 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
                   )
                 );
               }
+              if (data.keyword) {
+                onActiveKeywordChange?.(data.keyword);
+              }
             } else if (data.type === 'place') {
               if (!seenIds.has(data.place.id)) {
                 seenIds.add(data.place.id);
@@ -167,6 +175,7 @@ export function BaladSearch({ sharedParams, selectedIndustries = [] }: BaladSear
       setPaused(false);
       setCurrentPoint(null);
       abortControllerRef.current = null;
+      onActiveKeywordChange?.(null);
     }
   };
 
