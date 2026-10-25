@@ -72,8 +72,6 @@ function parseCards(html: string): BaladPlace[] {
       address,
       category: '',
       website: '',
-      rating: null,
-      ratingCount: null,
       isExisting: false,
       matchedKeyword: personName,
       searchedIndustry: 'شیمیایی',

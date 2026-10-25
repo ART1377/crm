@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!leads?.length) return NextResponse.json({ added: 0, skipped: 0 });
 
     const phones = leads.map((l: any) => sanitizePhone(l.phoneNumber)).filter(Boolean);
-    
+
     // چک کردن تکراری در StagedLead
     const existingStaged = await prisma.stagedLead.findMany({
       where: { phoneNumber: { in: phones } },
