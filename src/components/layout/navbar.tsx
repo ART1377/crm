@@ -1,3 +1,5 @@
+// src/components/layout/navbar.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,6 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import {
+  Archive,
   CheckSquare,
   LayoutDashboard,
   MapPin,
@@ -24,6 +27,7 @@ import { cn } from '@/lib/utils';
 const navigation = [
   { name: 'داشبورد', href: '/', icon: LayoutDashboard, exact: true },
   { name: 'سرنخ‌ها', href: '/leads', icon: Users, exact: true },
+  { name: 'انبار سرنخ‌ها', href: '/leads/staged', icon: Archive, exact: true }, // ✅ جدید
   { name: 'تسک‌ها', href: '/tasks', icon: CheckSquare, exact: true },
   { name: 'قالب‌های پیام', href: '/templates', icon: MessageSquare, exact: true },
   { name: 'جستجوی Maps', href: '/leads/import', icon: MapPin, exact: false },
@@ -92,7 +96,7 @@ export function Navbar() {
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 space-y-1 p-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {navigation.map((item) => {
             const active = isActive(item);
             return (

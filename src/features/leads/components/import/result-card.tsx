@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { Copy, MapPin, Phone, Plus, Search, Tag, X } from 'lucide-react';
+import { Archive, Copy, MapPin, Phone, Plus, Search, Tag, X } from 'lucide-react';
 import { EditPlaceDialog } from './edit-place-dialog';
 import type { BaladPlace } from './types';
 
@@ -21,6 +21,8 @@ interface Props {
   onSave: (id: string, place: BaladPlace) => void;
   onImportOne?: (place: BaladPlace) => void;
   onHide?: (id: string) => void;
+  savingOne?: boolean;
+  onSaveOneToStaging?: (place: BaladPlace) => void;
 }
 
 export function ResultCard({
@@ -34,6 +36,8 @@ export function ResultCard({
   onSave,
   onImportOne,
   onHide,
+  savingOne = false,
+  onSaveOneToStaging,
 }: Props) {
   const { copy: copyName } = useCopyToClipboard();
   const { copy: copyPhone } = useCopyToClipboard();
@@ -123,6 +127,26 @@ export function ResultCard({
           </div>
 
           <div className="flex shrink-0 items-center gap-0.5">
+            {/* ✅ دکمه ذخیره در انبار */}
+            {!place.isExisting && onSaveOneToStaging && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-lg text-amber-600 transition-all hover:bg-amber-50 hover:text-amber-700"
+                disabled={savingOne}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSaveOneToStaging(place);
+                }}
+                title="ذخیره در انبار"
+              >
+                {savingOne ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+                ) : (
+                  <Archive className="h-4 w-4" />
+                )}
+              </Button>
+            )}
             {/* دکمه مخفی‌سازی */}
             {!place.isExisting && onHide && (
               <Button

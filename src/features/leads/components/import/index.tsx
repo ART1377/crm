@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Compass, MapPin, Navigation } from 'lucide-react';
+import { Building2, Compass, MapPin, Navigation } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
 import { BaladSearch } from './balad-search';
+import { EmshimiSearch } from './emshimi-search';
 import { GoogleSearch } from './google-search';
 import { NeshanSearch } from './neshan-search';
 import { SearchConfig } from './search-config';
@@ -39,14 +40,19 @@ const SEARCH_SOURCES = [
     color: 'text-purple-600 border-purple-200 bg-purple-50',
     description: 'Scraping',
   },
+  {
+    value: 'emshimi',
+    label: 'اتحادیه شیمیایی',
+    icon: Building2,
+    color: 'text-emerald-600 border-emerald-200 bg-emerald-50',
+    description: 'Scraping',
+  },
 ] as const;
 
 type SearchSource = (typeof SEARCH_SOURCES)[number]['value'];
 
 export function ImportPage() {
-  const [selectedSources, setSelectedSources] = useState<Set<SearchSource>>(
-    new Set(['balad', 'google', 'neshan'])
-  );
+  const [selectedSources, setSelectedSources] = useState<Set<SearchSource>>(new Set(['balad']));
 
   const [searchParams, setSearchParams] = useState({
     keyword: '',
@@ -122,6 +128,21 @@ export function ImportPage() {
             </Badge>
           </div>
           <NeshanSearch sharedParams={searchParams} />
+        </div>
+      );
+    }
+
+    if (selectedSources.has('emshimi')) {
+      components.push(
+        <div key="emshimi" className="space-y-4">
+          <div className="flex items-center gap-2 border-b pb-2">
+            <Building2 className="h-5 w-5 text-emerald-600" />
+            <h3 className="font-semibold">اتحادیه مواد شیمیایی</h3>
+            <Badge variant="outline" className="text-[10px]">
+              Scraping
+            </Badge>
+          </div>
+          <EmshimiSearch selectedIndustries={searchParams.selectedIndustries} />
         </div>
       );
     }

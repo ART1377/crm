@@ -68,6 +68,10 @@ export function BaladSearch({
     handleImport,
     handleImportOne,
     updatePlace,
+    saving,
+    handleSaveToStaging,
+    savingOne,
+    handleSaveOneToStaging,
   } = useImportSearch({
     searchFn: async () => ({ places: [], total: 0 }), // ✅ خالی - دیگه استفاده نمیشه
     sharedParams,
@@ -311,6 +315,8 @@ export function BaladSearch({
                     showDuplicates={showDuplicates}
                     showHidden={showHidden}
                     searchQuery={searchQuery}
+                    onSaveToStaging={handleSaveToStaging}
+                    saving={saving}
                   />
                 </CardHeader>
                 <CardContent>
@@ -333,6 +339,8 @@ export function BaladSearch({
                           onSave={updatePlace}
                           onImportOne={handleImportOne}
                           onHide={handleHide}
+                          savingOne={savingOne === place.id}
+                          onSaveOneToStaging={handleSaveOneToStaging}
                         />
                       ))
                     )}
@@ -372,6 +380,8 @@ export function BaladSearch({
                   showDuplicates={showDuplicates}
                   showHidden={showHidden}
                   searchQuery={searchQuery}
+                  onSaveToStaging={handleSaveToStaging}
+                  saving={saving}
                 />
               </CardHeader>
               <CardContent>
@@ -394,6 +404,8 @@ export function BaladSearch({
                         onSave={updatePlace}
                         onImportOne={handleImportOne}
                         onHide={handleHide}
+                        savingOne={savingOne === place.id}
+                        onSaveOneToStaging={handleSaveOneToStaging}
                       />
                     ))
                   )}

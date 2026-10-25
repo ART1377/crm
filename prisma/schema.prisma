@@ -80,3 +80,34 @@ model ListOption {
   type  String // "SOURCE" or "INDUSTRY"
   value String
 }
+
+model StagedLead {
+  id             String   @id @default(cuid())
+  
+  businessName   String
+  contactPerson  String?
+  phoneNumber    String
+  secondaryPhone String?
+  industry       String
+  source         String   // "بلد", "گوگل مپ", "نشان", "اتحادیه شیمیایی", ...
+  category       String?
+  address        String?
+  website        String?
+  rating         Float?
+  notes          String?
+  
+  // اطلاعات اضافی برای ردیابی
+  matchedKeyword String?
+  searchedIndustry String?
+  
+  // وضعیت
+  status         String   @default("PENDING") // PENDING, IMPORTED, IGNORED
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  importedAt     DateTime? // زمان تبدیل به Lead
+  
+  @@index([phoneNumber])
+  @@index([status])
+  @@index([source])
+}

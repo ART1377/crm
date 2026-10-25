@@ -42,6 +42,10 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
     handleImport,
     handleImportOne,
     updatePlace,
+    saving,
+    handleSaveToStaging,
+    savingOne,
+    handleSaveOneToStaging,
   } = useImportSearch({
     searchFn: async ({ keyword, lat, lng, radius }) => {
       const radiusMeters = parseFloat(radius) * 1000;
@@ -92,6 +96,8 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
               showDuplicates={showDuplicates}
               showHidden={showHidden}
               searchQuery={searchQuery}
+              onSaveToStaging={handleSaveToStaging}
+              saving={saving}
             />
           </CardHeader>
           <CardContent>
@@ -114,6 +120,8 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
                     onSave={updatePlace}
                     onImportOne={handleImportOne}
                     onHide={handleHide}
+                    savingOne={savingOne === place.id}
+                    onSaveOneToStaging={handleSaveOneToStaging}
                   />
                 ))
               )}

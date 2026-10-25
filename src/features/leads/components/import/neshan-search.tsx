@@ -42,6 +42,10 @@ export function NeshanSearch({ sharedParams }: NeshanSearchProps) {
     handleImport,
     handleImportOne,
     updatePlace,
+    saving,
+    handleSaveToStaging,
+    savingOne,
+    handleSaveOneToStaging,
   } = useImportSearch({
     searchFn: async ({ keyword, lat, lng, radius }) => {
       const params = new URLSearchParams({ keyword, lat, lng, radius });
@@ -86,6 +90,8 @@ export function NeshanSearch({ sharedParams }: NeshanSearchProps) {
               showDuplicates={showDuplicates}
               showHidden={showHidden}
               searchQuery={searchQuery}
+              onSaveToStaging={handleSaveToStaging}
+              saving={saving}
             />
           </CardHeader>
           <CardContent>
@@ -108,6 +114,8 @@ export function NeshanSearch({ sharedParams }: NeshanSearchProps) {
                     onSave={updatePlace}
                     onImportOne={handleImportOne}
                     onHide={handleHide}
+                    savingOne={savingOne === place.id}
+                    onSaveOneToStaging={handleSaveOneToStaging}
                   />
                 ))
               )}

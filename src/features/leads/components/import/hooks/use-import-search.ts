@@ -4,6 +4,9 @@
 
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBulkSaveToStaging, useSaveToStaging } from '@/features/leads/hooks/use-staged-leads';
+
 import type { BaladPlace } from '../types';
 
 interface UseImportSearchProps {
@@ -38,6 +41,11 @@ export function useImportSearch({
   const [searchQuery, setSearchQuery] = useState('');
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [showHidden, setShowHidden] = useState(false);
+  const [savingOne, setSavingOne] = useState<string | null>(null);
+
+  // ✅ استفاده از hookهای انبار
+  const saveToStaging = useSaveToStaging();
+  const bulkSaveToStaging = useBulkSaveToStaging();
 
   const filteredPlaces = useMemo(() => {
     let result = places;
@@ -119,15 +127,12 @@ export function useImportSearch({
 
   // ✅ تابع کمکی برای تعیین صنعت هر مکان
   const getIndustryForPlace = (place: BaladPlace): string => {
-    // 1. اگه place.searchedIndustry داره، از اون استفاده کن
     if (place.searchedIndustry) {
       return place.searchedIndustry;
     }
-    // 2. اگه فقط یک صنعت انتخاب شده، از همون استفاده کن
     if (selectedIndustries.length === 1) {
       return selectedIndustries[0];
     }
-    // 3. Fallback: اولین کلیدواژه
     return sharedParams.keyword.split(',')[0];
   };
 
@@ -189,6 +194,49 @@ export function useImportSearch({
     setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)));
   };
 
+  // ✅ ذخیره گروهی در انبار (با hook)
+  const handleSaveToStaging = async () => {
+    if (selected.size === 0) return;
+    try {
+      const leads = places
+        .filter((p) => selected.has(p.id))
+        .map((p) => ({
+          ...p,
+          industry: getIndustryForPlace(p),
+          source: sourceName,
+        }));
+
+      await bulkSaveToStaging.mutateAsync(leads);
+
+      // ✅ بعد از ذخیره، از لیست حذف کن
+      setPlaces((prev) => prev.filter((p) => !selected.has(p.id)));
+      setSelected(new Set());
+    } catch {
+      // خطا در hook مدیریت میشه
+    }
+  };
+
+  // ✅ ذخیره تکی در انبار (با hook)
+  const handleSaveOneToStaging = async (place: BaladPlace) => {
+    setSavingOne(place.id);
+    try {
+      const result = await saveToStaging.mutateAsync({
+        ...place,
+        industry: getIndustryForPlace(place),
+        source: sourceName,
+      });
+
+      if (result.added > 0) {
+        // ✅ از لیست حذف کن (چون به انبار منتقل شد)
+        setPlaces((prev) => prev.filter((p) => p.id !== place.id));
+      }
+    } catch {
+      // خطا در hook مدیریت میشه
+    } finally {
+      setSavingOne(null);
+    }
+  };
+
   return {
     loading,
     setLoading,
@@ -215,5 +263,9 @@ export function useImportSearch({
     handleImportOne,
     updatePlace,
     totalCount: places.length,
+    saving: bulkSaveToStaging.isPending,
+    handleSaveToStaging,
+    savingOne,
+    handleSaveOneToStaging,
   };
 }

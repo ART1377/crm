@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff, RotateCcw, Search } from 'lucide-react';
+import { Archive, Eye, EyeOff, RotateCcw, Search } from 'lucide-react';
 import type { BaladPlace } from './types';
 
 interface ImportToolbarProps {
@@ -23,6 +23,8 @@ interface ImportToolbarProps {
   showDuplicates: boolean;
   showHidden?: boolean;
   searchQuery: string;
+  onSaveToStaging?: () => void;
+  saving?: boolean;
 }
 
 export function ImportToolbar({
@@ -37,6 +39,8 @@ export function ImportToolbar({
   onShowHidden,
   showDuplicates,
   searchQuery,
+  onSaveToStaging,
+  saving = false,
 }: ImportToolbarProps) {
   const available = places.filter((p) => !p.isExisting);
   const allSelected = available.length > 0 && selected.size === available.length;
@@ -128,15 +132,27 @@ export function ImportToolbar({
         )}
       </div>
 
-      {/* ردیف سوم: دکمه ایمپورت */}
-      <Button
-        size="sm"
-        className="w-full"
-        disabled={selected.size === 0 || importing}
-        onClick={onImport}
-      >
-        {importing ? 'در حال وارد کردن...' : `وارد کردن (${selected.size})`}
-      </Button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full gap-2 sm:flex-1"
+          disabled={selected.size === 0 || saving}
+          onClick={onSaveToStaging}
+        >
+          <Archive className="h-4 w-4" />
+          {saving ? 'در حال ذخیره...' : `ذخیره در انبار (${selected.size})`}
+        </Button>
+
+        <Button
+          size="sm"
+          className="w-full gap-2 sm:flex-1"
+          disabled={selected.size === 0 || importing}
+          onClick={onImport}
+        >
+          {importing ? 'در حال وارد کردن...' : `وارد کردن (${selected.size})`}
+        </Button>
+      </div>
     </div>
   );
 }
