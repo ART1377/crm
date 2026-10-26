@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 
 import { MultiSelect } from '@/components/shared/multi-select';
 
+import { useStagedCounts } from '@/features/leads/hooks/use-staged-leads';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
 interface StagedFiltersProps {
@@ -21,12 +22,24 @@ interface StagedFiltersProps {
 export function StagedFilters({ filters, onFilterChange, onClearFilters }: StagedFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
+  const { data: countsData } = useStagedCounts();
+
+  const industryCounts = countsData?.industryCounts ?? {};
 
   const selectedSources = filters.source ? filters.source.split(',').filter(Boolean) : [];
   const selectedIndustries = filters.industry ? filters.industry.split(',').filter(Boolean) : [];
 
   const hasFilters =
     Boolean(filters.search) || Boolean(filters.source) || Boolean(filters.industry);
+
+  // ✅ اضافه کردن تعداد به label صنایع
+  const industryOptionsWithCount = industryOptions.map((option) => {
+    const count = industryCounts[option.value] ?? 0;
+    return {
+      value: option.value,
+      label: count > 0 ? `${option.value} (${count})` : option.value,
+    };
+  });
 
   return (
     <Card className="overflow-visible">
@@ -63,7 +76,7 @@ export function StagedFilters({ filters, onFilterChange, onClearFilters }: Stage
 
             <MultiSelect
               label="صنعت"
-              options={industryOptions.map((s) => ({ value: s.value, label: s.value }))}
+              options={industryOptionsWithCount}
               selectedValues={selectedIndustries}
               onChange={(v) => onFilterChange('industry', v)}
               className="flex-1"

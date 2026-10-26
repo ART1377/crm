@@ -80,4 +80,10 @@ export const stagedLeadsService = {
   async update(id: string, data: Partial<StagedLead>) {
     return apiClient.patch(`/leads/staged/${id}`, data) as Promise<StagedLead>;
   },
+
+  async getCounts() {
+    return apiClient.get('/leads/staged/counts') as Promise<{
+      industryCounts: Record<string, number>;
+    }>;
+  },
 };

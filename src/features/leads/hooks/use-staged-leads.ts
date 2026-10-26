@@ -4,7 +4,7 @@
 
 import toast from 'react-hot-toast';
 
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { stagedLeadsService } from '@/features/leads/api/staged-leads.api';
 
@@ -30,6 +30,14 @@ export function useStagedLeads(params?: {
     initialPageParam: 1,
     staleTime: 30 * 1000,
     refetchOnWindowFocus: false,
+  });
+}
+
+export function useStagedCounts() {
+  return useQuery({
+    queryKey: [STAGED_LEADS_QUERY_KEY, 'counts'],
+    queryFn: () => stagedLeadsService.getCounts(),
+    staleTime: 30 * 1000,
   });
 }
 
