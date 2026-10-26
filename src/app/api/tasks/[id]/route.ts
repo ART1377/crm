@@ -36,16 +36,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         select: { status: true },
       });
 
-      // اگر وضعیت سرنخ CALLED, MESSAGED, یا FOLLOW_UP باشه
-      if (lead && ['CALLED', 'MESSAGED', 'FOLLOW_UP'].includes(lead.status)) {
+      // ✅ اگر وضعیت سرنخ MESSAGED یا FOLLOW_UP باشه (نه CALLED)
+      if (lead && ['MESSAGED', 'FOLLOW_UP'].includes(lead.status)) {
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
 
-        // عنوان تسک بر اساس وضعیت سرنخ
-        let title = 'پیگیری';
-        if (lead.status === 'CALLED') title = 'پیگیری تماس';
-        else if (lead.status === 'MESSAGED') title = 'پیگیری پیام';
-        else if (lead.status === 'FOLLOW_UP') title = 'پیگیری وضعیت';
+        const title = lead.status === 'MESSAGED' ? 'پیگیری پیام' : 'پیگیری وضعیت';
 
         // چک کن که آیا تسک جدیدی برای این تاریخ وجود داره یا نه
         const existingTask = await prisma.task.findFirst({
@@ -60,7 +56,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           },
         });
 
-        // اگر تسک جدید وجود نداشت، ایجاد کن
         if (!existingTask) {
           await prisma.task.create({
             data: {

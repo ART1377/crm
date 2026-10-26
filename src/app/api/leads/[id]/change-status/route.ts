@@ -33,16 +33,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
-    // ✅ Auto-create follow-up task for CALLED, MESSAGED, and FOLLOW_UP
-    if (status === 'CALLED' || status === 'MESSAGED' || status === 'FOLLOW_UP') {
+    // ✅ Auto-create follow-up task فقط برای MESSAGED و FOLLOW_UP
+    // برای CALLED (شماره گرفته شد) تسکی ساخته نمی‌شود
+    if (status === 'MESSAGED' || status === 'FOLLOW_UP') {
       const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS); // NOW 25 days (changed in constants)
+      dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
 
-      // تعیین عنوان مناسب بر اساس وضعیت
-      let title = 'پیگیری';
-      if (status === 'CALLED') title = 'پیگیری تماس';
-      else if (status === 'MESSAGED') title = 'پیگیری پیام';
-      else if (status === 'FOLLOW_UP') title = 'پیگیری وضعیت';
+      const title = status === 'MESSAGED' ? 'پیگیری پیام' : 'پیگیری وضعیت';
 
       await prisma.task.create({
         data: {
