@@ -12,7 +12,12 @@ import { LEADS_PAGE_SIZE } from '@/constants/constants';
 import { LEADS_QUERY_KEY, STAGED_LEADS_QUERY_KEY } from '@/lib/query-keys';
 
 // ✅ دریافت لیست انبار
-export function useStagedLeads(params?: { status?: string; search?: string }) {
+export function useStagedLeads(params?: {
+  status?: string;
+  search?: string;
+  source?: string; // ✅
+  industry?: string; // ✅
+}) {
   return useInfiniteQuery({
     queryKey: [STAGED_LEADS_QUERY_KEY, params],
     queryFn: ({ pageParam = 1 }) =>
@@ -24,6 +29,7 @@ export function useStagedLeads(params?: { status?: string; search?: string }) {
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
     initialPageParam: 1,
     staleTime: 30 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 

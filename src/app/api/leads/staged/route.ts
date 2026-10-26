@@ -79,12 +79,25 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || 'PENDING';
     const search = searchParams.get('search');
+    const source = searchParams.get('source');
+    const industry = searchParams.get('industry');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const skip = (page - 1) * limit;
 
     const where: any = {};
     if (status !== 'all') where.status = status;
+
+    if (source) {
+      const sourceList = source.split(',').filter(Boolean);
+      where.source = sourceList.length === 1 ? sourceList[0] : { in: sourceList };
+    }
+
+    if (industry) {
+      const industryList = industry.split(',').filter(Boolean);
+      where.industry = industryList.length === 1 ? industryList[0] : { in: industryList };
+    }
+
     if (search) {
       where.OR = [
         { businessName: { contains: search, mode: 'insensitive' } },

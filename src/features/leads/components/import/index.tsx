@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Building2, Compass, MapPin, Navigation } from 'lucide-react';
+import { BookOpen, Compass, MapPin, Navigation } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
+import { AvvalSearch } from './avval-search';
 import { BaladSearch } from './balad-search';
-import { EmshimiSearch } from './emshimi-search';
 import { GoogleSearch } from './google-search';
 import { NeshanSearch } from './neshan-search';
 import { SearchConfig } from './search-config';
@@ -41,11 +41,11 @@ const SEARCH_SOURCES = [
     description: 'Scraping',
   },
   {
-    value: 'emshimi',
-    label: 'اتحادیه شیمیایی',
-    icon: Building2,
-    color: 'text-emerald-600 border-emerald-200 bg-emerald-50',
-    description: 'Scraping',
+    value: 'avval',
+    label: 'کتاب اول',
+    icon: BookOpen, // از lucide-react
+    color: 'text-orange-600 border-orange-200 bg-orange-50',
+    description: 'Scraping (۲ صفحه)',
   },
 ] as const;
 
@@ -132,17 +132,17 @@ export function ImportPage() {
       );
     }
 
-    if (selectedSources.has('emshimi')) {
+    if (selectedSources.has('avval')) {
       components.push(
-        <div key="emshimi" className="space-y-4">
+        <div key="avval" className="space-y-4">
           <div className="flex items-center gap-2 border-b pb-2">
-            <Building2 className="h-5 w-5 text-emerald-600" />
-            <h3 className="font-semibold">اتحادیه مواد شیمیایی</h3>
+            <BookOpen className="h-5 w-5 text-orange-600" />
+            <h3 className="font-semibold">کتاب اول</h3>
             <Badge variant="outline" className="text-[10px]">
               Scraping
             </Badge>
           </div>
-          <EmshimiSearch selectedIndustries={searchParams.selectedIndustries} />
+          <AvvalSearch />
         </div>
       );
     }
