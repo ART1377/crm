@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -15,7 +23,7 @@ import { scrapeAvval } from './services/avval.service';
 
 export function AvvalSearch() {
   const [slug, setSlug] = useState('');
-  const [industry, setIndustry] = useState('');
+  const [industry, setIndustry] = useState(''); // ✅ تک‌گزینه‌ای - رشته
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<any[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -28,13 +36,16 @@ export function AvvalSearch() {
   const [importing, setImporting] = useState(false);
   const [savingBulk, setSavingBulk] = useState(false);
 
+  // ✅ دریافت صنایع از بک‌اند
+  const { data: industryOptions = [] } = useListOptions('INDUSTRY');
+
   const handleFetch = async () => {
     if (!slug.trim()) {
       toast.error('اسلاگ دسته را وارد کنید (مثلاً میلگرد-صنعتی)');
       return;
     }
-    if (!industry.trim()) {
-      toast.error('نام صنعت را وارد کنید (مثلاً آهن آلات)');
+    if (!industry) {
+      toast.error('یک صنعت برای ذخیره انتخاب کنید');
       return;
     }
 
@@ -44,7 +55,7 @@ export function AvvalSearch() {
     setHiddenIds(new Set());
 
     try {
-      const result = await scrapeAvval({ slug: slug.trim(), industry: industry.trim() });
+      const result = await scrapeAvval({ slug: slug.trim(), industry });
       setPlaces(result.places);
 
       if (result.total === 0) {
@@ -115,8 +126,8 @@ export function AvvalSearch() {
             {
               ...place,
               source: 'کتاب اول',
-              industry: industry.trim(), // ✅ از input
-              category: industry.trim(),
+              industry,
+              category: industry,
             },
           ],
         }),
@@ -161,13 +172,20 @@ export function AvvalSearch() {
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="avval-industry">نام صنعت برای ذخیره</Label>
-              <Input
-                id="avval-industry"
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                placeholder="مثلاً: آهن آلات"
-              />
+              <Label htmlFor="avval-industry">صنعت برای ذخیره</Label>
+              {/* ✅ Select تک‌گزینه‌ای */}
+              <Select value={industry} onValueChange={setIndustry}>
+                <SelectTrigger id="avval-industry" className="w-full">
+                  <SelectValue placeholder="انتخاب صنعت..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {industryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-muted-foreground text-[10px]">
                 با این نام در دیتابیس ذخیره می‌شود
               </p>
@@ -203,8 +221,8 @@ export function AvvalSearch() {
                     .map((p) => ({
                       ...p,
                       source: 'کتاب اول',
-                      industry: industry.trim(),
-                      category: industry.trim(),
+                      industry,
+                      category: industry,
                     }));
                   const res = await fetch('/api/leads/bulk-import', {
                     method: 'POST',
@@ -231,15 +249,15 @@ export function AvvalSearch() {
               searchQuery={searchQuery}
               onSaveToStaging={async () => {
                 if (selected.size === 0) return;
-                setSavingBulk(true); // ✅ شروع لودینگ
+                setSavingBulk(true);
                 try {
                   const leads = places
                     .filter((p) => selected.has(p.id))
                     .map((p) => ({
                       ...p,
                       source: 'کتاب اول',
-                      industry: industry.trim(),
-                      category: industry.trim(),
+                      industry,
+                      category: industry,
                     }));
                   const res = await fetch('/api/leads/staged', {
                     method: 'POST',
@@ -283,8 +301,8 @@ export function AvvalSearch() {
                             {
                               ...p,
                               source: 'کتاب اول',
-                              industry: industry.trim(),
-                              category: industry.trim(),
+                              industry,
+                              category: industry,
                             },
                           ],
                         }),
