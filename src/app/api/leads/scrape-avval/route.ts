@@ -29,10 +29,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: `Upstream ${res.status}` },
-        { status: res.status }
-      );
+      return NextResponse.json({ error: `Upstream ${res.status}` }, { status: res.status });
     }
 
     const html = await res.text();

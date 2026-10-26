@@ -126,7 +126,7 @@ export function useStagedLeadsPage() {
     items,
     totalCount,
     isLoading,
-    isFetching, 
+    isFetching,
     isFetchingNextPage,
     hasNextPage,
     loaderRef,
