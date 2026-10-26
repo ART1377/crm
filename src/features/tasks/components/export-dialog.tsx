@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 
-import { Download, FileSpreadsheet, FileText, RotateCcw } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Plus, RotateCcw, Trash2, Wand2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,13 @@ import { Label } from '@/components/ui/label';
 
 import { Task } from '../types/tasks-types';
 import { ALL_COLUMNS, type ColumnKey, exportToCsv, exportToText } from '../utils/export-utils';
+
+interface FilePart {
+  id: string;
+  count: number;
+}
+
+type SplitMode = 'auto' | 'custom';
 
 interface ExportDialogProps {
   totalCount: number;
@@ -40,7 +47,9 @@ export function ExportDialog({
   const [internalOpen, setInternalOpen] = useState(false);
   const [format, setFormat] = useState<'csv' | 'txt'>('txt');
   const [columns, setColumns] = useState<ColumnKey[]>(['title', 'leadName', 'dueDate', 'status']);
+  const [splitMode, setSplitMode] = useState<SplitMode>('auto');
   const [splitCount, setSplitCount] = useState('1');
+  const [parts, setParts] = useState<FilePart[]>([{ id: crypto.randomUUID(), count: 0 }]);
   const [generatedParts, setGeneratedParts] = useState<{ name: string; tasks: Task[] }[] | null>(
     null
   );
@@ -53,37 +62,98 @@ export function ExportDialog({
     } else {
       setInternalOpen(open);
     }
-    if (!open) setGeneratedParts(null);
+    if (!open) {
+      setGeneratedParts(null);
+      setParts([{ id: crypto.randomUUID(), count: 0 }]);
+      setSplitCount('1');
+    }
   };
 
   const splitNumber = parseInt(splitCount) || 1;
   const tasksPerFile = Math.ceil(totalCount / splitNumber);
   const allColumnsSelected = columns.length === ALL_COLUMNS.length;
 
+  const assignedTotal = parts.reduce((sum, p) => sum + (p.count || 0), 0);
+  const remaining = totalCount - assignedTotal;
+  const isCustomValid = assignedTotal > 0 && assignedTotal <= totalCount;
+
   const toggleAllColumns = () => {
     setColumns(allColumnsSelected ? [] : [...ALL_COLUMNS.map((c) => c.key)]);
   };
 
+  const handleAddPart = () => {
+    setParts((prev) => [...prev, { id: crypto.randomUUID(), count: 0 }]);
+  };
+
+  const handleRemovePart = (id: string) => {
+    setParts((prev) => (prev.length === 1 ? prev : prev.filter((p) => p.id !== id)));
+  };
+
+  const handlePartCountChange = (id: string, value: string) => {
+    const num = parseInt(value) || 0;
+    setParts((prev) => prev.map((p) => (p.id === id ? { ...p, count: num } : p)));
+  };
+
+  // ✅ دکمه «باقی‌مانده»: این فایل = کل موجودی - مجموع بقیه فایل‌ها
+  const handleFillRemaining = (id: string) => {
+    setParts((prev) => {
+      const othersSum = prev.reduce((sum, p) => (p.id === id ? sum : sum + (p.count || 0)), 0);
+      const fill = Math.max(0, totalCount - othersSum);
+      return prev.map((p) => (p.id === id ? { ...p, count: fill } : p));
+    });
+  };
+
+  const handleAutoFill = () => {
+    if (parts.length === 0) return;
+    const perFile = Math.ceil(totalCount / parts.length);
+    setParts((prev) =>
+      prev.map((p, i) => {
+        const start = i * perFile;
+        const end = Math.min(start + perFile, totalCount);
+        return { ...p, count: Math.max(0, end - start) };
+      })
+    );
+  };
+
   const handleGenerate = async () => {
     if (columns.length === 0) return;
+    if (splitMode === 'custom' && !isCustomValid) return;
+
     setLoading(true);
     try {
       const allTasks = await onExportAll();
       const dateStr = new Date().toLocaleDateString('fa-IR').replace(/[\/]/g, '-');
 
-      const parts: { name: string; tasks: Task[] }[] = [];
+      const result: { name: string; tasks: Task[] }[] = [];
 
-      if (splitNumber <= 1 || allTasks.length <= tasksPerFile) {
-        parts.push({ name: `${dateStr}-قسمت-1`, tasks: allTasks });
-      } else {
-        for (let i = 0; i < splitNumber; i++) {
-          const chunk = allTasks.slice(i * tasksPerFile, (i + 1) * tasksPerFile);
-          if (!chunk.length) break;
-          parts.push({ name: `${dateStr}-قسمت-${i + 1}`, tasks: chunk });
+      if (splitMode === 'auto') {
+        if (splitNumber <= 1 || allTasks.length <= tasksPerFile) {
+          result.push({ name: `${dateStr}-قسمت-1-${allTasks.length}`, tasks: allTasks });
+        } else {
+          for (let i = 0; i < splitNumber; i++) {
+            const chunk = allTasks.slice(i * tasksPerFile, (i + 1) * tasksPerFile);
+            if (!chunk.length) break;
+            result.push({
+              name: `${dateStr}-قسمت-${i + 1}-${chunk.length}`,
+              tasks: chunk,
+            });
+          }
         }
+      } else {
+        let cursor = 0;
+        parts.forEach((part, index) => {
+          if (part.count <= 0) return;
+          const chunk = allTasks.slice(cursor, cursor + part.count);
+          if (!chunk.length) return;
+          result.push({
+            name: `${dateStr}-قسمت-${index + 1}-${chunk.length}`,
+            tasks: chunk,
+          });
+          cursor += part.count;
+        });
       }
 
-      setGeneratedParts(parts);
+      setGeneratedParts(result);
     } finally {
       setLoading(false);
     }
@@ -144,23 +214,135 @@ export function ExportDialog({
             </div>
           </div>
 
-          {/* Split count */}
+          {/* Mode toggle */}
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs font-medium">تعداد فایل‌ها</Label>
-            <Input
-              type="number"
-              min="1"
-              max={totalCount}
-              value={splitCount}
-              onChange={(e) => setSplitCount(e.target.value || '1')}
-              className="h-11 rounded-xl border-2 text-center text-sm"
-            />
-            {splitNumber > 1 && (
-              <p className="text-muted-foreground text-center text-[11px]">
-                ≈ {tasksPerFile} تسک در هر فایل
-              </p>
-            )}
+            <Label className="text-muted-foreground text-xs font-medium">حالت تقسیم</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setSplitMode('auto')}
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 p-2.5 text-xs font-medium transition-all ${
+                  splitMode === 'auto'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-muted text-muted-foreground hover:border-primary/30'
+                }`}
+              >
+                تقسیم خودکار
+              </button>
+              <button
+                onClick={() => setSplitMode('custom')}
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 p-2.5 text-xs font-medium transition-all ${
+                  splitMode === 'custom'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-muted text-muted-foreground hover:border-primary/30'
+                }`}
+              >
+                تعداد اختصاصی
+              </button>
+            </div>
           </div>
+
+          {/* AUTO mode */}
+          {splitMode === 'auto' && (
+            <div className="space-y-2">
+              <Label className="text-muted-foreground text-xs font-medium">تعداد فایل‌ها</Label>
+              <Input
+                type="number"
+                min="1"
+                max={totalCount}
+                value={splitCount}
+                onChange={(e) => setSplitCount(e.target.value || '1')}
+                className="h-11 rounded-xl border-2 text-center text-sm"
+              />
+              {splitNumber > 1 && (
+                <p className="text-muted-foreground text-center text-[11px]">
+                  ≈ {tasksPerFile} تسک در هر فایل
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* CUSTOM mode */}
+          {splitMode === 'custom' && (
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-muted-foreground text-xs font-medium">
+                  فایل‌ها ({parts.length})
+                </Label>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAutoFill}
+                    className="text-muted-foreground hover:text-foreground h-7 gap-1 rounded-lg text-[11px]"
+                  >
+                    تقسیم مساوی
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAddPart}
+                    className="text-primary hover:bg-primary/10 h-7 gap-1 rounded-lg text-[11px]"
+                  >
+                    <Plus className="h-3 w-3" />
+                    فایل جدید
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                {parts.map((part, index) => (
+                  <div key={part.id} className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground w-14 shrink-0 text-[11px]">
+                      فایل {index + 1}
+                    </span>
+                    <Input
+                      type="number"
+                      min="0"
+                      max={totalCount}
+                      value={part.count || ''}
+                      onChange={(e) => handlePartCountChange(part.id, e.target.value)}
+                      placeholder="تعداد"
+                      className="h-9 rounded-lg border-2 text-center text-xs"
+                    />
+                    {/* ✅ دکمه پر کردن باقی‌مانده */}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleFillRemaining(part.id)}
+                      className="h-8 w-8 shrink-0 border-amber-200 text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                      title="پر کردن با تعداد باقی‌مانده"
+                    >
+                      <Wand2 className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemovePart(part.id)}
+                      disabled={parts.length === 1}
+                      className="text-muted-foreground hover:text-destructive h-8 w-8 shrink-0"
+                      title="حذف این فایل"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {/* وضعیت تخصیص */}
+              <div className="bg-muted/30 flex items-center justify-between rounded-lg px-3 py-2 text-[11px]">
+                <span className="text-muted-foreground">
+                  تخصیص: {assignedTotal} از {totalCount}
+                </span>
+                {remaining > 0 && <span className="text-amber-600">{remaining} باقی‌مانده</span>}
+                {remaining === 0 && assignedTotal > 0 && (
+                  <span className="text-emerald-600">✓ کامل</span>
+                )}
+                {remaining < 0 && (
+                  <span className="text-red-600">⚠️ {Math.abs(remaining)} بیشتر</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Columns */}
           <div className="space-y-2.5">
@@ -238,7 +420,9 @@ export function ExportDialog({
             <Button
               className="shadow-primary/20 hover:shadow-primary/30 h-11 w-full shrink-0 rounded-xl text-sm font-semibold shadow-lg transition-all hover:shadow-xl"
               onClick={handleGenerate}
-              disabled={columns.length === 0 || loading}
+              disabled={
+                columns.length === 0 || loading || (splitMode === 'custom' && !isCustomValid)
+              }
             >
               {loading ? (
                 <span className="border-background h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
