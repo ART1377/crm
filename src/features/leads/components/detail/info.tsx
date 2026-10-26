@@ -3,7 +3,9 @@
 import {
   ArrowUpDown,
   Building2,
+  Calendar,
   Check,
+  Clock,
   Contact,
   Copy,
   Globe,
@@ -25,7 +27,7 @@ import { Separator } from '@/components/ui/separator';
 import { useUpdateLead } from '@/features/leads/hooks/use-leads';
 import { useCopyToClipboard } from '@/hooks/use-copy';
 
-import { downloadVCard, getDisplayUrl } from '@/lib/utils';
+import { downloadVCard, formatDate, getDisplayUrl } from '@/lib/utils';
 
 import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from '../table/edit-lead/dialog';
@@ -206,6 +208,25 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
             <div className="min-w-0">
               <p className="text-muted-foreground text-[10px]">صنعت</p>
               <p className="truncate text-sm font-medium">{lead.industry}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ تاریخ ایجاد و بروزرسانی */}
+        <Separator />
+        <div className="grid grid-cols-2 divide-x">
+          <div className="flex items-center gap-2.5 px-5 py-3">
+            <Calendar className="text-muted-foreground h-4 w-4 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-muted-foreground text-[10px]">تاریخ ایجاد</p>
+              <p className="truncate text-sm font-medium">{formatDate(new Date(lead.createdAt))}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 px-5 py-3">
+            <Clock className="text-muted-foreground h-4 w-4 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-muted-foreground text-[10px]">آخرین بروزرسانی</p>
+              <p className="truncate text-sm font-medium">{formatDate(new Date(lead.updatedAt))}</p>
             </div>
           </div>
         </div>
