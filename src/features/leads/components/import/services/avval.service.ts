@@ -163,7 +163,7 @@ function parseAvvalPage(html: string, industry: string): BaladPlace[] {
       latitude,
       longitude,
       searchedIndustry: industry,
-      matchedKeyword: activity || industry, 
+      matchedKeyword: activity || industry,
       source: 'کتاب اول',
       isExisting: false,
       email,
