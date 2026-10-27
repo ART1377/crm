@@ -14,8 +14,8 @@ import { PageWrapper } from '@/components/shared/page-wrapper';
 
 import { useStagedLeadsPage } from '@/features/leads/hooks/use-staged-leads-page';
 
-import { StagedFilters } from './components/staged-filters';
-import { StagedLeadCard } from './components/staged-lead-card';
+import { StagedFilters } from './staged-filters';
+import { StagedLeadCard } from './staged-lead-card';
 import type { StagedLead } from './types';
 
 export function StagedLeadsPage() {

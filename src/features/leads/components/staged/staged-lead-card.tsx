@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { cn } from '@/lib/utils';
 
-import type { StagedLead } from '../types';
+import type { StagedLead } from './types';
 
 interface StagedLeadCardProps {
   lead: StagedLead;
