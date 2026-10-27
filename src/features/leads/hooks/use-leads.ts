@@ -34,6 +34,14 @@ export function useLead(id: string) {
   });
 }
 
+export function useLeadCounts() {
+  return useQuery({
+    queryKey: [LEADS_QUERY_KEY, 'counts'],
+    queryFn: () => leadsService.getCounts(),
+    staleTime: 30 * 1000,
+  });
+}
+
 export function useCreateLead() {
   const queryClient = useQueryClient();
 

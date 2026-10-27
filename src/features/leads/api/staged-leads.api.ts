@@ -84,6 +84,7 @@ export const stagedLeadsService = {
   async getCounts() {
     return apiClient.get('/leads/staged/counts') as Promise<{
       industryCounts: Record<string, number>;
+      sourceCounts: Record<string, number>;
     }>;
   },
 };

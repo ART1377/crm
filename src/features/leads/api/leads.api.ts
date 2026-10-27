@@ -133,4 +133,12 @@ export const leadsService = {
       message: string;
     }>;
   },
+
+  async getCounts() {
+    return apiClient.get('/leads/counts') as Promise<{
+      industryCounts: Record<string, number>;
+      statusCounts: Record<string, number>;
+      sourceCounts: Record<string, number>;
+    }>;
+  },
 };

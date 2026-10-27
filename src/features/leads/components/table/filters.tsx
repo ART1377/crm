@@ -1,4 +1,5 @@
 // src/features/leads/components/table/filters.tsx
+
 'use client';
 
 import { ArrowUpDown, RotateCcw, Search, X } from 'lucide-react';
@@ -17,9 +18,11 @@ import {
 import { MultiSelect } from '@/components/shared/multi-select';
 import { PersianDatePicker } from '@/components/shared/persian-date-picker';
 
+import { useLeadCounts } from '@/features/leads/hooks/use-leads';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
 import { LEAD_STATUSES } from '../../constants/leads-constants';
+import { mapListOptions, withCount } from '../../utils/filter-utils';
 
 const hasActiveFilters = (
   filters: LeadsFiltersProps['filters'],
@@ -66,11 +69,27 @@ export function LeadsFilters({
 }: LeadsFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
+  const { data: countsData } = useLeadCounts();
+
+  const industryCounts = countsData?.industryCounts ?? {};
+  const statusCounts = countsData?.statusCounts ?? {};
+  const sourceCounts = countsData?.sourceCounts ?? {};
+
   const showClear = hasActiveFilters(filters, sortBy, sortOrder);
 
   const selectedStatuses = filters.status ? filters.status.split(',').filter(Boolean) : [];
   const selectedSources = filters.source ? filters.source.split(',').filter(Boolean) : [];
   const selectedIndustries = filters.industry ? filters.industry.split(',').filter(Boolean) : [];
+
+  // ✅ استفاده از helper مشترک — مرتب‌سازی نزولی بر اساس تعداد
+  const statusOptionsWithCount = withCount(
+    LEAD_STATUSES.map((s) => ({ value: s.value, label: s.label })),
+    statusCounts
+  );
+
+  const sourceOptionsWithCount = withCount(mapListOptions(sourceOptions), sourceCounts);
+
+  const industryOptionsWithCount = withCount(mapListOptions(industryOptions), industryCounts);
 
   const clearField = (field: keyof typeof filters) => {
     onFilterChange(field, '');
@@ -103,7 +122,7 @@ export function LeadsFilters({
 
             <MultiSelect
               label="وضعیت"
-              options={LEAD_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+              options={statusOptionsWithCount}
               selectedValues={selectedStatuses}
               onChange={(v) => onFilterChange('status', v)}
               className="sm:w-48"
@@ -115,7 +134,7 @@ export function LeadsFilters({
           <div className="flex flex-col gap-3 sm:flex-row">
             <MultiSelect
               label="منبع"
-              options={sourceOptions.map((s) => ({ value: s.value, label: s.value }))}
+              options={sourceOptionsWithCount}
               selectedValues={selectedSources}
               onChange={(v) => onFilterChange('source', v)}
               className="flex-1"
@@ -124,7 +143,7 @@ export function LeadsFilters({
 
             <MultiSelect
               label="صنعت"
-              options={industryOptions.map((s) => ({ value: s.value, label: s.value }))}
+              options={industryOptionsWithCount}
               selectedValues={selectedIndustries}
               onChange={(v) => onFilterChange('industry', v)}
               className="flex-1"

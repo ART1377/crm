@@ -13,6 +13,8 @@ import { MultiSelect } from '@/components/shared/multi-select';
 import { useStagedCounts } from '@/features/leads/hooks/use-staged-leads';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 
+import { mapListOptions, withCount } from '@/features/leads/utils/filter-utils';
+
 interface StagedFiltersProps {
   filters: { search: string; source: string; industry: string };
   onFilterChange: (field: 'search' | 'source' | 'industry', value: string) => void;
@@ -25,21 +27,17 @@ export function StagedFilters({ filters, onFilterChange, onClearFilters }: Stage
   const { data: countsData } = useStagedCounts();
 
   const industryCounts = countsData?.industryCounts ?? {};
+  const sourceCounts = countsData?.sourceCounts ?? {};
 
   const selectedSources = filters.source ? filters.source.split(',').filter(Boolean) : [];
   const selectedIndustries = filters.industry ? filters.industry.split(',').filter(Boolean) : [];
 
+  // ✅ استفاده از helper مشترک
+  const sourceOptionsWithCount = withCount(mapListOptions(sourceOptions), sourceCounts);
+  const industryOptionsWithCount = withCount(mapListOptions(industryOptions), industryCounts);
+
   const hasFilters =
     Boolean(filters.search) || Boolean(filters.source) || Boolean(filters.industry);
-
-  // ✅ اضافه کردن تعداد به label صنایع
-  const industryOptionsWithCount = industryOptions.map((option) => {
-    const count = industryCounts[option.value] ?? 0;
-    return {
-      value: option.value,
-      label: count > 0 ? `${option.value} (${count})` : option.value,
-    };
-  });
 
   return (
     <Card className="overflow-visible">
@@ -67,7 +65,7 @@ export function StagedFilters({ filters, onFilterChange, onClearFilters }: Stage
           <div className="flex flex-col gap-3 sm:flex-row">
             <MultiSelect
               label="منبع"
-              options={sourceOptions.map((s) => ({ value: s.value, label: s.value }))}
+              options={sourceOptionsWithCount}
               selectedValues={selectedSources}
               onChange={(v) => onFilterChange('source', v)}
               className="flex-1"
