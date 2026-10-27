@@ -17,7 +17,7 @@ interface Props {
   total: number;
   importing?: boolean;
   isHidden?: boolean;
-  onCheckedChange: () => void;
+  onCheckedChange: (e?: React.MouseEvent) => void; // ✅ event
   onSave: (id: string, place: BaladPlace) => void;
   onImportOne?: (place: BaladPlace) => void;
   onHide?: (id: string) => void;
@@ -45,12 +45,11 @@ export function ResultCard({
 
   const hasExtraInfo = place.website || place.rating || place.category;
 
-  // اگر مخفی شده بود، نمایش نده
   if (isHidden) return null;
 
   return (
     <div
-      onClick={place.isExisting ? undefined : onCheckedChange}
+      onClick={(e) => (place.isExisting ? undefined : onCheckedChange(e))} // ✅ event پاس داده می‌شود
       className={`group relative flex cursor-pointer items-start gap-3 overflow-hidden rounded-xl border-2 p-4 transition-all duration-200 ${
         place.isExisting
           ? 'cursor-default border-amber-200 bg-amber-50/50 opacity-60'
@@ -63,7 +62,7 @@ export function ResultCard({
         <Checkbox
           checked={checked}
           disabled={place.isExisting}
-          onCheckedChange={onCheckedChange}
+          onCheckedChange={() => onCheckedChange()} // checkbox بدون event
           className="pointer-events-none"
         />
         <span className="text-muted-foreground text-[10px] font-medium">
@@ -99,7 +98,6 @@ export function ResultCard({
               </Button>
             </div>
 
-            {/* Phone */}
             {place.phoneNumber && (
               <div className="mt-1.5 flex items-center gap-2">
                 <a
@@ -127,7 +125,6 @@ export function ResultCard({
           </div>
 
           <div className="flex shrink-0 items-center gap-0.5">
-            {/* ✅ دکمه ذخیره در انبار */}
             {!place.isExisting && onSaveOneToStaging && (
               <Button
                 variant="ghost"
@@ -147,7 +144,6 @@ export function ResultCard({
                 )}
               </Button>
             )}
-            {/* دکمه مخفی‌سازی */}
             {!place.isExisting && onHide && (
               <Button
                 variant="ghost"
@@ -163,7 +159,6 @@ export function ResultCard({
               </Button>
             )}
 
-            {/* دکمه ایمپورت */}
             {!place.isExisting && onImportOne && (
               <Button
                 variant="ghost"
@@ -179,12 +174,10 @@ export function ResultCard({
               </Button>
             )}
 
-            {/* دکمه ویرایش */}
             <EditPlaceDialog place={place} onSave={onSave} isExisting={place.isExisting} />
           </div>
         </div>
 
-        {/* Address */}
         {place.address && (
           <div className="mt-2 flex items-start gap-1.5">
             <MapPin className="text-muted-foreground mt-0.5 h-3 w-3 shrink-0" />
@@ -205,27 +198,14 @@ export function ResultCard({
           </div>
         )}
 
-        {/* Extra info: Website, Category, Rating */}
         {hasExtraInfo && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            {/* {place.rating && (
-              <Badge
-                variant="outline"
-                className="gap-1 border-amber-200 bg-amber-50 text-[11px] text-amber-700"
-              >
-                <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-                {place.rating}
-                {place.ratingCount && <span className="text-[10px]">({place.ratingCount})</span>}
-              </Badge>
-            )} */}
-
             {place.category && (
               <Badge variant="outline" className="text-muted-foreground text-[11px]">
                 {place.category}
               </Badge>
             )}
 
-            {/* ✅ صنعت سرچ‌شده */}
             {place.searchedIndustry && (
               <Badge
                 variant="outline"
@@ -236,7 +216,6 @@ export function ResultCard({
               </Badge>
             )}
 
-            {/* ✅ کلیدواژه‌ای که با اون پیدا شده */}
             {place.matchedKeyword && (
               <Badge
                 variant="outline"
@@ -246,23 +225,6 @@ export function ResultCard({
                 {place.matchedKeyword}
               </Badge>
             )}
-
-            {/* {place.website && (
-              <Badge variant="outline" className="text-muted-foreground gap-1 text-[11px]">
-                <Globe className="h-3 w-3" />
-                <a
-                  href={
-                    place.website.startsWith('http') ? place.website : `https://${place.website}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="hover:text-primary transition-colors"
-                >
-                  وبسایت
-                </a>
-              </Badge>
-            )} */}
           </div>
         )}
       </div>

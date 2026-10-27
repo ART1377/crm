@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 
+import { DeleteConfirmDialog } from '@/components/shared/delete-dialog';
 import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
@@ -30,18 +31,27 @@ export function StagedLeadsPage() {
     hasFilters,
     selected,
     toggleWithRange,
-    toggleAll,
+    selectAll,
     selectAllMatching,
     isSelectingAll,
     clearSelection,
     handleImport,
+    // ✅
+    deleteOneId,
+    openDeleteOneDialog,
+    closeDeleteOneDialog,
+    handleDeleteOne,
+    isDeleteOnePending,
+    isBulkDeleteDialogOpen,
+    openBulkDeleteDialog,
+    closeBulkDeleteDialog,
     handleDeleteSelected,
+    isBulkDeleting,
+    // ...
     handleFilterChange,
     handleClearFilters,
     importOne,
-    deleteOne,
     importBulk,
-    deleteBulk,
   } = useStagedLeadsPage();
 
   return (
@@ -60,11 +70,11 @@ export function StagedLeadsPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={handleDeleteSelected}
-                    disabled={deleteBulk.isPending}
+                    onClick={openBulkDeleteDialog} // ✅ باز کردن دیالوگ
+                    disabled={isBulkDeleting}
                     className="gap-2 text-red-600"
                   >
-                    {deleteBulk.isPending ? (
+                    {isBulkDeleting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
                         در حال حذف...
@@ -96,7 +106,6 @@ export function StagedLeadsPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {/* ✅ Card: flex-col و بدون overflow-y-auto */}
       <Card className="flex min-h-100 flex-1 flex-col">
         <CardHeader className="flex shrink-0 flex-row items-center justify-between">
           <CardTitle>
@@ -121,7 +130,7 @@ export function StagedLeadsPage() {
               <label className="flex cursor-pointer items-center gap-2 text-xs">
                 <Checkbox
                   checked={selected.size === items.length && items.length > 0}
-                  onCheckedChange={toggleAll}
+                  onCheckedChange={selectAll}
                 />
                 انتخاب همه ({selected.size}/{items.length})
               </label>
@@ -145,8 +154,6 @@ export function StagedLeadsPage() {
             </div>
           )}
         </CardHeader>
-
-        {/* ✅ CardContent: min-h-0 و overflow-hidden تا فقط لیست داخلی اسکرول بخورد */}
         <CardContent className="min-h-0 flex-1 overflow-hidden">
           {isLoading ? (
             <div className="flex h-full justify-center py-12">
@@ -165,7 +172,6 @@ export function StagedLeadsPage() {
               </p>
             </div>
           ) : (
-            /* ✅ فقط این div اسکرول می‌خورد */
             <div className="h-full space-y-2 overflow-y-auto pr-1">
               {isFetching && !isFetchingNextPage && (
                 <div className="text-muted-foreground flex items-center justify-center gap-2 py-2 text-xs">
@@ -180,10 +186,10 @@ export function StagedLeadsPage() {
                   lead={item}
                   checked={selected.has(item.id)}
                   importing={importOne.isPending && importOne.variables === item.id}
-                  deleting={deleteOne.isPending && deleteOne.variables === item.id}
+                  deleting={isDeleteOnePending && deleteOneId === item.id}
                   onToggle={(e) => toggleWithRange(item.id, e)}
                   onImport={() => importOne.mutate(item.id)}
-                  onDelete={() => deleteOne.mutate(item.id)}
+                  onDelete={() => openDeleteOneDialog(item.id)} // ✅ باز کردن دیالوگ
                 />
               ))}
 
@@ -199,6 +205,26 @@ export function StagedLeadsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* ✅ دیالوگ حذف تکی */}
+      <DeleteConfirmDialog
+        open={Boolean(deleteOneId)}
+        onClose={closeDeleteOneDialog}
+        onConfirm={handleDeleteOne}
+        title="حذف از انبار"
+        description="آیا از حذف این سرنخ از انبار اطمینان دارید؟ این عملیات قابل بازگشت نیست."
+        isPending={isDeleteOnePending}
+      />
+
+      {/* ✅ دیالوگ حذف گروهی */}
+      <DeleteConfirmDialog
+        open={isBulkDeleteDialogOpen}
+        onClose={closeBulkDeleteDialog}
+        onConfirm={handleDeleteSelected}
+        title="حذف گروهی از انبار"
+        description={`آیا از حذف ${selected.size} سرنخ انتخاب شده از انبار اطمینان دارید؟ این عملیات قابل بازگشت نیست.`}
+        isPending={isBulkDeleting}
+      />
     </PageWrapper>
   );
 }

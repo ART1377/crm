@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useBulkSaveToStaging, useSaveToStaging } from '@/features/leads/hooks/use-staged-leads';
+import { useRangeSelection } from '@/hooks/use-range-selection';
 
 import type { BaladPlace } from '../types';
 
@@ -34,7 +35,6 @@ export function useImportSearch({
 }: UseImportSearchProps) {
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<BaladPlace[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [importing, setImporting] = useState(false);
   const [importingOne, setImportingOne] = useState<string | null>(null);
   const [showDuplicates, setShowDuplicates] = useState(false);
@@ -72,10 +72,14 @@ export function useImportSearch({
     return result;
   }, [places, searchQuery, showDuplicates, hiddenIds, showHidden]);
 
+  // ✅ انتخاب بازه‌ای مشترک
+  const { selected, setSelected, toggleWithRange, selectAll, clearSelection } =
+    useRangeSelection(filteredPlaces);
+
   const handleSearch = async () => {
     setLoading(true);
     setPlaces([]);
-    setSelected(new Set());
+    clearSelection();
     setHiddenIds(new Set());
 
     try {
@@ -96,28 +100,13 @@ export function useImportSearch({
     }
   };
 
-  const toggle = (id: string) => {
-    setSelected((prev) => {
-      const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  };
-
-  const toggleAll = () => {
-    const av = filteredPlaces.filter((p) => !p.isExisting);
-    setSelected(selected.size === av.length ? new Set() : new Set(av.map((p) => p.id)));
-  };
-
   const handleHide = (id: string) => {
     setHiddenIds((prev) => new Set([...prev, id]));
-    if (selected.has(id)) {
-      setSelected((prev) => {
-        const n = new Set(prev);
-        n.delete(id);
-        return n;
-      });
-    }
+    setSelected((prev) => {
+      const n = new Set(prev);
+      n.delete(id);
+      return n;
+    });
   };
 
   const handleShowAllHidden = () => {
@@ -125,14 +114,9 @@ export function useImportSearch({
     setShowHidden(false);
   };
 
-  // ✅ تابع کمکی برای تعیین صنعت هر مکان
   const getIndustryForPlace = (place: BaladPlace): string => {
-    if (place.searchedIndustry) {
-      return place.searchedIndustry;
-    }
-    if (selectedIndustries.length === 1) {
-      return selectedIndustries[0];
-    }
+    if (place.searchedIndustry) return place.searchedIndustry;
+    if (selectedIndustries.length === 1) return selectedIndustries[0];
     return sharedParams.keyword.split(',')[0];
   };
 
@@ -156,7 +140,7 @@ export function useImportSearch({
       const r = await res.json();
       toast.success(`${r.imported} وارد شد`);
       setPlaces((prev) => prev.map((p) => (selected.has(p.id) ? { ...p, isExisting: true } : p)));
-      setSelected(new Set());
+      clearSelection();
     } catch {
       toast.error('خطا در وارد کردن');
     } finally {
@@ -194,7 +178,6 @@ export function useImportSearch({
     setPlaces((prev) => prev.map((p) => (p.id === id ? updated : p)));
   };
 
-  // ✅ ذخیره گروهی در انبار (با hook)
   const handleSaveToStaging = async () => {
     if (selected.size === 0) return;
     try {
@@ -207,16 +190,13 @@ export function useImportSearch({
         }));
 
       await bulkSaveToStaging.mutateAsync(leads);
-
-      // ✅ بعد از ذخیره، از لیست حذف کن
       setPlaces((prev) => prev.filter((p) => !selected.has(p.id)));
-      setSelected(new Set());
+      clearSelection();
     } catch {
       // خطا در hook مدیریت میشه
     }
   };
 
-  // ✅ ذخیره تکی در انبار (با hook)
   const handleSaveOneToStaging = async (place: BaladPlace) => {
     setSavingOne(place.id);
     try {
@@ -227,7 +207,6 @@ export function useImportSearch({
       });
 
       if (result.added > 0) {
-        // ✅ از لیست حذف کن (چون به انبار منتقل شد)
         setPlaces((prev) => prev.filter((p) => p.id !== place.id));
       }
     } catch {
@@ -255,8 +234,13 @@ export function useImportSearch({
     showHidden,
     setShowHidden,
     handleSearch,
-    toggle,
-    toggleAll,
+    // ✅ API انتخاب بازه‌ای (مشترک)
+    toggleWithRange,
+    selectAll,
+    clearSelection,
+    // ✅ سازگاری با نسخه قبلی:
+    toggle: toggleWithRange, // placeholder - در ResultCard استفاده نکن
+    toggleAll: selectAll, // سازگاری
     handleHide,
     handleShowAllHidden,
     handleImport,

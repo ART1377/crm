@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
+import { useRangeSelection } from '@/hooks/use-range-selection';
 import { Download, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ImportToolbar } from './import-toolbar';
 import { ResultCard } from './result-card';
@@ -23,10 +24,9 @@ import { scrapeAvval } from './services/avval.service';
 
 export function AvvalSearch() {
   const [slug, setSlug] = useState('');
-  const [industry, setIndustry] = useState(''); // ✅ تک‌گزینه‌ای - رشته
+  const [industry, setIndustry] = useState('');
   const [loading, setLoading] = useState(false);
   const [places, setPlaces] = useState<any[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [showDuplicates, setShowDuplicates] = useState(false);
@@ -38,6 +38,29 @@ export function AvvalSearch() {
 
   // ✅ دریافت صنایع از بک‌اند
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
+
+  // ✅ فیلترها
+  const filteredPlaces = useMemo(
+    () =>
+      places.filter((p) => {
+        if (!showDuplicates && p.isExisting) return false;
+        if (!showHidden && hiddenIds.has(p.id)) return false;
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          return (
+            p.businessName.toLowerCase().includes(q) ||
+            p.phoneNumber.includes(q) ||
+            p.address?.toLowerCase().includes(q)
+          );
+        }
+        return true;
+      }),
+    [places, showDuplicates, hiddenIds, showHidden, searchQuery]
+  );
+
+  // ✅ انتخاب بازه‌ای با Shift+Click
+  const { selected, toggleWithRange, selectAll, clearSelection, setSelected } =
+    useRangeSelection(filteredPlaces);
 
   const handleFetch = async () => {
     if (!slug.trim()) {
@@ -51,7 +74,7 @@ export function AvvalSearch() {
 
     setLoading(true);
     setPlaces([]);
-    setSelected(new Set());
+    clearSelection(); // ✅
     setHiddenIds(new Set());
 
     try {
@@ -72,33 +95,6 @@ export function AvvalSearch() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filteredPlaces = places.filter((p) => {
-    if (!showDuplicates && p.isExisting) return false;
-    if (!showHidden && hiddenIds.has(p.id)) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        p.businessName.toLowerCase().includes(q) ||
-        p.phoneNumber.includes(q) ||
-        p.address?.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
-
-  const toggle = (id: string) => {
-    setSelected((prev) => {
-      const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  };
-
-  const toggleAll = () => {
-    const av = filteredPlaces.filter((p) => !p.isExisting);
-    setSelected(selected.size === av.length ? new Set() : new Set(av.map((p) => p.id)));
   };
 
   const handleHide = (id: string) => {
@@ -173,7 +169,6 @@ export function AvvalSearch() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="avval-industry">صنعت برای ذخیره</Label>
-              {/* ✅ Select تک‌گزینه‌ای */}
               <Select value={industry} onValueChange={setIndustry}>
                 <SelectTrigger id="avval-industry" className="w-full">
                   <SelectValue placeholder="انتخاب صنعت..." />
@@ -211,7 +206,7 @@ export function AvvalSearch() {
               selected={selected}
               importing={importing}
               hiddenCount={hiddenIds.size}
-              onToggleAll={toggleAll}
+              onToggleAll={selectAll}
               onImport={async () => {
                 if (selected.size === 0) return;
                 setImporting(true);
@@ -234,7 +229,7 @@ export function AvvalSearch() {
                   setPlaces((prev) =>
                     prev.map((p) => (selected.has(p.id) ? { ...p, isExisting: true } : p))
                   );
-                  setSelected(new Set());
+                  clearSelection();
                 } catch {
                   toast.error('خطا در وارد کردن');
                 } finally {
@@ -267,7 +262,7 @@ export function AvvalSearch() {
                   const r = await res.json();
                   toast.success(`${r.added} به انبار ذخیره شد`);
                   setPlaces((prev) => prev.filter((p) => !selected.has(p.id)));
-                  setSelected(new Set());
+                  clearSelection();
                 } catch {
                   toast.error('خطا');
                 } finally {
@@ -288,7 +283,7 @@ export function AvvalSearch() {
                   total={filteredPlaces.length}
                   importing={importingOne === place.id}
                   isHidden={hiddenIds.has(place.id)}
-                  onCheckedChange={() => toggle(place.id)}
+                  onCheckedChange={(e) => toggleWithRange(place.id, e)} // ✅
                   onSave={(id, p) => setPlaces((prev) => prev.map((x) => (x.id === id ? p : x)))}
                   onImportOne={async (p) => {
                     setImportingOne(p.id);

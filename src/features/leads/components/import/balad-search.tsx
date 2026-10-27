@@ -50,8 +50,6 @@ export function BaladSearch({
     setLoading,
     places,
     setPlaces,
-    selected,
-    setSelected,
     filteredPlaces,
     importing,
     importingOne,
@@ -61,8 +59,6 @@ export function BaladSearch({
     setSearchQuery,
     hiddenIds,
     showHidden,
-    toggle,
-    toggleAll,
     handleHide,
     handleShowAllHidden,
     handleImport,
@@ -72,8 +68,13 @@ export function BaladSearch({
     handleSaveToStaging,
     savingOne,
     handleSaveOneToStaging,
+    selected,
+    setSelected,
+    toggleWithRange,
+    selectAll,
+    clearSelection,
   } = useImportSearch({
-    searchFn: async () => ({ places: [], total: 0 }), // ✅ خالی - دیگه استفاده نمیشه
+    searchFn: async () => ({ places: [], total: 0 }),
     sharedParams,
     sourceName: 'بلد',
     selectedIndustries,
@@ -84,6 +85,7 @@ export function BaladSearch({
     setPaused(false);
     pauseRef.current = false;
     setPlaces([]);
+    clearSelection();
     setSelected(new Set());
     setProgress('در حال شروع...');
     setProgressPercent(0);
@@ -307,7 +309,7 @@ export function BaladSearch({
                     selected={selected}
                     importing={importing}
                     hiddenCount={hiddenIds.size}
-                    onToggleAll={toggleAll}
+                    onToggleAll={selectAll}
                     onImport={handleImport}
                     onSearchChange={setSearchQuery}
                     onToggleDuplicates={setShowDuplicates}
@@ -335,7 +337,7 @@ export function BaladSearch({
                           total={filteredPlaces.length}
                           importing={importingOne === place.id}
                           isHidden={hiddenIds.has(place.id)}
-                          onCheckedChange={() => toggle(place.id)}
+                          onCheckedChange={(e) => toggleWithRange(place.id, e)}
                           onSave={updatePlace}
                           onImportOne={handleImportOne}
                           onHide={handleHide}
@@ -372,7 +374,7 @@ export function BaladSearch({
                   selected={selected}
                   importing={importing}
                   hiddenCount={hiddenIds.size}
-                  onToggleAll={toggleAll}
+                  onToggleAll={selectAll}
                   onImport={handleImport}
                   onSearchChange={setSearchQuery}
                   onToggleDuplicates={setShowDuplicates}
@@ -400,7 +402,7 @@ export function BaladSearch({
                         total={filteredPlaces.length}
                         importing={importingOne === place.id}
                         isHidden={hiddenIds.has(place.id)}
-                        onCheckedChange={() => toggle(place.id)}
+                        onCheckedChange={(e) => toggleWithRange(place.id, e)}
                         onSave={updatePlace}
                         onImportOne={handleImportOne}
                         onHide={handleHide}

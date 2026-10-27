@@ -18,7 +18,9 @@ import {
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import { StagedLead } from '../components/staged/types';
+import { useRangeSelection } from '@/hooks/use-range-selection';
+
+import type { StagedLead } from '../components/staged/types';
 
 export function useStagedLeadsPage() {
   const [params, setParams] = useQueryStates(
@@ -32,8 +34,9 @@ export function useStagedLeadsPage() {
     { history: 'push', shallow: true }
   );
 
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [lastClickedId, setLastClickedId] = useState<string | null>(null);
+  // ✅ stateهای دیالوگ حذف
+  const [deleteOneId, setDeleteOneId] = useState<string | null>(null);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const debouncedSearch = useDebounce(params.search, 300);
 
@@ -59,7 +62,6 @@ export function useStagedLeadsPage() {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
 
-  // ✅ ادغام همه صفحات با حذف تکراری‌ها
   const items = useMemo(() => {
     const map = new Map<string, StagedLead>();
     for (const page of data?.pages ?? []) {
@@ -77,38 +79,9 @@ export function useStagedLeadsPage() {
     enabled: hasNextPage && !isFetchingNextPage,
   });
 
-  // ✅ toggle با پشتیبانی از Shift+Click
-  const toggleWithRange = useCallback(
-    (id: string, event?: React.MouseEvent) => {
-      if (event?.shiftKey && lastClickedId) {
-        const startIdx = items.findIndex((i) => i.id === lastClickedId);
-        const endIdx = items.findIndex((i) => i.id === id);
-        if (startIdx !== -1 && endIdx !== -1) {
-          const [from, to] = startIdx < endIdx ? [startIdx, endIdx] : [endIdx, startIdx];
-          const rangeIds = items.slice(from, to + 1).map((i) => i.id);
-          setSelected((prev) => new Set([...prev, ...rangeIds]));
-          setLastClickedId(id);
-          return;
-        }
-      }
-      setSelected((prev) => {
-        const n = new Set(prev);
-        n.has(id) ? n.delete(id) : n.add(id);
-        return n;
-      });
-      setLastClickedId(id);
-    },
-    [items, lastClickedId]
-  );
+  const { selected, setSelected, toggleWithRange, selectAll, clearSelection } =
+    useRangeSelection(items);
 
-  // ✅ انتخاب همه لود شده‌ها
-  const toggleAll = useCallback(() => {
-    setSelected((prev) =>
-      prev.size === items.length ? new Set() : new Set(items.map((i) => i.id))
-    );
-  }, [items]);
-
-  // ✅ انتخاب همه نتایج فیلتر (حتی لود نشده‌ها) با API
   const selectAllMatching = useCallback(async () => {
     const result = await allIds.mutateAsync({
       search: debouncedSearch.length >= MIN_SEARCH_LENGTH ? debouncedSearch : undefined,
@@ -118,11 +91,7 @@ export function useStagedLeadsPage() {
     setSelected(new Set(result.ids));
   }, [allIds, debouncedSearch, params.source, params.industry]);
 
-  const clearSelection = useCallback(() => {
-    setSelected(new Set());
-    setLastClickedId(null);
-  }, []);
-
+  // ✅ Import (بدون دیالوگ — چون ایمپورت خطرناک نیست)
   const handleImport = useCallback(() => {
     if (selected.size === 0) return;
     importBulk.mutate(Array.from(selected), {
@@ -130,11 +99,38 @@ export function useStagedLeadsPage() {
     });
   }, [selected, importBulk, clearSelection]);
 
-  const handleDeleteSelected = useCallback(() => {
+  // ✅ حذف تکی: باز کردن دیالوگ
+  const openDeleteOneDialog = useCallback((id: string) => {
+    setDeleteOneId(id);
+  }, []);
+
+  const closeDeleteOneDialog = useCallback(() => {
+    setDeleteOneId(null);
+  }, []);
+
+  // ✅ تأیید حذف تکی
+  const handleDeleteOne = useCallback(async () => {
+    if (!deleteOneId) return;
+    await deleteOne.mutateAsync(deleteOneId);
+    setDeleteOneId(null);
+  }, [deleteOneId, deleteOne]);
+
+  // ✅ حذف گروهی: باز کردن دیالوگ
+  const openBulkDeleteDialog = useCallback(() => {
     if (selected.size === 0) return;
-    deleteBulk.mutate(Array.from(selected), {
-      onSuccess: () => clearSelection(),
-    });
+    setIsBulkDeleteDialogOpen(true);
+  }, [selected]);
+
+  const closeBulkDeleteDialog = useCallback(() => {
+    setIsBulkDeleteDialogOpen(false);
+  }, []);
+
+  // ✅ تأیید حذف گروهی
+  const handleDeleteSelected = useCallback(async () => {
+    if (selected.size === 0) return;
+    await deleteBulk.mutateAsync(Array.from(selected));
+    setIsBulkDeleteDialogOpen(false);
+    clearSelection();
   }, [selected, deleteBulk, clearSelection]);
 
   const handleFilterChange = useCallback(
@@ -170,12 +166,23 @@ export function useStagedLeadsPage() {
     hasFilters,
     selected,
     toggleWithRange,
-    toggleAll,
+    selectAll,
     selectAllMatching,
     isSelectingAll: allIds.isPending,
     clearSelection,
     handleImport,
+    // ✅ دیالوگ‌های حذف
+    deleteOneId,
+    openDeleteOneDialog,
+    closeDeleteOneDialog,
+    handleDeleteOne,
+    isDeleteOnePending: deleteOne.isPending,
+    isBulkDeleteDialogOpen,
+    openBulkDeleteDialog,
+    closeBulkDeleteDialog,
     handleDeleteSelected,
+    isBulkDeleting: deleteBulk.isPending,
+    // ... بقیه
     handleFilterChange,
     handleClearFilters,
     importOne,

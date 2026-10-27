@@ -35,8 +35,8 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
     hiddenIds,
     showHidden,
     handleSearch,
-    toggle,
-    toggleAll,
+    toggleWithRange, // ✅
+    selectAll, // ✅
     handleHide,
     handleShowAllHidden,
     handleImport,
@@ -88,7 +88,7 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
               selected={selected}
               importing={importing}
               hiddenCount={hiddenIds.size}
-              onToggleAll={toggleAll}
+              onToggleAll={selectAll} // ✅
               onImport={handleImport}
               onSearchChange={setSearchQuery}
               onToggleDuplicates={setShowDuplicates}
@@ -116,7 +116,7 @@ export function GoogleSearch({ sharedParams }: GoogleSearchProps) {
                     total={filteredPlaces.length}
                     importing={importingOne === place.id}
                     isHidden={hiddenIds.has(place.id)}
-                    onCheckedChange={() => toggle(place.id)}
+                    onCheckedChange={(e) => toggleWithRange(place.id, e)} // ✅
                     onSave={updatePlace}
                     onImportOne={handleImportOne}
                     onHide={handleHide}
