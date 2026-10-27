@@ -15,8 +15,8 @@ import { LEADS_QUERY_KEY, STAGED_LEADS_QUERY_KEY } from '@/lib/query-keys';
 export function useStagedLeads(params?: {
   status?: string;
   search?: string;
-  source?: string; // ✅
-  industry?: string; // ✅
+  source?: string;
+  industry?: string;
 }) {
   return useInfiniteQuery({
     queryKey: [STAGED_LEADS_QUERY_KEY, params],
@@ -33,11 +33,20 @@ export function useStagedLeads(params?: {
   });
 }
 
+// ✅ شمارش‌ها (صنعت + منبع) با فیلترهای پویا
 export function useStagedCounts(filters?: { industry?: string; source?: string; search?: string }) {
   return useQuery({
     queryKey: [STAGED_LEADS_QUERY_KEY, 'counts', filters],
     queryFn: () => stagedLeadsService.getCounts(filters),
     staleTime: 30 * 1000,
+  });
+}
+
+// ✅ جدید: دریافت همه IDها با فیلتر فعلی (برای انتخاب گروهی)
+export function useStagedAllIds() {
+  return useMutation({
+    mutationFn: (filters: { search?: string; source?: string; industry?: string }) =>
+      stagedLeadsService.getAllIds(filters),
   });
 }
 

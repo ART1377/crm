@@ -17,7 +17,7 @@ interface StagedLeadCardProps {
   checked: boolean;
   importing?: boolean;
   deleting?: boolean;
-  onToggle: () => void;
+  onToggle: (e?: React.MouseEvent) => void;
   onImport: () => void;
   onDelete: () => void;
 }
@@ -33,7 +33,7 @@ export function StagedLeadCard({
 }: StagedLeadCardProps) {
   return (
     <div
-      onClick={onToggle}
+      onClick={(e) => onToggle(e)} // ✅ event پاس داده می‌شود
       className={cn(
         'group relative flex cursor-pointer items-start gap-3 overflow-hidden rounded-xl border-2 p-4 transition-all duration-200',
         checked
@@ -43,7 +43,11 @@ export function StagedLeadCard({
     >
       {/* Checkbox */}
       <div className="flex shrink-0 flex-col items-center gap-1.5">
-        <Checkbox checked={checked} onCheckedChange={onToggle} className="pointer-events-none" />
+        <Checkbox
+          checked={checked}
+          onCheckedChange={() => onToggle()} // checkbox بدون event
+          className="pointer-events-none"
+        />
       </div>
 
       {/* محتوا */}
@@ -52,7 +56,7 @@ export function StagedLeadCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h4 className="text-foreground text-sm font-semibold break-words">
+              <h4 className="text-foreground text-sm font-semibold wrap-break-word">
                 {lead.businessName}
               </h4>
               {lead.searchedIndustry && (

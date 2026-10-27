@@ -39,6 +39,33 @@ export const stagedLeadsService = {
     return apiClient.get(url) as Promise<StagedLeadsResponse>;
   },
 
+  // ✅ جدید: دریافت فقط IDها با فیلتر فعلی
+  async getAllIds(filters?: { search?: string; source?: string; industry?: string }) {
+    const params = new URLSearchParams();
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.industry) params.append('industry', filters.industry);
+
+    const qs = params.toString();
+    return apiClient.get(`/leads/staged/ids${qs ? `?${qs}` : ''}`) as Promise<{
+      ids: string[];
+    }>;
+  },
+
+  // ✅ جدید: شمارش‌ها با فیلترهای پویا
+  async getCounts(filters?: { industry?: string; source?: string; search?: string }) {
+    const params = new URLSearchParams();
+    if (filters?.industry) params.append('industry', filters.industry);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.search) params.append('search', filters.search);
+
+    const qs = params.toString();
+    return apiClient.get(`/leads/staged/counts${qs ? `?${qs}` : ''}`) as Promise<{
+      industryCounts: Record<string, number>;
+      sourceCounts: Record<string, number>;
+    }>;
+  },
+
   async saveOne(lead: SaveToStagingPayload) {
     return apiClient.post('/leads/staged', { leads: [lead] }) as Promise<{
       added: number;
@@ -79,18 +106,5 @@ export const stagedLeadsService = {
 
   async update(id: string, data: Partial<StagedLead>) {
     return apiClient.patch(`/leads/staged/${id}`, data) as Promise<StagedLead>;
-  },
-
-  async getCounts(filters?: { industry?: string; source?: string; search?: string }) {
-    const params = new URLSearchParams();
-    if (filters?.industry) params.append('industry', filters.industry);
-    if (filters?.source) params.append('source', filters.source);
-    if (filters?.search) params.append('search', filters.search);
-
-    const qs = params.toString();
-    return apiClient.get(`/leads/staged/counts${qs ? `?${qs}` : ''}`) as Promise<{
-      industryCounts: Record<string, number>;
-      sourceCounts: Record<string, number>;
-    }>;
   },
 };
