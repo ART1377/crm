@@ -180,19 +180,19 @@ export function StagedLeadsPage() {
                 </div>
               )}
 
-              {items.map((item: StagedLead) => (
+              {items.map((item: StagedLead, index) => (
                 <StagedLeadCard
                   key={item.id}
                   lead={item}
+                  index={index}
                   checked={selected.has(item.id)}
                   importing={importOne.isPending && importOne.variables === item.id}
                   deleting={isDeleteOnePending && deleteOneId === item.id}
                   onToggle={(e) => toggleWithRange(item.id, e)}
                   onImport={() => importOne.mutate(item.id)}
-                  onDelete={() => openDeleteOneDialog(item.id)} // ✅ باز کردن دیالوگ
+                  onDelete={() => openDeleteOneDialog(item.id)}
                 />
               ))}
-
               <div ref={loaderRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (
                   <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />

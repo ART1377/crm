@@ -15,6 +15,7 @@ import type { StagedLead } from './types';
 interface StagedLeadCardProps {
   lead: StagedLead;
   checked: boolean;
+  index: number;
   importing?: boolean;
   deleting?: boolean;
   onToggle: (e?: React.MouseEvent) => void;
@@ -25,6 +26,7 @@ interface StagedLeadCardProps {
 export function StagedLeadCard({
   lead,
   checked,
+  index,
   importing,
   deleting,
   onToggle,
@@ -33,7 +35,7 @@ export function StagedLeadCard({
 }: StagedLeadCardProps) {
   return (
     <div
-      onClick={(e) => onToggle(e)} // ✅ event پاس داده می‌شود
+      onClick={(e) => onToggle(e)}
       className={cn(
         'group relative flex cursor-pointer items-start gap-3 overflow-hidden rounded-xl border-2 p-4 transition-all duration-200',
         checked
@@ -42,23 +44,37 @@ export function StagedLeadCard({
       )}
     >
       {/* Checkbox */}
-      <div className="flex shrink-0 flex-col items-center gap-1.5">
+      <div className="flex shrink-0 items-center pt-0.5">
         <Checkbox
           checked={checked}
-          onCheckedChange={() => onToggle()} // checkbox بدون event
+          onCheckedChange={() => onToggle()}
           className="pointer-events-none"
         />
       </div>
 
       {/* محتوا */}
       <div className="min-w-0 flex-1">
-        {/* ردیف اول: نام + بج‌ها */}
+        {/* ردیف اول: شماره + نام + بج‌ها */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
+              {/* ✅ شماره ترتیبی با استایل فانتزی */}
+              <span
+                className={cn(
+                  'inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md px-1.5 text-[11px] font-bold tabular-nums transition-colors',
+                  checked
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'from-primary/10 to-primary/5 text-primary ring-primary/20 bg-gradient-to-br ring-1'
+                )}
+                title={`ردیف ${index + 1}`}
+              >
+                {index + 1}
+              </span>
+
               <h4 className="text-foreground text-sm font-semibold wrap-break-word">
                 {lead.businessName}
               </h4>
+
               {lead.searchedIndustry && (
                 <Badge
                   variant="outline"

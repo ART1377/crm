@@ -111,3 +111,18 @@ model StagedLead {
   @@index([status])
   @@index([source])
 }
+
+model AvvalSearchHistory {
+  id              String   @id @default(cuid())
+  slug            String
+  industry        String
+  count           Int      @default(0)
+  pages           Int      @default(0)
+  searchCount     Int      @default(1)
+  lastSearchedAt  DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([slug, industry])
+  @@index([lastSearchedAt])
+}

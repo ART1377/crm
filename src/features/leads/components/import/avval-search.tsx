@@ -13,11 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSaveAvvalHistory } from '@/features/leads/hooks/use-avval-history';
 import { useListOptions } from '@/features/settings/hooks/use-list-options';
 import { useRangeSelection } from '@/hooks/use-range-selection';
 import { Download, Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { AvvalHistory } from './avval-history';
 import { ImportToolbar } from './import-toolbar';
 import { ResultCard } from './result-card';
 import { scrapeAvval } from './services/avval.service';
@@ -38,6 +41,9 @@ export function AvvalSearch() {
 
   // ✅ دریافت صنایع از بک‌اند
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
+
+  // ✅ ثبت تاریخچه
+  const saveHistory = useSaveAvvalHistory();
 
   // ✅ فیلترها
   const filteredPlaces = useMemo(
@@ -74,12 +80,22 @@ export function AvvalSearch() {
 
     setLoading(true);
     setPlaces([]);
-    clearSelection(); // ✅
+    clearSelection();
     setHiddenIds(new Set());
 
     try {
       const result = await scrapeAvval({ slug: slug.trim(), industry });
       setPlaces(result.places);
+
+      // ✅ ثبت در تاریخچه (فقط اگر نتیجه داشت)
+      if (result.total > 0) {
+        saveHistory.mutate({
+          slug: slug.trim(),
+          industry,
+          count: result.total,
+          pages: result.pagesScraped,
+        });
+      }
 
       if (result.total === 0) {
         toast.error('هیچ شرکتی پیدا نشد — اسلاگ را بررسی کنید');
@@ -95,6 +111,13 @@ export function AvvalSearch() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ انتخاب از تاریخچه
+  const handleSelectFromHistory = (selectedSlug: string, selectedIndustry: string) => {
+    setSlug(selectedSlug);
+    setIndustry(selectedIndustry);
+    toast.success('از تاریخچه بارگذاری شد');
   };
 
   const handleHide = (id: string) => {
@@ -198,6 +221,9 @@ export function AvvalSearch() {
         </CardContent>
       </Card>
 
+      {/* ✅ تاریخچه جستجوها */}
+      <AvvalHistory onSelect={handleSelectFromHistory} />
+
       {places.length > 0 && (
         <Card>
           <CardHeader>
@@ -283,7 +309,7 @@ export function AvvalSearch() {
                   total={filteredPlaces.length}
                   importing={importingOne === place.id}
                   isHidden={hiddenIds.has(place.id)}
-                  onCheckedChange={(e) => toggleWithRange(place.id, e)} // ✅
+                  onCheckedChange={(e) => toggleWithRange(place.id, e)}
                   onSave={(id, p) => setPlaces((prev) => prev.map((x) => (x.id === id ? p : x)))}
                   onImportOne={async (p) => {
                     setImportingOne(p.id);

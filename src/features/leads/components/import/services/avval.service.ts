@@ -3,12 +3,10 @@
 import type { BaladPlace } from '../types';
 
 const BASE_URL = 'https://avval.ir';
-const MAX_PAGES = 2; // فقط ۲ صفحه (بقیه پولی)
+const MAX_PAGES = 2;
 
 export interface AvvalScrapeParams {
-  /** اسلاگ مسیر در URL، مثلاً 'میلگرد-صنعتی' یا 'فروش-آهن' */
   slug: string;
-  /** نام صنعت/دسته برای ذخیره در دیتابیس، مثلاً 'آهن آلات' */
   industry: string;
 }
 
@@ -159,13 +157,13 @@ function parseAvvalPage(html: string, industry: string): BaladPlace[] {
       phoneNumber: phones[0] || '',
       secondaryPhone: phones[1],
       address,
-      category: industry, // ✅ پارامتری
+      category: industry,
       rating: rating > 0 ? rating : undefined,
       ratingCount: ratingCount > 0 ? ratingCount : undefined,
       latitude,
       longitude,
-      searchedIndustry: industry, // ✅ پارامتری
-      matchedKeyword: activity || industry, // اطلاعات اصلی avval به‌عنوان کلیدواژه
+      searchedIndustry: industry,
+      matchedKeyword: activity || industry, 
       source: 'کتاب اول',
       isExisting: false,
       email,
