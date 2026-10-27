@@ -1,20 +1,55 @@
 // src/app/api/leads/staged/counts/route.ts
 
 import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+function buildWhere(searchParams: URLSearchParams): any {
+  const where: any = { status: 'PENDING' };
+
+  const industry = searchParams.get('industry');
+  if (industry) {
+    const list = industry.split(',').filter(Boolean);
+    where.industry = list.length === 1 ? list[0] : { in: list };
+  }
+
+  const source = searchParams.get('source');
+  if (source) {
+    const list = source.split(',').filter(Boolean);
+    where.source = list.length === 1 ? list[0] : { in: list };
+  }
+
+  const search = searchParams.get('search');
+  if (search) {
+    where.OR = [
+      { businessName: { contains: search, mode: 'insensitive' } },
+      { phoneNumber: { contains: search } },
+      { address: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+
+  return where;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    // ✅ هر دو groupBy را موازی اجرا کن (فقط PENDING)
+    const { searchParams } = new URL(request.url);
+
+    const whereWithoutIndustry = buildWhere(
+      new URLSearchParams([...searchParams.entries()].filter(([k]) => k !== 'industry'))
+    );
+    const whereWithoutSource = buildWhere(
+      new URLSearchParams([...searchParams.entries()].filter(([k]) => k !== 'source'))
+    );
+
     const [byIndustry, bySource] = await Promise.all([
       prisma.stagedLead.groupBy({
         by: ['industry'],
-        where: { status: 'PENDING' },
+        where: whereWithoutIndustry,
         _count: { id: true },
       }),
       prisma.stagedLead.groupBy({
         by: ['source'],
-        where: { status: 'PENDING' },
+        where: whereWithoutSource,
         _count: { id: true },
       }),
     ]);

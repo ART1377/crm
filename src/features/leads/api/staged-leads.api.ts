@@ -81,8 +81,14 @@ export const stagedLeadsService = {
     return apiClient.patch(`/leads/staged/${id}`, data) as Promise<StagedLead>;
   },
 
-  async getCounts() {
-    return apiClient.get('/leads/staged/counts') as Promise<{
+  async getCounts(filters?: { industry?: string; source?: string; search?: string }) {
+    const params = new URLSearchParams();
+    if (filters?.industry) params.append('industry', filters.industry);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.search) params.append('search', filters.search);
+
+    const qs = params.toString();
+    return apiClient.get(`/leads/staged/counts${qs ? `?${qs}` : ''}`) as Promise<{
       industryCounts: Record<string, number>;
       sourceCounts: Record<string, number>;
     }>;

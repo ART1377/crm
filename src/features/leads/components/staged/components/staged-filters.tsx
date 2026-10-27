@@ -24,7 +24,7 @@ interface StagedFiltersProps {
 export function StagedFilters({ filters, onFilterChange, onClearFilters }: StagedFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
-  const { data: countsData } = useStagedCounts();
+  const { data: countsData } = useStagedCounts(filters);
 
   const industryCounts = countsData?.industryCounts ?? {};
   const sourceCounts = countsData?.sourceCounts ?? {};

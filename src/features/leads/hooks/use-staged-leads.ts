@@ -33,10 +33,10 @@ export function useStagedLeads(params?: {
   });
 }
 
-export function useStagedCounts() {
+export function useStagedCounts(filters?: { industry?: string; source?: string; search?: string }) {
   return useQuery({
-    queryKey: [STAGED_LEADS_QUERY_KEY, 'counts'],
-    queryFn: () => stagedLeadsService.getCounts(),
+    queryKey: [STAGED_LEADS_QUERY_KEY, 'counts', filters],
+    queryFn: () => stagedLeadsService.getCounts(filters),
     staleTime: 30 * 1000,
   });
 }

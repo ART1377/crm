@@ -69,7 +69,7 @@ export function LeadsFilters({
 }: LeadsFiltersProps) {
   const { data: industryOptions = [] } = useListOptions('INDUSTRY');
   const { data: sourceOptions = [] } = useListOptions('SOURCE');
-  const { data: countsData } = useLeadCounts();
+  const { data: countsData } = useLeadCounts(filters);
 
   const industryCounts = countsData?.industryCounts ?? {};
   const statusCounts = countsData?.statusCounts ?? {};

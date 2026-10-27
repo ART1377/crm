@@ -134,11 +134,28 @@ export const leadsService = {
     }>;
   },
 
-  async getCounts() {
-    return apiClient.get('/leads/counts') as Promise<{
+  async getCounts(filters?: {
+    status?: string;
+    industry?: string;
+    source?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }) {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.industry) params.append('industry', filters.industry);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+
+    const qs = params.toString();
+    return apiClient.get(`/leads/counts${qs ? `?${qs}` : ''}`) as Promise<{
       industryCounts: Record<string, number>;
       statusCounts: Record<string, number>;
       sourceCounts: Record<string, number>;
+      total: number;
     }>;
   },
 };

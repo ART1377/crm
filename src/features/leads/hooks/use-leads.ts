@@ -34,10 +34,17 @@ export function useLead(id: string) {
   });
 }
 
-export function useLeadCounts() {
+export function useLeadCounts(filters?: {
+  status?: string;
+  industry?: string;
+  source?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}) {
   return useQuery({
-    queryKey: [LEADS_QUERY_KEY, 'counts'],
-    queryFn: () => leadsService.getCounts(),
+    queryKey: [LEADS_QUERY_KEY, 'counts', filters],
+    queryFn: () => leadsService.getCounts(filters),
     staleTime: 30 * 1000,
   });
 }
