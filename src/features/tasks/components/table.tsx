@@ -13,6 +13,7 @@ import {
   Clock,
   Contact,
   Loader2,
+  MessageSquare,
   Phone,
   Trash2,
   User,
@@ -40,6 +41,7 @@ import { cn } from '@/lib/utils';
 
 import { Task } from '../types/tasks-types';
 import { getTaskDueInfo, getTaskStatusBadge } from '../utils/task-utils';
+import { TaskChannelIcons } from './task-channel-icons';
 
 interface TasksTableProps {
   tasks: Task[];
@@ -122,6 +124,12 @@ export function TasksTable({
             <TableHead className="min-w-32 text-start">شخص تماس</TableHead>
             <TableHead className="min-w-32 text-start">شماره تماس</TableHead>
             <TableHead className="min-w-32 text-start">شماره دوم</TableHead>
+            <TableHead className="min-w-28 text-start">
+              <div className="flex items-center gap-1">
+                <MessageSquare className="h-3.5 w-3.5" />
+                پیام‌رسان‌ها
+              </div>
+            </TableHead>
             <TableHead className="min-w-32 text-start">تاریخ سررسید</TableHead>
             <TableHead className="min-w-24 text-start">وضعیت</TableHead>
             <TableHead className="min-w-48 text-start">عملیات</TableHead>
@@ -225,6 +233,16 @@ export function TasksTable({
                     renderPhoneCell(task.lead.secondaryPhone)
                   ) : (
                     <span className="text-muted-foreground text-sm">---</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {task.lead ? (
+                    <TaskChannelIcons
+                      channels={task.lead.channels || ''}
+                      phoneNumber={task.lead.phoneNumber}
+                    />
+                  ) : (
+                    <span className="text-muted-foreground text-xs">---</span>
                   )}
                 </TableCell>
                 <TableCell>

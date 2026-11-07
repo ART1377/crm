@@ -12,13 +12,13 @@ import { PageHeader } from '@/components/shared/page-header';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 
 import { BulkActionsBar } from './components/bulk-actions-bar';
+import { ContactImportDialog } from './components/contact-import-dialog';
 import { TasksEmptyState } from './components/empty';
 import { ExportDialog } from './components/export-dialog';
 import { TaskFilters } from './components/filters';
 import { TasksSkeleton } from './components/skeleton';
 import { TasksTable } from './components/table';
 import { useTasksPage } from './hooks/use-tasks-page';
-import { ContactImportDialog } from './components/contact-import-dialog';
 
 export function TasksPage() {
   const {

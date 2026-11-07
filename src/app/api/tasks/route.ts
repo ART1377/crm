@@ -107,7 +107,8 @@ export async function GET(request: NextRequest) {
             secondaryPhone: true,
             industry: true,
             notes: true,
-            contactSaved: true, // ✅
+            contactSaved: true,
+            channels: true,
           },
         },
       },

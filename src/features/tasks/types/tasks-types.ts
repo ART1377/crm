@@ -14,6 +14,7 @@ export interface Task {
     industry?: string;
     notes?: string | null;
     contactSaved: boolean;
+    channels?: string;
   };
   createdAt: string;
 }
