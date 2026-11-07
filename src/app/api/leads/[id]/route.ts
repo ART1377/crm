@@ -54,7 +54,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updateData.rating = body.rating ? parseFloat(body.rating) : null;
     }
     if (body.category !== undefined) updateData.category = body.category;
-
+    if (body.contactSaved !== undefined) {
+      updateData.contactSaved = body.contactSaved;
+    }
     const lead = await prisma.lead.update({
       where: { id },
       data: updateData,

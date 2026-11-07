@@ -158,4 +158,8 @@ export const leadsService = {
       total: number;
     }>;
   },
+
+  async toggleContactSaved(id: string, contactSaved: boolean) {
+    return apiClient.patch(`/leads/${id}`, { contactSaved }) as Promise<Lead>;
+  },
 };

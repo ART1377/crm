@@ -2,8 +2,17 @@
 
 'use client';
 
-import { ArrowUpDown, RotateCcw, Search, X } from 'lucide-react';
+import {
+  ArrowUpDown,
+  BookmarkCheck,
+  BookmarkX,
+  ListFilter,
+  RotateCcw,
+  Search,
+  X,
+} from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const DUE_DATE_FILTERS = [
   { value: 'all', label: 'همه' },
@@ -32,6 +41,12 @@ const STATUS_FILTERS = [
   { value: 'completed', label: 'انجام شده' },
 ] as const;
 
+const CONTACT_SAVED_FILTERS = [
+  { value: '', label: 'همه', Icon: ListFilter },
+  { value: 'true', label: 'ذخیره شده', Icon: BookmarkCheck },
+  { value: 'false', label: 'ذخیره نشده', Icon: BookmarkX },
+] as const;
+
 interface TaskFiltersProps {
   filters: {
     status: string;
@@ -41,6 +56,7 @@ interface TaskFiltersProps {
     sortOrder: string;
     overdueDays: string;
     hasMobile: string;
+    contactSaved: string;
   };
   counts: {
     all: number;
@@ -69,7 +85,8 @@ export function TaskFilters({
     filters.status !== 'all' ||
     filters.dueDate !== 'all' ||
     Boolean(filters.search) ||
-    Boolean(filters.hasMobile);
+    Boolean(filters.hasMobile) ||
+    Boolean(filters.contactSaved);
 
   const toggleMobileFilter = () => {
     onFilterChange('hasMobile', filters.hasMobile === 'true' ? '' : 'true');
@@ -151,7 +168,7 @@ export function TaskFilters({
             </Select>
           </div>
 
-          {/* Row 2: Sort */}
+          {/* Row 2: Sort + Filters */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <Select value={filters.sortBy} onValueChange={onSortByChange}>
               <SelectTrigger className="w-full">
@@ -195,22 +212,66 @@ export function TaskFilters({
                 </SelectContent>
               </Select>
             )}
-
-            <button
-              type="button"
-              onClick={toggleMobileFilter}
-              className={`inline-flex min-w-fit cursor-pointer! items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                filters.hasMobile === 'true'
-                  ? 'bg-primary/10 text-primary ring-primary/40 ring-1'
-                  : 'bg-muted/50 text-muted-foreground hover:bg-muted ring-primary/10 ring-1'
-              } `}
-            >
-              <span>📱</span>
-              {filters.hasMobile === 'true' ? 'فقط موبایل' : 'همه شماره‌ها'}
-            </button>
           </div>
 
-          {/* دکمه‌های پایین */}
+          {/* Row 3: فیلترهای سریع */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* ✅ گروه ۱: نوع شماره */}
+            <div className="bg-muted/40 ring-border/50 inline-flex items-center gap-0.5 rounded-full p-0.5 ring-1">
+              <button
+                type="button"
+                onClick={() => onFilterChange('hasMobile', '')}
+                className={cn(
+                  'inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all',
+                  filters.hasMobile !== 'true'
+                    ? 'text-foreground bg-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <span>📞</span>
+                همه شماره‌ها
+              </button>
+              <button
+                type="button"
+                onClick={() => onFilterChange('hasMobile', 'true')}
+                className={cn(
+                  'inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all',
+                  filters.hasMobile === 'true'
+                    ? 'text-foreground bg-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <span>📱</span>
+                فقط موبایل
+              </button>
+            </div>
+
+            {/* ✅ گروه ۲: وضعیت مخاطب */}
+            <div className="bg-muted/40 ring-border/50 inline-flex items-center gap-0.5 rounded-full p-0.5 ring-1">
+              {CONTACT_SAVED_FILTERS.map((opt) => {
+                const isActive = (filters.contactSaved || '') === opt.value;
+                const Icon = opt.Icon;
+                return (
+                  <button
+                    key={opt.value || 'all'}
+                    type="button"
+                    onClick={() => onFilterChange('contactSaved', opt.value)}
+                    className={cn(
+                      'inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all',
+                      isActive
+                        ? 'text-foreground bg-white shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="h-3 w-3 shrink-0" />
+                    <span>{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* دکمه بازنشانی */}
           {hasActiveFilters && (
             <Button
               variant="destructive"

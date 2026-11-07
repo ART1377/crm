@@ -7,7 +7,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { leadsService } from '@/features/leads/api/leads.api';
 
-import { LEADS_QUERY_KEY } from '@/lib/query-keys';
+import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from '@/lib/query-keys';
 
 import { CreateLeadData, LeadFilters, UpdateLeadData } from '../types/leads-types';
 
@@ -163,5 +163,19 @@ export function useBulkDeleteLeads() {
     onError: (error: Error) => {
       toast.error(error.message || 'خطا در حذف گروهی');
     },
+  });
+}
+
+export function useToggleLeadContactSaved() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, contactSaved }: { id: string; contactSaved: boolean }) =>
+      leadsService.toggleContactSaved(id, contactSaved),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+    },
+    onError: (error: Error) => toast.error(error.message || 'خطا'),
   });
 }

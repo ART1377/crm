@@ -13,6 +13,7 @@ export interface Task {
     secondaryPhone?: string | null;
     industry?: string;
     notes?: string | null;
+    contactSaved: boolean;
   };
   createdAt: string;
 }

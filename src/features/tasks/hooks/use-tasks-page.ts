@@ -24,6 +24,7 @@ export function useTasksPage() {
       sortOrder: parseAsString.withDefault('asc'),
       overdueDays: parseAsString.withDefault(''),
       hasMobile: parseAsString.withDefault(''),
+      contactSaved: parseAsString.withDefault(''), // ✅ جدید
     },
     { history: 'push', shallow: true }
   );
@@ -46,6 +47,7 @@ export function useTasksPage() {
       sortOrder: params.sortOrder,
       overdueDays: params.overdueDays,
       hasMobile: params.hasMobile,
+      contactSaved: params.contactSaved, // ✅ جدید
     }),
     [
       params.status,
@@ -55,6 +57,7 @@ export function useTasksPage() {
       params.sortOrder,
       params.overdueDays,
       params.hasMobile,
+      params.contactSaved,
     ]
   );
 
@@ -117,7 +120,9 @@ export function useTasksPage() {
       search: '',
       sortBy: 'dueDate',
       sortOrder: 'asc',
+      overdueDays: '',
       hasMobile: '',
+      contactSaved: '', // ✅ جدید
     });
   }, [setParams]);
 
@@ -149,7 +154,6 @@ export function useTasksPage() {
   const exportAllTasks = useCallback(async () => {
     const result = await tasksService.getAll({
       ...queryFilters,
-      // بدون limit برای دریافت همه
     });
     return result;
   }, [queryFilters]);
@@ -160,7 +164,12 @@ export function useTasksPage() {
     return selectedTasks;
   }, [selectedIds, tasks]);
 
-  const hasFilters = params.status !== 'all' || params.dueDate !== 'all' || Boolean(params.search);
+  const hasFilters =
+    params.status !== 'all' ||
+    params.dueDate !== 'all' ||
+    Boolean(params.search) ||
+    Boolean(params.hasMobile) ||
+    Boolean(params.contactSaved); // ✅ جدید
 
   return {
     tasks,
@@ -174,6 +183,7 @@ export function useTasksPage() {
       sortOrder: params.sortOrder,
       overdueDays: params.overdueDays,
       hasMobile: params.hasMobile,
+      contactSaved: params.contactSaved, // ✅ جدید
     },
     counts,
     hasFilters,

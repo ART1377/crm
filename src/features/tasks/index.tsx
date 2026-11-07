@@ -18,6 +18,7 @@ import { TaskFilters } from './components/filters';
 import { TasksSkeleton } from './components/skeleton';
 import { TasksTable } from './components/table';
 import { useTasksPage } from './hooks/use-tasks-page';
+import { ContactImportDialog } from './components/contact-import-dialog';
 
 export function TasksPage() {
   const {
@@ -83,7 +84,8 @@ export function TasksPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{counts.all} تسک پیدا شد</CardTitle>
           <div className="flex items-center gap-2">
-            <ExportDialog totalCount={counts.all} onExportAll={handleExportAll} />
+            <ExportDialog totalCount={counts.all} onExportAll={handleExportAll} />{' '}
+            <ContactImportDialog />
             {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
           </div>
         </CardHeader>

@@ -5,7 +5,18 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/routes/routes';
-import { CheckCircle2, Circle, Clock, Contact, Phone, Trash2, User } from 'lucide-react';
+import {
+  BookmarkCheck,
+  BookmarkPlus,
+  CheckCircle2,
+  Circle,
+  Clock,
+  Contact,
+  Loader2,
+  Phone,
+  Trash2,
+  User,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +30,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { useToggleLeadContactSaved } from '@/features/leads/hooks/use-leads';
 import { useUpdateTask } from '@/features/tasks/hooks/use-tasks';
 
 import { useCopyToClipboard } from '@/hooks/use-copy';
@@ -45,12 +57,21 @@ export function TasksTable({
   onSelectOne,
 }: TasksTableProps) {
   const updateTask = useUpdateTask();
+  const toggleContactSaved = useToggleLeadContactSaved();
   const { copy } = useCopyToClipboard();
 
   const handleToggleComplete = (task: Task) => {
     updateTask.mutate({
       taskId: task.id,
       data: { isCompleted: !task.isCompleted },
+    });
+  };
+
+  const handleToggleContactSaved = (task: Task) => {
+    if (!task.lead) return;
+    toggleContactSaved.mutate({
+      id: task.lead.id,
+      contactSaved: !task.lead.contactSaved,
     });
   };
 
@@ -93,6 +114,9 @@ export function TasksTable({
             <TableHead className="w-10">
               <Checkbox checked={allSelected} onCheckedChange={onSelectAll} />
             </TableHead>
+            <TableHead className="w-10 text-center" title="مخاطب در گوشی ذخیره شده">
+              📱
+            </TableHead>
             <TableHead className="min-w-40 text-start">عنوان</TableHead>
             <TableHead className="min-w-32 text-start">سرنخ</TableHead>
             <TableHead className="min-w-32 text-start">شخص تماس</TableHead>
@@ -107,6 +131,8 @@ export function TasksTable({
           {tasks.map((task) => {
             const { isOverdue, dueDate, dueText, dueColor } = getTaskDueInfo(task);
             const statusBadge = getTaskStatusBadge(task);
+            const isSaved = Boolean(task.lead?.contactSaved);
+            const isSaving = toggleContactSaved.isPending;
 
             return (
               <TableRow
@@ -122,6 +148,34 @@ export function TasksTable({
                     onCheckedChange={() => onSelectOne(task.id)}
                   />
                 </TableCell>
+
+                {/* ✅ ستون مخاطب ذخیره شده */}
+                <TableCell>
+                  {task.lead && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleContactSaved(task)}
+                      disabled={isSaving}
+                      className={cn(
+                        'h-7 w-7 rounded-md transition-all',
+                        isSaved
+                          ? 'text-emerald-600 hover:bg-emerald-50'
+                          : 'text-muted-foreground hover:bg-amber-50 hover:text-amber-600'
+                      )}
+                      title={isSaved ? 'مخاطب ذخیره شده (کلیک برای لغو)' : 'مخاطب ذخیره نشده'}
+                    >
+                      {isSaving ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : isSaved ? (
+                        <BookmarkCheck className="h-4 w-4" />
+                      ) : (
+                        <BookmarkPlus className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </TableCell>
+
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="cursor-pointer" onClick={() => handleToggleComplete(task)}>

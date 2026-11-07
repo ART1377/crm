@@ -19,6 +19,7 @@ export function useAllTasks(filters: {
   sortOrder?: string;
   search?: string;
   hasMobile?: string;
+  contactSaved?: string; // ✅ جدید
 }) {
   return useQuery({
     queryKey: [TASKS_QUERY_KEY, 'all', filters],

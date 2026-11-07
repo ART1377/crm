@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'asc';
     const search = searchParams.get('search');
     const overdueDays = searchParams.get('overdueDays');
-    const hasMobile = searchParams.get('hasMobile'); // جدید
+    const hasMobile = searchParams.get('hasMobile');
+    const contactSaved = searchParams.get('contactSaved'); // ✅ جدید
 
     const where: Prisma.TaskWhereInput = {};
 
@@ -68,6 +69,20 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    // ✅ فیلتر مخاطب ذخیره شده
+    if (contactSaved === 'true') {
+      // merge با where.lead قبلی (اگر hasMobile هم true بود)
+      where.lead = {
+        ...((where.lead as Prisma.LeadWhereInput) || {}),
+        contactSaved: true,
+      };
+    } else if (contactSaved === 'false') {
+      where.lead = {
+        ...((where.lead as Prisma.LeadWhereInput) || {}),
+        contactSaved: false,
+      };
+    }
+
     // جستجو در عنوان، نام سرنخ، شماره تماس و شماره دوم
     if (search) {
       const englishSearch = toEnglishDigits(search);
@@ -92,6 +107,7 @@ export async function GET(request: NextRequest) {
             secondaryPhone: true,
             industry: true,
             notes: true,
+            contactSaved: true, // ✅
           },
         },
       },
