@@ -16,7 +16,8 @@ import { useMessengers } from '@/features/settings/hooks/use-messengers';
 
 import { cn, getMessengerLink } from '@/lib/utils';
 
-type IconComponent = React.ComponentType<{ className?: string }>;
+// ✅ className به‌جای اختیاری، اجباری شد
+type IconComponent = React.ComponentType<{ className: string }>;
 
 const CHANNEL_META: Record<string, { icon: IconComponent; label: string; color: string }> = {
   WHATSAPP: { icon: WhatsappIcon, label: 'واتساپ', color: 'text-emerald-600' },
@@ -45,26 +46,21 @@ export function TaskChannelIcons({ channels, phoneNumber }: TaskChannelIconsProp
   }
 
   const getLink = (channelKey: string): string | null => {
-    // تماس مستقیم
     if (channelKey === 'CALL') return `tel:${phoneNumber}`;
 
-    // پیامک
     if (channelKey === 'SMS') {
       return `sms:${phoneNumber.replace(/[^0-9]/g, '')}`;
     }
 
-    // اینستاگرام/تلگرام: لینک مستقیم به شماره ممکن نیست
     if (channelKey === 'INSTAGRAM' || channelKey === 'TELEGRAM') {
       return null;
     }
 
-    // سایر: تلاش برای گرفتن قالب از تنظیمات
     const messenger = messengers.find((m) => m.key === channelKey);
     if (messenger?.linkTemplate) {
       return getMessengerLink(channelKey, phoneNumber, '', messenger.linkTemplate);
     }
 
-    // fallback برای رایج‌ها
     const clean = phoneNumber.replace(/[^0-9]/g, '');
     if (channelKey === 'WHATSAPP') return `https://wa.me/${clean}`;
     if (channelKey === 'ETA') return `https://eitaa.com/${clean}`;
