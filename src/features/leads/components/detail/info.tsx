@@ -2,6 +2,8 @@
 
 import {
   ArrowUpDown,
+  BookmarkCheck,
+  BookmarkPlus,
   Building2,
   Calendar,
   Check,
@@ -24,10 +26,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { useUpdateLead } from '@/features/leads/hooks/use-leads';
+import { useToggleLeadContactSaved, useUpdateLead } from '@/features/leads/hooks/use-leads';
 import { useCopyToClipboard } from '@/hooks/use-copy';
 
-import { downloadVCard, formatDate, getDisplayUrl } from '@/lib/utils';
+import { cn, downloadVCard, formatDate, getDisplayUrl } from '@/lib/utils';
 
 import { Lead } from '../../types/leads-types';
 import { EditLeadDialog } from '../table/edit-lead/dialog';
@@ -36,6 +38,7 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
   const { copy, copied: primaryCopied } = useCopyToClipboard();
   const { copy: copySecondary, copied: secondaryCopied } = useCopyToClipboard();
   const updateLead = useUpdateLead();
+  const toggleContactSaved = useToggleLeadContactSaved();
 
   const handleSwapPhones = async () => {
     await updateLead.mutateAsync({
@@ -44,6 +47,13 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
         phoneNumber: lead.secondaryPhone || '',
         secondaryPhone: lead.phoneNumber,
       },
+    });
+  };
+
+  const handleToggleContactSaved = () => {
+    toggleContactSaved.mutate({
+      id: lead.id,
+      contactSaved: !lead.contactSaved,
     });
   };
 
@@ -61,6 +71,33 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {/* ✅ دکمه فقط آیکون — با tooltip */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggleContactSaved}
+            disabled={toggleContactSaved.isPending}
+            className={cn(
+              'h-8 w-8 rounded-full transition-all hover:scale-110',
+              lead.contactSaved
+                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-600'
+                : 'bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-600'
+            )}
+            title={
+              lead.contactSaved
+                ? 'مخاطب در گوشی ذخیره شده (کلیک برای لغو)'
+                : 'مخاطب در گوشی ذخیره نشده (کلیک برای علامت‌گذاری)'
+            }
+          >
+            {toggleContactSaved.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : lead.contactSaved ? (
+              <BookmarkCheck className="h-4 w-4" />
+            ) : (
+              <BookmarkPlus className="h-4 w-4" />
+            )}
+          </Button>
+
           <Button
             variant="ghost"
             size="icon"
@@ -212,7 +249,7 @@ export function LeadInfo({ lead, onDelete }: { lead: Lead; onDelete: () => void 
           </div>
         </div>
 
-        {/* ✅ تاریخ ایجاد و بروزرسانی */}
+        {/* تاریخ ایجاد و بروزرسانی */}
         <Separator />
         <div className="grid grid-cols-2 divide-x">
           <div className="flex items-center gap-2.5 px-5 py-3">

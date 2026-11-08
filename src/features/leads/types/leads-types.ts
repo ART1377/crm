@@ -22,6 +22,7 @@ export interface Lead {
   tasks?: Task[];
   _count?: { activities: number; tasks: number };
   channels?: string;
+  contactSaved: boolean;
   createdAt: string;
   updatedAt: string;
 }
