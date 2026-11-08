@@ -12,6 +12,7 @@ import {
   Circle,
   Clock,
   Contact,
+  Copy,
   Loader2,
   MessageSquare,
   Phone,
@@ -35,9 +36,7 @@ import { useToggleLeadContactSaved } from '@/features/leads/hooks/use-leads';
 import { useUpdateTask } from '@/features/tasks/hooks/use-tasks';
 
 import { useCopyToClipboard } from '@/hooks/use-copy';
-import { downloadVCard, formatDate, isMobilePhone } from '@/lib/utils';
-
-import { cn } from '@/lib/utils';
+import { cn, downloadVCard, formatDate, isMobilePhone } from '@/lib/utils';
 
 import { Task } from '../types/tasks-types';
 import { getTaskDueInfo, getTaskStatusBadge } from '../utils/task-utils';
@@ -61,6 +60,8 @@ export function TasksTable({
   const updateTask = useUpdateTask();
   const toggleContactSaved = useToggleLeadContactSaved();
   const { copy } = useCopyToClipboard();
+  const { copy: copyBusinessName } = useCopyToClipboard();
+  const { copy: copyContactPerson } = useCopyToClipboard();
 
   const handleToggleComplete = (task: Task) => {
     updateTask.mutate({
@@ -157,7 +158,7 @@ export function TasksTable({
                   />
                 </TableCell>
 
-                {/* ✅ ستون مخاطب ذخیره شده */}
+                {/* ستون مخاطب ذخیره شده */}
                 <TableCell>
                   {task.lead && (
                     <Button
@@ -203,24 +204,57 @@ export function TasksTable({
                     </span>
                   </div>
                 </TableCell>
+
+                {/* ✅ ستون سرنخ با کپی */}
                 <TableCell>
                   {task.lead && (
-                    <Link
-                      href={ROUTES.leads.detail(task.leadId)}
-                      className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-sm hover:underline"
-                    >
-                      <User className="h-3.5 w-3.5" />
-                      {task.lead.businessName}
-                    </Link>
+                    <div className="flex items-center gap-1">
+                      <Link
+                        href={ROUTES.leads.detail(task.leadId)}
+                        className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-sm hover:underline"
+                      >
+                        <User className="h-3.5 w-3.5 shrink-0" />
+                        {task.lead.businessName}
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-foreground h-5 w-5 shrink-0 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyBusinessName(task.lead!.businessName, 'نام سرنخ کپی شد');
+                        }}
+                        title="کپی نام سرنخ"
+                      >
+                        <Copy className="h-2.5 w-2.5" />
+                      </Button>
+                    </div>
                   )}
                 </TableCell>
+
+                {/* ✅ ستون شخص تماس با کپی */}
                 <TableCell>
                   {task.lead?.contactPerson ? (
-                    <span className="text-sm">{task.lead.contactPerson}</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm">{task.lead.contactPerson}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-foreground h-5 w-5 shrink-0 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyContactPerson(task.lead!.contactPerson!, 'نام شخص تماس کپی شد');
+                        }}
+                        title="کپی نام شخص تماس"
+                      >
+                        <Copy className="h-2.5 w-2.5" />
+                      </Button>
+                    </div>
                   ) : (
                     <span className="text-muted-foreground text-sm">---</span>
                   )}
                 </TableCell>
+
                 <TableCell>
                   {task.lead ? (
                     renderPhoneCell(task.lead.phoneNumber)
