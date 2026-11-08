@@ -52,6 +52,7 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
   const updateChannels = useUpdateChannels();
 
   const channelKeys = channels ? channels.split(',').filter(Boolean) : [];
+  const isEmpty = channelKeys.length === 0;
 
   const getLink = (channelKey: string): string | null => {
     if (channelKey === 'CALL') return `tel:${phoneNumber}`;
@@ -93,11 +94,6 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
     );
   };
 
-  // اگر هیچ کانالی وجود ندارد، فقط «---» نمایش بده (بدون تریگر)
-  if (channelKeys.length === 0) {
-    return <span className="text-muted-foreground text-xs">---</span>;
-  }
-
   return (
     <div className="flex flex-wrap items-center gap-1">
       {/* نمایش کانال‌های فعلی */}
@@ -131,14 +127,19 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
         );
       })}
 
-      {/* ✅ دکمه ویرایش با آیکون Pencil و استایل واضح */}
+      {/* ✅ دکمه ویرایش/افزودن — همیشه با آیکون Pencil */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             type="button"
             onClick={(e) => e.stopPropagation()}
-            title="ویرایش روش‌های ارتباطی"
-            className="text-muted-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary border-border bg-background inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border transition-all"
+            title={isEmpty ? 'افزودن روش ارتباطی' : 'ویرایش روش‌های ارتباطی'}
+            className={cn(
+              'text-muted-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border transition-all',
+              isEmpty
+                ? 'border-muted-foreground/40 border-dashed' // حالت خالی: dashed
+                : 'border-border bg-background' // حالت پر: solid
+            )}
           >
             {updateChannels.isPending ? (
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -164,13 +165,15 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
                 <div>
                   <p className="text-xs font-semibold">روش‌های ارتباطی</p>
                   <p className="text-muted-foreground text-[10px]">
-                    {channelKeys.length} کانال فعال
+                    {isEmpty ? 'هنوز کانالی انتخاب نشده' : `${channelKeys.length} کانال فعال`}
                   </p>
                 </div>
               </div>
-              <span className="bg-primary text-primary-foreground flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold">
-                {channelKeys.length}
-              </span>
+              {!isEmpty && (
+                <span className="bg-primary text-primary-foreground flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold">
+                  {channelKeys.length}
+                </span>
+              )}
             </div>
           </div>
 
@@ -219,11 +222,13 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
                   <Loader2 className="h-2.5 w-2.5 animate-spin" />
                   در حال ذخیره...
                 </span>
+              ) : isEmpty ? (
+                'برای افزودن، کلیک کنید'
               ) : (
                 'برای حذف، کلیک کنید'
               )}
             </p>
-            {channelKeys.length > 0 && (
+            {!isEmpty && (
               <button
                 type="button"
                 onClick={(e) => {
