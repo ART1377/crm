@@ -238,6 +238,7 @@ export function TasksTable({
                 <TableCell>
                   {task.lead ? (
                     <TaskChannelIcons
+                      leadId={task.lead.id}
                       channels={task.lead.channels || ''}
                       phoneNumber={task.lead.phoneNumber}
                     />
