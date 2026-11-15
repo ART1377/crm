@@ -36,21 +36,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         select: { status: true },
       });
 
-      // ✅ اگر وضعیت سرنخ MESSAGED یا FOLLOW_UP باشه (نه CALLED)
       if (lead && ['MESSAGED', 'FOLLOW_UP'].includes(lead.status)) {
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + OVERDUE_DAYS);
 
         const title = lead.status === 'MESSAGED' ? 'پیگیری پیام' : 'پیگیری وضعیت';
 
-        // چک کن که آیا تسک جدیدی برای این تاریخ وجود داره یا نه
+        // ✅ استفاده از startOfDay/endOfDay جداگانه
+        const startOfDay = new Date(dueDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(dueDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
         const existingTask = await prisma.task.findFirst({
           where: {
             leadId: task.leadId,
             title: title,
             dueDate: {
-              gte: new Date(dueDate.setHours(0, 0, 0, 0)),
-              lt: new Date(dueDate.setHours(23, 59, 59, 999)),
+              gte: startOfDay,
+              lt: endOfDay,
             },
             isCompleted: false,
           },

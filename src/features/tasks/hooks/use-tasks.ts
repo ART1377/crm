@@ -127,9 +127,17 @@ export function useBulkUpdateTasks() {
   return useMutation({
     mutationFn: ({ ids, data }: { ids: string[]; data: { isCompleted: boolean } }) =>
       tasksService.bulkUpdate(ids, data),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
-      toast.success('وضعیت تسک‌ها بروزرسانی شد');
+
+      // ✅ نمایش تعداد تسک‌های پیگیری ساخته‌شده
+      if (result.followUpCreated > 0) {
+        toast.success(
+          `${result.updatedCount} تسک انجام شد + ${result.followUpCreated} تسک پیگیری ساخته شد`
+        );
+      } else {
+        toast.success('وضعیت تسک‌ها بروزرسانی شد');
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);

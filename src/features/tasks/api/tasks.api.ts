@@ -64,6 +64,7 @@ export const tasksService = {
     return apiClient.patch('/tasks/bulk-update', { ids, data }) as Promise<{
       success: boolean;
       updatedCount: number;
+      followUpCreated: number; 
     }>;
   },
 };
