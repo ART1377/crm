@@ -90,6 +90,7 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { lead: { businessName: { contains: search, mode: 'insensitive' } } },
+        { lead: { contactPerson: { contains: search, mode: 'insensitive' } } },
         { lead: { phoneNumber: { contains: englishSearch, mode: 'insensitive' } } },
         { lead: { secondaryPhone: { contains: englishSearch, mode: 'insensitive' } } },
       ];
