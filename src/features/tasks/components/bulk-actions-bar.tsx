@@ -22,7 +22,7 @@ interface BulkActionsBarProps {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   isDeleting?: boolean;
-  onExportSelected: () => void; // جدید
+  onExportSelected: () => void;
   selectedTasks: Array<{
     id: string;
     leadId: string;
@@ -51,7 +51,15 @@ export function BulkActionsBar({
   const handleStatusChange = (status: string) => {
     if (!status) return;
     const isCompleted = status === 'completed';
-    bulkUpdate.mutate({ ids: selectedIds, data: { isCompleted } });
+    bulkUpdate.mutate(
+      { ids: selectedIds, data: { isCompleted } },
+      {
+        onSuccess: () => {
+          // ✅ پاک کردن انتخاب بعد از بروزرسانی گروهی موفق
+          onClearSelection();
+        },
+      }
+    );
   };
 
   const handleBulkExport = () => {
@@ -74,7 +82,6 @@ export function BulkActionsBar({
 
   return (
     <div className="bg-primary/5 border-primary/20 mb-3 rounded-lg border p-3">
-      {/* ردیف اول: تعداد و دکمه بستن */}
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium">{selectedCount} تسک انتخاب شد</span>
         <Button variant="ghost" size="sm" onClick={onClearSelection} className="h-8 gap-1.5 px-3">
@@ -83,7 +90,6 @@ export function BulkActionsBar({
         </Button>
       </div>
 
-      {/* ردیف دوم: اکشن‌ها - هر کدوم در یک خط جدا در موبایل */}
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
         <Select value="" onValueChange={handleStatusChange} disabled={bulkUpdate.isPending}>
           <SelectTrigger className="h-9 w-full text-sm sm:w-40">
@@ -97,7 +103,6 @@ export function BulkActionsBar({
           </SelectContent>
         </Select>
 
-        {/* دکمه خروجی گروهی */}
         <Button
           variant="outline"
           size="default"

@@ -63,7 +63,12 @@ export function TasksTable({
   const { copy: copyBusinessName } = useCopyToClipboard();
   const { copy: copyContactPerson } = useCopyToClipboard();
 
+  // ✅ تشخیص تسکی که در حال toggle است
+  const togglingTaskId = updateTask.isPending ? updateTask.variables?.taskId : null;
+  const isAnyTogglePending = updateTask.isPending;
+
   const handleToggleComplete = (task: Task) => {
+    if (isAnyTogglePending) return; // ✅ جلوگیری از کلیک مکرر
     updateTask.mutate({
       taskId: task.id,
       data: { isCompleted: !task.isCompleted },
@@ -141,7 +146,10 @@ export function TasksTable({
             const { isOverdue, dueDate, dueText, dueColor } = getTaskDueInfo(task);
             const statusBadge = getTaskStatusBadge(task);
             const isSaved = Boolean(task.lead?.contactSaved);
-            const isSaving = toggleContactSaved.isPending;
+            const isSavingContact = toggleContactSaved.isPending;
+
+            // ✅ وضعیت toggle این تسک
+            const isTogglingThisTask = togglingTaskId === task.id;
 
             return (
               <TableRow
@@ -165,7 +173,7 @@ export function TasksTable({
                       variant="ghost"
                       size="icon"
                       onClick={() => handleToggleContactSaved(task)}
-                      disabled={isSaving}
+                      disabled={isSavingContact}
                       className={cn(
                         'h-7 w-7 rounded-md transition-all',
                         isSaved
@@ -174,7 +182,7 @@ export function TasksTable({
                       )}
                       title={isSaved ? 'مخاطب ذخیره شده (کلیک برای لغو)' : 'مخاطب ذخیره نشده'}
                     >
-                      {isSaving ? (
+                      {isSavingContact ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       ) : isSaved ? (
                         <BookmarkCheck className="h-4 w-4" />
@@ -185,15 +193,40 @@ export function TasksTable({
                   )}
                 </TableCell>
 
+                {/* ✅ ستون عنوان با toggle + لودینگ */}
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="cursor-pointer" onClick={() => handleToggleComplete(task)}>
-                      {task.isCompleted ? (
+                    <button
+                      type="button"
+                      disabled={isAnyTogglePending}
+                      onClick={() => handleToggleComplete(task)}
+                      className={cn(
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-all',
+                        isAnyTogglePending ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'
+                      )}
+                      title={
+                        isTogglingThisTask
+                          ? 'در حال بروزرسانی...'
+                          : task.isCompleted
+                            ? 'برگرداندن به در انتظار'
+                            : 'علامت‌گذاری به عنوان انجام شده'
+                      }
+                    >
+                      {isTogglingThisTask ? (
+                        <Loader2 className="text-primary h-4 w-4 animate-spin" />
+                      ) : task.isCompleted ? (
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                       ) : (
-                        <Circle className="text-muted-foreground h-4 w-4" />
+                        <Circle
+                          className={cn(
+                            'h-4 w-4',
+                            isAnyTogglePending
+                              ? 'text-muted-foreground/50'
+                              : 'text-muted-foreground'
+                          )}
+                        />
                       )}
-                    </div>
+                    </button>
                     <span
                       className={cn(
                         'text-sm',
@@ -205,7 +238,7 @@ export function TasksTable({
                   </div>
                 </TableCell>
 
-                {/* ✅ ستون سرنخ با کپی */}
+                {/* ستون سرنخ با کپی */}
                 <TableCell>
                   {task.lead && (
                     <div className="flex items-center gap-1">
@@ -232,7 +265,7 @@ export function TasksTable({
                   )}
                 </TableCell>
 
-                {/* ✅ ستون شخص تماس با کپی */}
+                {/* ستون شخص تماس با کپی */}
                 <TableCell>
                   {task.lead?.contactPerson ? (
                     <div className="flex items-center gap-1">
