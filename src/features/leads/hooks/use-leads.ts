@@ -143,6 +143,7 @@ export function useUpdateChannels() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY, variables.id] });
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
       toast.success('روش‌های ارتباطی ذخیره شد');
     },
     onError: (error: Error) => {
@@ -177,5 +178,34 @@ export function useToggleLeadContactSaved() {
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
     },
     onError: (error: Error) => toast.error(error.message || 'خطا'),
+  });
+}
+
+export function useBulkCheckContacts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ phones, apply = true }: { phones: string[]; apply?: boolean }) =>
+      leadsService.bulkCheckContacts(phones, apply),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
+
+      // ✅ مدیریت toast در hook (بیرون از کامپوننت)
+      if (data.matchedCount === 0) {
+        toast('هیچ سرنخی با این شماره‌ها پیدا نشد', { icon: 'ℹ️' });
+      } else if (data.newlySavedCount > 0) {
+        toast.success(
+          `${data.newlySavedCount} سرنخ جدید علامت‌گذاری شد (${data.alreadySavedCount} از قبل بودند)`
+        );
+      } else {
+        toast(`همه ${data.alreadySavedCount} سرنخ از قبل علامت‌گذاری شده بودند`, {
+          icon: '✅',
+        });
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'خطا در بررسی مخاطبین');
+    },
   });
 }

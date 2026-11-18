@@ -4,7 +4,6 @@
 
 import { useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { Check, Loader2, MessageCircle, Pencil, X } from 'lucide-react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -22,7 +21,6 @@ import WhatsappIcon from '@/features/leads/components/detail/icon/whatsapp';
 import { useUpdateChannels } from '@/features/leads/hooks/use-leads';
 import { useMessengers } from '@/features/settings/hooks/use-messengers';
 
-import { TASKS_QUERY_KEY } from '@/lib/query-keys';
 import { cn, getMessengerLink } from '@/lib/utils';
 
 type IconComponent = React.ComponentType<{ className: string }>;
@@ -46,7 +44,6 @@ interface TaskChannelIconsProps {
 }
 
 export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelIconsProps) {
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const { data: messengers = [] } = useMessengers();
   const updateChannels = useUpdateChannels();
@@ -84,14 +81,7 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
       ? channelKeys.filter((k) => k !== key)
       : [...channelKeys, key];
 
-    updateChannels.mutate(
-      { id: leadId, channels: next.join(',') },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
-        },
-      }
-    );
+    updateChannels.mutate({ id: leadId, channels: next.join(',') });
   };
 
   return (
@@ -233,14 +223,7 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  updateChannels.mutate(
-                    { id: leadId, channels: '' },
-                    {
-                      onSuccess: () => {
-                        queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
-                      },
-                    }
-                  );
+                  updateChannels.mutate({ id: leadId, channels: '' });
                 }}
                 disabled={updateChannels.isPending}
                 className="text-muted-foreground hover:text-destructive inline-flex cursor-pointer items-center gap-1 text-[10px] transition-colors"

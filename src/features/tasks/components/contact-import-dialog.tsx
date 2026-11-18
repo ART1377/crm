@@ -2,7 +2,6 @@
 
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
 import { BookmarkCheck, CheckCircle2, FileText, Loader2, Phone, Upload, X } from 'lucide-react';
@@ -17,25 +16,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+import { useBulkCheckContacts } from '@/features/leads/hooks/use-leads';
+import type { BulkCheckContactsResult } from '@/features/leads/types/leads-types';
+
 import { extractPhonesFromText, parseVCardPhones } from '@/lib/phone-utils';
-import { LEADS_QUERY_KEY, TASKS_QUERY_KEY } from '@/lib/query-keys';
 import { cn } from '@/lib/utils';
-
-interface MatchedLead {
-  id: string;
-  businessName: string;
-  phoneNumber: string;
-  contactSaved: boolean;
-}
-
-interface BulkCheckResult {
-  totalPhones: number;
-  uniquePhones: number;
-  matchedCount: number;
-  alreadySavedCount: number;
-  newlySavedCount: number;
-  matchedLeads: MatchedLead[];
-}
 
 type Stage = 'idle' | 'parsed' | 'loading' | 'done';
 
@@ -44,11 +29,11 @@ export function ContactImportDialog() {
   const [stage, setStage] = useState<Stage>('idle');
   const [phones, setPhones] = useState<string[]>([]);
   const [fileName, setFileName] = useState<string>('');
-  const [result, setResult] = useState<BulkCheckResult | null>(null);
+  const [result, setResult] = useState<BulkCheckContactsResult | null>(null);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const queryClient = useQueryClient();
+  const bulkCheck = useBulkCheckContacts(); // ✅ هوک جدید
 
   const reset = () => {
     setStage('idle');
@@ -70,10 +55,7 @@ export function ContactImportDialog() {
     try {
       const text = await file.text();
 
-      // تلاش اول: vCard
       let extracted = parseVCardPhones(text);
-
-      // اگر vCard خالی بود، به‌عنوان متن آزاد امتحان کن
       if (extracted.length === 0) {
         extracted = extractPhonesFromText(text);
       }
@@ -100,45 +82,23 @@ export function ContactImportDialog() {
     if (file) handleFile(file);
   };
 
-  const handleApply = async () => {
+  // ✅ فقط mutation را صدا بزن — toast و invalidate در hook انجام می‌شود
+  const handleApply = () => {
     if (phones.length === 0) return;
     setStage('loading');
 
-    try {
-      const res = await fetch('/api/leads/bulk-check-contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phones, apply: true }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'خطا در بررسی');
+    bulkCheck.mutate(
+      { phones, apply: true },
+      {
+        onSuccess: (data) => {
+          setResult(data);
+          setStage('done');
+        },
+        onError: () => {
+          setStage('parsed');
+        },
       }
-
-      const data: BulkCheckResult = await res.json();
-      setResult(data);
-      setStage('done');
-
-      // refresh queries
-      queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
-
-      if (data.matchedCount === 0) {
-        toast('هیچ سرنخی با این شماره‌ها پیدا نشد', { icon: 'ℹ️' });
-      } else if (data.newlySavedCount > 0) {
-        toast.success(
-          `${data.newlySavedCount} سرنخ جدید علامت‌گذاری شد (${data.alreadySavedCount} از قبل بودند)`
-        );
-      } else {
-        toast(`همه ${data.alreadySavedCount} سرنخ از قبل علامت‌گذاری شده بودند`, {
-          icon: '✅',
-        });
-      }
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'خطا در بررسی');
-      setStage('parsed');
-    }
+    );
   };
 
   return (

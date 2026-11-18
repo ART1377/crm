@@ -146,7 +146,11 @@ export function TasksTable({
             const { isOverdue, dueDate, dueText, dueColor } = getTaskDueInfo(task);
             const statusBadge = getTaskStatusBadge(task);
             const isSaved = Boolean(task.lead?.contactSaved);
-            const isSavingContact = toggleContactSaved.isPending;
+            const savingContactLeadId = toggleContactSaved.isPending
+              ? toggleContactSaved.variables?.id
+              : null;
+
+            const isSavingThisContact = savingContactLeadId === task.lead?.id;
 
             // ✅ وضعیت toggle این تسک
             const isTogglingThisTask = togglingTaskId === task.id;
@@ -173,7 +177,7 @@ export function TasksTable({
                       variant="ghost"
                       size="icon"
                       onClick={() => handleToggleContactSaved(task)}
-                      disabled={isSavingContact}
+                      disabled={isSavingThisContact}
                       className={cn(
                         'h-7 w-7 rounded-md transition-all',
                         isSaved
@@ -182,7 +186,7 @@ export function TasksTable({
                       )}
                       title={isSaved ? 'مخاطب ذخیره شده (کلیک برای لغو)' : 'مخاطب ذخیره نشده'}
                     >
-                      {isSavingContact ? (
+                      {isSavingThisContact ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       ) : isSaved ? (
                         <BookmarkCheck className="h-4 w-4" />

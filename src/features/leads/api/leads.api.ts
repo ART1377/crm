@@ -4,7 +4,7 @@ import { LEADS_PAGE_SIZE } from '@/constants/constants';
 
 import { Task } from '@/features/tasks/types/tasks-types';
 
-import { CreateLeadData, Lead, LeadFilters, UpdateLeadData } from '../types/leads-types';
+import { BulkCheckContactsResult, CreateLeadData, Lead, LeadFilters, UpdateLeadData } from '../types/leads-types';
 
 const LEADS_ENDPOINT = '/leads';
 
@@ -161,5 +161,12 @@ export const leadsService = {
 
   async toggleContactSaved(id: string, contactSaved: boolean) {
     return apiClient.patch(`/leads/${id}`, { contactSaved }) as Promise<Lead>;
+  },
+
+  async bulkCheckContacts(phones: string[], apply = false) {
+    return apiClient.post('/leads/bulk-check-contacts', {
+      phones,
+      apply,
+    }) as Promise<BulkCheckContactsResult>;
   },
 };

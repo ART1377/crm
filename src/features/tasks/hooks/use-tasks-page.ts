@@ -61,7 +61,7 @@ export function useTasksPage() {
     ]
   );
 
-  const { data: tasks = [], isLoading, isFetching, refetch } = useAllTasks(queryFilters);
+  const { data: tasks = [], isLoading, isFetching } = useAllTasks(queryFilters);
 
   const counts = useMemo(() => {
     const all = tasks.length;
@@ -130,7 +130,6 @@ export function useTasksPage() {
     if (!deleteId) return;
     await deleteTask.mutateAsync(deleteId);
     setDeleteId(null);
-    refetch();
   };
 
   const handleSelectAll = useCallback(() => {
@@ -148,8 +147,7 @@ export function useTasksPage() {
     await bulkDeleteTasks.mutateAsync(selectedIds);
     setSelectedIds([]);
     setIsBulkDeleteDialogOpen(false);
-    refetch();
-  }, [selectedIds, bulkDeleteTasks, refetch]);
+  }, [selectedIds, bulkDeleteTasks]);
 
   const exportAllTasks = useCallback(async () => {
     const result = await tasksService.getAll({

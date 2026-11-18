@@ -71,3 +71,20 @@ export interface CreateActivityData {
   summary: string;
   detail?: string;
 }
+
+export interface MatchedLead {
+  id: string;
+  businessName: string;
+  phoneNumber: string;
+  contactSaved: boolean;
+}
+
+export interface BulkCheckContactsResult {
+  totalPhones: number;
+  uniquePhones: number;
+  matchedCount: number;
+  alreadySavedCount: number;
+  newlySavedCount: number;
+  applied: boolean;
+  matchedLeads: MatchedLead[];
+}
