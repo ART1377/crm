@@ -15,13 +15,13 @@ model Lead {
   phoneNumber    String
   secondaryPhone String?
   industry       String
-  source         String     @default("DIRECT")
+  source         String     @default("مستقیم")
   status         String     @default("NEW")
   notes          String?
-  address        String?    // فیلد جدید برای آدرس
-  website        String?    // فیلد جدید برای وبسایت
-  rating         Float?     // فیلد جدید برای امتیاز
-  category       String?    // فیلد جدید برای دسته‌بندی
+  address        String?   
+  website        String?   
+  rating         Float?    
+  category       String? 
   
   activities     Activity[]
   tasks          Task[]

@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         phoneNumber: sanitizePhone(body.phoneNumber),
         secondaryPhone: body.secondaryPhone ? sanitizePhone(body.secondaryPhone) : null,
         industry: sanitizeText(body.industry),
-        source: body.source || null,
+        source: body.source?.trim() || 'مستقیم',
         notes: body.notes || null,
         address: body.address || null,
         website: body.website || null,

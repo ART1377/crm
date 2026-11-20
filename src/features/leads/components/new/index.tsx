@@ -32,7 +32,7 @@ export function NewLeadPage() {
       notes: '',
       address: '',
       website: '',
-      rating: undefined, // اضافه شد
+      rating: undefined,
       category: '',
     },
   });
@@ -40,7 +40,7 @@ export function NewLeadPage() {
   const onSubmit = async (data: CreateLeadData) => {
     await createLead.mutateAsync(data, {
       onSuccess: () => {
-        form.reset(); // Clear all fields
+        form.reset();
       },
     });
   };

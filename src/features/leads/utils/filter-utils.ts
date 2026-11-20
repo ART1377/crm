@@ -9,11 +9,6 @@ export interface OptionWithCount extends CountableOption {
   count: number;
 }
 
-/**
- * تعداد هر گزینه را به label اضافه می‌کند و بر اساس تعداد (نزولی) مرتب می‌کند.
- * - اگر تعداد صفر باشد، فقط label نمایش داده می‌شود.
- * - گزینه‌های با تعداد بیشتر بالاتر می‌آیند.
- */
 export function withCount(
   options: CountableOption[],
   counts: Record<string, number>
@@ -30,10 +25,7 @@ export function withCount(
     .sort((a, b) => b.count - a.count);
 }
 
-/**
- * تبدیل `ListOption[]` (که label ندارد) به `CountableOption[]`
- * با استفاده از `value` به‌عنوان `label`.
- */
+
 export function mapListOptions(options: { value: string }[]): CountableOption[] {
   return options.map((opt) => ({ value: opt.value, label: opt.value }));
 }

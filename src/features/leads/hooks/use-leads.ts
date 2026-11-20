@@ -191,7 +191,6 @@ export function useBulkCheckContacts() {
       queryClient.invalidateQueries({ queryKey: [LEADS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
 
-      // ✅ مدیریت toast در hook (بیرون از کامپوننت)
       if (data.matchedCount === 0) {
         toast('هیچ سرنخی با این شماره‌ها پیدا نشد', { icon: 'ℹ️' });
       } else if (data.newlySavedCount > 0) {

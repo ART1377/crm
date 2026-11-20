@@ -8,11 +8,11 @@ export const leadSchema = z.object({
   phoneNumber: z.string().min(10, 'شماره تماس معتبر نیست'),
   secondaryPhone: z.string().optional(),
   industry: z.string().min(1, 'حوزه فعالیت الزامی است'),
-  source: z.string().default('DIRECT'),
+  source: z.string().default('مستقیم'),
   status: z.string().default('NEW'),
   notes: z.string().optional(),
   address: z.string().optional(),
   website: z.string().optional(),
-  rating: z.number().min(0).max(5).optional(), // حذف .nullable()
+  rating: z.number().min(0).max(5).optional(),
   category: z.string().optional(),
 });
