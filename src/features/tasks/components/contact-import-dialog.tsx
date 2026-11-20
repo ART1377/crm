@@ -2,10 +2,9 @@
 
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { BookmarkCheck, CheckCircle2, FileText, Loader2, Phone, Upload, X } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,106 +14,46 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
-import { useBulkCheckContacts } from '@/features/leads/hooks/use-leads';
-import type { BulkCheckContactsResult } from '@/features/leads/types/leads-types';
+import { useContactImport } from '../hooks/use-contact-import';
 
-import { extractPhonesFromText, parseVCardPhones } from '@/lib/phone-utils';
 import { cn } from '@/lib/utils';
-
-type Stage = 'idle' | 'parsed' | 'loading' | 'done';
 
 export function ContactImportDialog() {
   const [open, setOpen] = useState(false);
-  const [stage, setStage] = useState<Stage>('idle');
-  const [phones, setPhones] = useState<string[]>([]);
-  const [fileName, setFileName] = useState<string>('');
-  const [result, setResult] = useState<BulkCheckContactsResult | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const bulkCheck = useBulkCheckContacts(); // ✅ هوک جدید
+  const {
+    stage,
+    phones,
+    fileName,
+    result,
+    dragging,
+    fileInputRef,
+    reset,
+    openFilePicker,
+    handleFile,
+    handleDrop,
+    handleDragOver,
+    handleDragLeave,
+    handleApply,
+    isApplying,
+  } = useContactImport();
 
-  const reset = () => {
-    setStage('idle');
-    setPhones([]);
-    setFileName('');
-    setResult(null);
-  };
-
-  const handleFile = async (file: File) => {
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('حجم فایل بیشتر از ۱۰ مگابایت است');
-      return;
-    }
-
-    setFileName(file.name);
-
-    try {
-      const text = await file.text();
-
-      let extracted = parseVCardPhones(text);
-      if (extracted.length === 0) {
-        extracted = extractPhonesFromText(text);
-      }
-
-      if (extracted.length === 0) {
-        toast.error('هیچ شماره‌ای در فایل پیدا نشد');
-        setStage('idle');
-        return;
-      }
-
-      setPhones(extracted);
-      setStage('parsed');
-      toast.success(`${extracted.length} شماره از فایل استخراج شد`);
-    } catch {
-      toast.error('خطا در خواندن فایل');
-      setStage('idle');
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFile(file);
-  };
-
-  // ✅ فقط mutation را صدا بزن — toast و invalidate در hook انجام می‌شود
-  const handleApply = () => {
-    if (phones.length === 0) return;
-    setStage('loading');
-
-    bulkCheck.mutate(
-      { phones, apply: true },
-      {
-        onSuccess: (data) => {
-          setResult(data);
-          setStage('done');
-        },
-        onError: () => {
-          setStage('parsed');
-        },
-      }
-    );
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) reset();
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) reset();
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Upload className="h-4 w-4" />
           بررسی مخاطبین گوشی
         </Button>
       </DialogTrigger>
+
       <DialogContent className="flex max-h-[90dvh] max-w-md flex-col overflow-hidden">
         <DialogHeader className="shrink-0">
           <DialogTitle className="text-base font-bold">بررسی مخاطبین گوشی</DialogTitle>
@@ -131,13 +70,10 @@ export function ContactImportDialog() {
           {stage === 'idle' && (
             <>
               <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={openFilePicker}
                 className={cn(
                   'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition-colors',
                   dragging
@@ -151,14 +87,14 @@ export function ContactImportDialog() {
                 <p className="text-sm font-medium">فایل vCard را اینجا رها کنید</p>
                 <p className="text-muted-foreground text-xs">یا کلیک کنید تا انتخاب شود</p>
               </div>
-              <input
+
+              <Input
                 ref={fileInputRef}
                 type="file"
                 accept=".vcf,.vcard,text/vcard,text/x-vcard,*/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFile(file);
+                  handleFile(e.target.files?.[0]);
                   e.target.value = '';
                 }}
               />
@@ -184,9 +120,13 @@ export function ContactImportDialog() {
                 <Button
                   onClick={handleApply}
                   className="flex-1 gap-2"
-                  disabled={phones.length === 0}
+                  disabled={phones.length === 0 || isApplying}
                 >
-                  <BookmarkCheck className="h-4 w-4" />
+                  {isApplying ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <BookmarkCheck className="h-4 w-4" />
+                  )}
                   بررسی و علامت‌گذاری
                 </Button>
                 <Button variant="outline" size="icon" onClick={reset} title="فایل جدید">
@@ -207,7 +147,6 @@ export function ContactImportDialog() {
           {/* Stage: done → results */}
           {stage === 'done' && result && (
             <>
-              {/* آمار */}
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
                   <p className="text-muted-foreground text-[10px]">شماره‌های یکتا</p>
@@ -227,7 +166,6 @@ export function ContactImportDialog() {
                 </div>
               </div>
 
-              {/* لیست سرنخ‌های پیدا‌شده */}
               {result.matchedLeads.length > 0 && (
                 <div className="space-y-1.5">
                   <p className="text-muted-foreground text-xs font-medium">
