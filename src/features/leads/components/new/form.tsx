@@ -97,7 +97,7 @@ export function LeadForm({ form }: { form: UseFormReturn<CreateLeadData> }) {
           />
         </FormField>
 
-        <FormField label="منبع سرنخ" error={errors.source?.message}>
+        <FormField label="منبع سرنخ *" error={errors.source?.message}>
           <ComboboxInput
             value={form.watch('source') ?? ''}
             onChange={(value) => form.setValue('source', value)}

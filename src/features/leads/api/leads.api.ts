@@ -4,7 +4,13 @@ import { LEADS_PAGE_SIZE } from '@/constants/constants';
 
 import { Task } from '@/features/tasks/types/tasks-types';
 
-import { BulkCheckContactsResult, CreateLeadData, Lead, LeadFilters, UpdateLeadData } from '../types/leads-types';
+import {
+  BulkCheckContactsResult,
+  CreateLeadData,
+  Lead,
+  LeadFilters,
+  UpdateLeadData,
+} from '../types/leads-types';
 
 const LEADS_ENDPOINT = '/leads';
 

@@ -25,7 +25,6 @@ export function withCount(
     .sort((a, b) => b.count - a.count);
 }
 
-
 export function mapListOptions(options: { value: string }[]): CountableOption[] {
   return options.map((opt) => ({ value: opt.value, label: opt.value }));
 }

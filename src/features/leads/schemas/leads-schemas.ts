@@ -8,7 +8,7 @@ export const leadSchema = z.object({
   phoneNumber: z.string().min(10, 'شماره تماس معتبر نیست'),
   secondaryPhone: z.string().optional(),
   industry: z.string().min(1, 'حوزه فعالیت الزامی است'),
-  source: z.string().default('مستقیم'),
+  source: z.string().min(1, 'منبع سرنخ الزامی است'),
   status: z.string().default('NEW'),
   notes: z.string().optional(),
   address: z.string().optional(),

@@ -33,7 +33,7 @@ export interface CreateLeadData {
   phoneNumber: string;
   secondaryPhone?: string;
   industry: string;
-  source?: string;
+  source: string;
   notes?: string;
   address?: string;
   website?: string;
