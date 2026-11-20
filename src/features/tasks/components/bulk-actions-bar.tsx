@@ -55,7 +55,6 @@ export function BulkActionsBar({
       { ids: selectedIds, data: { isCompleted } },
       {
         onSuccess: () => {
-          // ✅ پاک کردن انتخاب بعد از بروزرسانی گروهی موفق
           onClearSelection();
         },
       }
