@@ -37,6 +37,24 @@ const CHANNEL_META: Record<string, { icon: IconComponent; label: string; color: 
   OTHER: { icon: OtherIcon, label: 'سایر', color: 'text-muted-foreground' },
 };
 
+// ✅ ترتیب نمایش در Popover و کارت
+const CHANNEL_ORDER: string[] = [
+  'WHATSAPP',
+  'ETA',
+  'BALE',
+  'RUBIKA',
+  'SMS',
+  'CALL',
+  'INSTAGRAM',
+  'TELEGRAM',
+  'OTHER',
+];
+
+// ✅ ترتیب نمایش برای کارت (فقط موارد فعال، بر اساس CHANNEL_ORDER)
+function sortChannels(keys: string[]): string[] {
+  return [...keys].sort((a, b) => CHANNEL_ORDER.indexOf(a) - CHANNEL_ORDER.indexOf(b));
+}
+
 interface TaskChannelIconsProps {
   leadId: string;
   channels: string;
@@ -48,8 +66,9 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
   const { data: messengers = [] } = useMessengers();
   const updateChannels = useUpdateChannels();
 
-  const channelKeys = channels ? channels.split(',').filter(Boolean) : [];
-  const isEmpty = channelKeys.length === 0;
+  // ✅ کانال‌های فعال، مرتب‌شده بر اساس CHANNEL_ORDER
+  const activeChannels = sortChannels(channels ? channels.split(',').filter(Boolean) : []);
+  const isEmpty = activeChannels.length === 0;
 
   const getLink = (channelKey: string): string | null => {
     if (channelKey === 'CALL') return `tel:${phoneNumber}`;
@@ -77,17 +96,17 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
   };
 
   const toggleChannel = (key: string) => {
-    const next = channelKeys.includes(key)
-      ? channelKeys.filter((k) => k !== key)
-      : [...channelKeys, key];
+    const next = activeChannels.includes(key)
+      ? activeChannels.filter((k) => k !== key)
+      : [...activeChannels, key];
 
     updateChannels.mutate({ id: leadId, channels: next.join(',') });
   };
 
   return (
     <div className="flex flex-wrap items-center gap-1">
-      {/* نمایش کانال‌های فعلی */}
-      {channelKeys.map((key) => {
+      {/* ✅ نمایش کانال‌های فعلی — با ترتیب دلخواه */}
+      {activeChannels.map((key) => {
         const meta = CHANNEL_META[key];
         if (!meta) return null;
 
@@ -126,9 +145,7 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
             title={isEmpty ? 'افزودن روش ارتباطی' : 'ویرایش روش‌های ارتباطی'}
             className={cn(
               'text-muted-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border transition-all',
-              isEmpty
-                ? 'border-muted-foreground/40 border-dashed' // حالت خالی: dashed
-                : 'border-border bg-background' // حالت پر: solid
+              isEmpty ? 'border-muted-foreground/40 border-dashed' : 'border-border bg-background'
             )}
           >
             {updateChannels.isPending ? (
@@ -155,24 +172,27 @@ export function TaskChannelIcons({ leadId, channels, phoneNumber }: TaskChannelI
                 <div>
                   <p className="text-xs font-semibold">روش‌های ارتباطی</p>
                   <p className="text-muted-foreground text-[10px]">
-                    {isEmpty ? 'هنوز کانالی انتخاب نشده' : `${channelKeys.length} کانال فعال`}
+                    {isEmpty ? 'هنوز کانالی انتخاب نشده' : `${activeChannels.length} کانال فعال`}
                   </p>
                 </div>
               </div>
               {!isEmpty && (
                 <span className="bg-primary text-primary-foreground flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold">
-                  {channelKeys.length}
+                  {activeChannels.length}
                 </span>
               )}
             </div>
           </div>
 
-          {/* گرید کانال‌ها */}
+          {/* ✅ گرید کانال‌ها — بر اساس CHANNEL_ORDER */}
           <div className="max-h-72 overflow-y-auto p-2">
             <div className="grid grid-cols-2 gap-1.5">
-              {Object.entries(CHANNEL_META).map(([key, meta]) => {
+              {CHANNEL_ORDER.map((key) => {
+                const meta = CHANNEL_META[key];
+                if (!meta) return null;
+
                 const Icon = meta.icon;
-                const isActive = channelKeys.includes(key);
+                const isActive = activeChannels.includes(key);
                 return (
                   <button
                     key={key}
